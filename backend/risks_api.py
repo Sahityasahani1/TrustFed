@@ -6,8 +6,10 @@ The browser must call this backend. Keep GEMINI_API_Key in the server .env,
 never in frontend JavaScript. ML output remains authoritative; Gemini explains it.
 """
 
+import io
 import json
 import os
+import time
 from pathlib import Path
 from typing import Any, Literal
 
@@ -17,8 +19,9 @@ import pandas as pd
 import requests
 import shap
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from predict_paysim import assess_transaction
@@ -29,6 +32,7 @@ load_dotenv(ROOT / ".env")
 load_dotenv(ROOT.parent / ".env")
 
 ARTIFACTS_DIR = (ROOT / "artifacts") if (ROOT / "artifacts").exists() else (ROOT.parent / "artifacts")
+SAMPLES_DIR = (ROOT / "samples") if (ROOT / "samples").exists() else (ROOT.parent / "backend" / "samples")
 MODEL_PATHS = {
     "banks": ARTIFACTS_DIR / "paysim" / "model.joblib",
     "creditfraud": ARTIFACTS_DIR / "creditfraud" / "model.joblib",
@@ -82,6 +86,20 @@ def _finite_number(payload, name, minimum=None):
     if minimum is not None and value < minimum:
         raise ValueError(f"{name} must be at least {minimum}")
     return value
+
+
+_PAYSIM_BUNDLE = None
+_PAYSIM_EXPLAINER = None
+
+def get_paysim_bundle():
+    global _PAYSIM_BUNDLE, _PAYSIM_EXPLAINER
+    if _PAYSIM_BUNDLE is None:
+        path = MODEL_PATHS["banks"]
+        if not path.is_file():
+            raise FileNotFoundError(f"PaySim model missing: {path}")
+        _PAYSIM_BUNDLE = joblib.load(path)
+        _PAYSIM_EXPLAINER = shap.TreeExplainer(_PAYSIM_BUNDLE["model"])
+    return _PAYSIM_BUNDLE, _PAYSIM_EXPLAINER
 
 
 _INS_BUNDLE = None
@@ -262,6 +280,342 @@ def run_ml(domain, user_input):
     if d in ("insurance", "insurers"):
         return _insurance_assessment(user_input)
     raise ValueError(f"Unknown domain: {domain}. Must be one of: banks, creditfraud, insurance")
+
+
+def _batch_assess_banks(records: list[dict[str, Any]]) -> dict[str, Any]:
+    t0 = time.perf_counter()
+    if not records:
+        return {
+            "domain": "banks",
+            "batch_summary": {"total_records": 0, "flagged_count": 0, "cleared_count": 0, "fraud_rate": 0.0, "mean_risk_score": 0.0, "p95_risk_score": 0.0, "decision_threshold": 0.40, "processing_time_ms": 0.0},
+            "records": []
+        }
+    
+    bundle, explainer = get_paysim_bundle()
+    model = bundle["model"]
+    cols = bundle["feature_columns"]
+    threshold = float(bundle.get("decision_threshold", 0.40))
+    
+    df = pd.DataFrame(records)
+    steps = pd.to_numeric(df.get("step", 1), errors="coerce").fillna(1).astype(int)
+    amounts = pd.to_numeric(df.get("amount", 0.0), errors="coerce").fillna(0.0).astype(float)
+    old_orgs = pd.to_numeric(df.get("oldbalanceOrg", 0.0), errors="coerce").fillna(0.0).astype(float)
+    old_dests = pd.to_numeric(df.get("oldbalanceDest", 0.0), errors="coerce").fillna(0.0).astype(float)
+    types = df.get("type", "PAYMENT").astype(str).str.strip().str.upper()
+    
+    drain_ratios = np.where(old_orgs > 0, amounts / (old_orgs + 1.0), 0.0)
+    is_dest_zeros = (old_dests == 0.0).astype(int)
+    
+    features = pd.DataFrame({
+        "step": steps,
+        "amount": amounts,
+        "oldbalanceOrg": old_orgs,
+        "oldbalanceDest": old_dests,
+        "drain_ratio": drain_ratios,
+        "is_dest_zero": is_dest_zeros,
+    })
+    for cat in ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"]:
+        features[f"type_{cat}"] = (types == cat).astype(int)
+        
+    encoded = features.reindex(columns=cols, fill_value=0.0).fillna(0.0)
+    raw_probs = model.predict_proba(encoded)[:, 1]
+    
+    if bundle.get("calibrator") is not None:
+        clipped = np.clip(raw_probs, 1e-6, 1.0 - 1e-6)
+        logits = np.log(clipped / (1.0 - clipped)).reshape(-1, 1)
+        probs = bundle["calibrator"].predict_proba(logits)[:, 1]
+    else:
+        probs = raw_probs
+        
+    scores = np.round(probs * 100.0, 2)
+    is_flagged = probs >= threshold
+    
+    anomaly_scores = [None] * len(records)
+    if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
+        raw_anom = bundle["anomaly_model"].decision_function(encoded)
+        ref = np.asarray(bundle["anomaly_reference_scores"])
+        anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
+        
+    shap_vals = explainer(encoded)
+    vals = np.asarray(shap_vals.values)
+    if vals.ndim == 3:
+        vals = vals[:, :, -1]
+    top_indices = np.argmax(np.abs(vals), axis=1)
+    
+    results = []
+    for i, r in enumerate(records):
+        rec_id = str(r.get("transaction_id", f"TX-B-{i+1:04d}"))
+        top_col = cols[top_indices[i]]
+        top_imp = float(vals[i, top_indices[i]])
+        results.append({
+            "row_index": i,
+            "record_id": rec_id,
+            "fraud_probability": round(float(probs[i]), 4),
+            "risk_score": float(scores[i]),
+            "decision_threshold": round(threshold, 4),
+            "classification": "fraud" if bool(is_flagged[i]) else "safe",
+            "anomaly_score": float(anomaly_scores[i]) if anomaly_scores[i] is not None else None,
+            "top_factor": {
+                "feature": top_col,
+                "impact_log_odds": round(top_imp, 3),
+                "direction": "increases_risk" if top_imp > 0 else "decreases_risk"
+            },
+            "summary": f"{types.iloc[i]} ${amounts.iloc[i]:,.2f} (Drain: {drain_ratios[i]:.0%})",
+            "raw_record": r
+        })
+        
+    elapsed_ms = (time.perf_counter() - t0) * 1000
+    n = len(records)
+    flagged_sum = int(np.sum(is_flagged))
+    
+    return {
+        "domain": "banks",
+        "batch_summary": {
+            "total_records": n,
+            "flagged_count": flagged_sum,
+            "cleared_count": n - flagged_sum,
+            "fraud_rate": round(flagged_sum / max(n, 1), 4),
+            "mean_risk_score": round(float(np.mean(scores)), 2),
+            "p95_risk_score": round(float(np.percentile(scores, 95)), 2) if n > 0 else 0.0,
+            "decision_threshold": round(threshold, 4),
+            "processing_time_ms": round(elapsed_ms, 2)
+        },
+        "records": results
+    }
+
+
+def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
+    t0 = time.perf_counter()
+    if not records:
+        return {
+            "domain": "lenders",
+            "batch_summary": {"total_records": 0, "flagged_count": 0, "cleared_count": 0, "fraud_rate": 0.0, "mean_risk_score": 0.0, "p95_risk_score": 0.0, "decision_threshold": 0.1557, "processing_time_ms": 0.0},
+            "records": []
+        }
+    
+    bundle, explainer = get_creditfraud_bundle()
+    model = bundle["model"]
+    cols = bundle["feature_columns"]
+    threshold = float(bundle.get("decision_threshold", 0.15566))
+    
+    df = pd.DataFrame(records)
+    income = pd.to_numeric(df.get("amt_income_total", df.get("AMT_INCOME_TOTAL", 270000.0)), errors="coerce").fillna(270000.0).astype(float)
+    credit = pd.to_numeric(df.get("amt_credit", df.get("AMT_CREDIT", 1031053.5)), errors="coerce").fillna(1031053.5).astype(float)
+    annuity = pd.to_numeric(df.get("amt_annuity", df.get("AMT_ANNUITY", 34204.5)), errors="coerce").fillna(34204.5).astype(float)
+    goods_price = pd.to_numeric(df.get("amt_goods_price", df.get("AMT_GOODS_PRICE", credit * 0.9)), errors="coerce").fillna(credit * 0.9).astype(float)
+    ext2 = pd.to_numeric(df.get("ext_source_2", df.get("EXT_SOURCE_2", 0.55)), errors="coerce").fillna(0.55).astype(float)
+    ext3 = pd.to_numeric(df.get("ext_source_3", df.get("EXT_SOURCE_3", 0.45)), errors="coerce").fillna(0.45).astype(float)
+    days_birth = pd.to_numeric(df.get("days_birth", df.get("DAYS_BIRTH", -14500)), errors="coerce").fillna(-14500).astype(float)
+    days_employed = pd.to_numeric(df.get("days_employed", df.get("DAYS_EMPLOYED", -2500)), errors="coerce").fillna(-2500).astype(float)
+    contract_types = df.get("contract_type", df.get("NAME_CONTRACT_TYPE", "Cash loans")).astype(str).str.strip()
+    genders = df.get("code_gender", df.get("CODE_GENDER", "M")).astype(str).str.strip().str.upper()
+    
+    feat_df = pd.DataFrame(0.0, index=df.index, columns=cols)
+    feat_df["AMT_INCOME_TOTAL"] = income
+    feat_df["AMT_CREDIT"] = credit
+    feat_df["AMT_ANNUITY"] = annuity
+    feat_df["AMT_GOODS_PRICE"] = goods_price
+    feat_df["EXT_SOURCE_2"] = ext2
+    feat_df["EXT_SOURCE_3"] = ext3
+    feat_df["DAYS_BIRTH"] = days_birth
+    feat_df["DAYS_EMPLOYED"] = days_employed
+    feat_df["CREDIT_TERM"] = annuity / (credit + 1.0)
+    feat_df["ANNUITY_INCOME_RATIO"] = annuity / (income + 1.0)
+    
+    for idx, ctype in enumerate(contract_types):
+        col = f"NAME_CONTRACT_TYPE_{ctype}"
+        if col in feat_df.columns:
+            feat_df.loc[idx, col] = 1.0
+    for idx, g in enumerate(genders):
+        col = f"CODE_GENDER_{g}"
+        if col in feat_df.columns:
+            feat_df.loc[idx, col] = 1.0
+            
+    encoded = feat_df.fillna(0.0)
+    raw_probs = model.predict_proba(encoded)[:, 1]
+    
+    if bundle.get("calibrator") is not None:
+        clipped = np.clip(raw_probs, 1e-6, 1.0 - 1e-6)
+        logits = np.log(clipped / (1.0 - clipped)).reshape(-1, 1)
+        probs = bundle["calibrator"].predict_proba(logits)[:, 1]
+    else:
+        probs = raw_probs
+        
+    scores = np.round(probs * 100.0, 2)
+    is_flagged = probs >= threshold
+    
+    anomaly_scores = [None] * len(records)
+    if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
+        raw_anom = bundle["anomaly_model"].decision_function(encoded)
+        ref = np.asarray(bundle["anomaly_reference_scores"])
+        anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
+        
+    shap_vals = explainer(encoded)
+    vals = np.asarray(shap_vals.values)
+    if vals.ndim == 3:
+        vals = vals[:, :, -1]
+    top_indices = np.argmax(np.abs(vals), axis=1)
+    
+    results = []
+    for i, r in enumerate(records):
+        rec_id = str(r.get("applicant_id", f"APP-LN-{i+1:04d}"))
+        top_col = cols[top_indices[i]]
+        top_imp = float(vals[i, top_indices[i]])
+        results.append({
+            "row_index": i,
+            "record_id": rec_id,
+            "fraud_probability": round(float(probs[i]), 4),
+            "risk_score": float(scores[i]),
+            "decision_threshold": round(threshold, 4),
+            "classification": "fraud" if bool(is_flagged[i]) else "safe",
+            "anomaly_score": float(anomaly_scores[i]) if anomaly_scores[i] is not None else None,
+            "top_factor": {
+                "feature": top_col,
+                "impact_log_odds": round(top_imp, 3),
+                "direction": "increases_risk" if top_imp > 0 else "decreases_risk"
+            },
+            "summary": f"${credit.iloc[i]:,.0f} Credit | Income ${income.iloc[i]:,.0f} | Ext2: {ext2.iloc[i]:.2f}",
+            "raw_record": r
+        })
+        
+    elapsed_ms = (time.perf_counter() - t0) * 1000
+    n = len(records)
+    flagged_sum = int(np.sum(is_flagged))
+    
+    return {
+        "domain": "lenders",
+        "batch_summary": {
+            "total_records": n,
+            "flagged_count": flagged_sum,
+            "cleared_count": n - flagged_sum,
+            "fraud_rate": round(flagged_sum / max(n, 1), 4),
+            "mean_risk_score": round(float(np.mean(scores)), 2),
+            "p95_risk_score": round(float(np.percentile(scores, 95)), 2) if n > 0 else 0.0,
+            "decision_threshold": round(threshold, 4),
+            "processing_time_ms": round(elapsed_ms, 2)
+        },
+        "records": results
+    }
+
+
+def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
+    t0 = time.perf_counter()
+    if not records:
+        return {
+            "domain": "insurers",
+            "batch_summary": {"total_records": 0, "flagged_count": 0, "cleared_count": 0, "fraud_rate": 0.0, "mean_risk_score": 0.0, "p95_risk_score": 0.0, "decision_threshold": 0.1798, "processing_time_ms": 0.0},
+            "records": []
+        }
+    
+    bundle, explainer = get_insurance_bundle()
+    model = bundle["model"]
+    cols = bundle["feature_columns"]
+    threshold = float(bundle.get("decision_threshold", 0.1798))
+    
+    df = pd.DataFrame(records)
+    claim_types = df.get("claim_type", "home").astype(str).str.strip().str.lower()
+    states = df.get("state", "CA").astype(str).str.strip().str.upper()
+    tenure = pd.to_numeric(df.get("policyholder_tenure_years", 1.0), errors="coerce").fillna(1.0).astype(float)
+    previous = pd.to_numeric(df.get("previous_claims_count", 0), errors="coerce").fillna(0).astype(float)
+    amount = pd.to_numeric(df.get("claim_amount", 5000.0), errors="coerce").fillna(5000.0).astype(float)
+    deductible = pd.to_numeric(df.get("deductible", 1000.0), errors="coerce").fillna(1000.0).astype(float)
+    
+    incidents = pd.to_datetime(df.get("incident_date", "2025-01-01"), errors="coerce")
+    fileds = pd.to_datetime(df.get("claim_filed_date", "2025-01-05"), errors="coerce")
+    filing_delay = (fileds - incidents).dt.days.fillna(4).astype(int)
+    
+    features = pd.DataFrame({
+        "policyholder_tenure_years": tenure,
+        "previous_claims_count": previous,
+        "claim_amount": amount,
+        "deductible": deductible,
+        "filing_delay_days": filing_delay,
+        "claim_to_deductible_ratio": amount / (deductible + 1.0),
+        "claim_amount_log": np.log1p(amount),
+    })
+    
+    for ct in ["auto", "business", "home", "property", "renters", "nan"]:
+        features[f"claim_type_{ct}"] = (claim_types == ct).astype(np.uint8)
+        
+    for st in ["AL", "AR", "AZ", "CA", "CO", "CT", "FL", "GA", "HI", "IA", "ID", "IL", "IN", "KS", "KY", "LA", "MA", "MD", "MI", "MN", "MO", "MS", "NC", "NE", "NJ", "NM", "NV", "NY", "OH", "OK", "OR", "PA", "SC", "TN", "TX", "UT", "VA", "WA", "WI", "WV", "nan"]:
+        features[f"state_{st}"] = (states == st).astype(np.uint8)
+        
+    encoded = features.reindex(columns=cols, fill_value=0).fillna(0)
+    raw_probs = model.predict_proba(encoded)[:, 1]
+    
+    if bundle.get("calibrator") is not None:
+        clipped = np.clip(raw_probs, 1e-6, 1.0 - 1e-6)
+        logits = np.log(clipped / (1.0 - clipped)).reshape(-1, 1)
+        probs = bundle["calibrator"].predict_proba(logits)[:, 1]
+    else:
+        probs = raw_probs
+        
+    scores = np.round(probs * 100.0, 2)
+    is_flagged = probs >= threshold
+    
+    anomaly_scores = [None] * len(records)
+    if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
+        raw_anom = bundle["anomaly_model"].decision_function(encoded)
+        ref = np.asarray(bundle["anomaly_reference_scores"])
+        anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
+        
+    shap_vals = explainer(encoded)
+    vals = np.asarray(shap_vals.values)
+    if vals.ndim == 3:
+        vals = vals[:, :, -1]
+    top_indices = np.argmax(np.abs(vals), axis=1)
+    
+    results = []
+    for i, r in enumerate(records):
+        rec_id = str(r.get("claim_id", f"CLM-IN-{i+1:04d}"))
+        top_col = cols[top_indices[i]]
+        top_imp = float(vals[i, top_indices[i]])
+        results.append({
+            "row_index": i,
+            "record_id": rec_id,
+            "fraud_probability": round(float(probs[i]), 4),
+            "risk_score": float(scores[i]),
+            "decision_threshold": round(threshold, 4),
+            "classification": "fraud" if bool(is_flagged[i]) else "safe",
+            "anomaly_score": float(anomaly_scores[i]) if anomaly_scores[i] is not None else None,
+            "top_factor": {
+                "feature": top_col,
+                "impact_log_odds": round(top_imp, 3),
+                "direction": "increases_risk" if top_imp > 0 else "decreases_risk"
+            },
+            "summary": f"{claim_types.iloc[i].upper()} Claim ${amount.iloc[i]:,.2f} ({states.iloc[i]})",
+            "raw_record": r
+        })
+        
+    elapsed_ms = (time.perf_counter() - t0) * 1000
+    n = len(records)
+    flagged_sum = int(np.sum(is_flagged))
+    
+    return {
+        "domain": "insurers",
+        "batch_summary": {
+            "total_records": n,
+            "flagged_count": flagged_sum,
+            "cleared_count": n - flagged_sum,
+            "fraud_rate": round(flagged_sum / max(n, 1), 4),
+            "mean_risk_score": round(float(np.mean(scores)), 2),
+            "p95_risk_score": round(float(np.percentile(scores, 95)), 2) if n > 0 else 0.0,
+            "decision_threshold": round(threshold, 4),
+            "processing_time_ms": round(elapsed_ms, 2)
+        },
+        "records": results
+    }
+
+
+def run_batch_ml(domain: str, records: list[dict[str, Any]]) -> dict[str, Any]:
+    d = domain.lower()
+    if d in ("banks", "paysim"):
+        return _batch_assess_banks(records)
+    if d in ("creditfraud", "lenders"):
+        return _batch_assess_creditfraud(records)
+    if d in ("insurance", "insurers"):
+        return _batch_assess_insurance(records)
+    raise ValueError(f"Unknown domain: {domain}. Must be one of: banks, lenders, insurers")
 
 
 def local_reasoning(domain, ml_json):
@@ -487,3 +841,79 @@ def assess(request: AssessRequest):
 
     reasoning = gemini_reasoning(request.domain, ml_json) if request.include_ai_reasoning else None
     return {"domain": request.domain, "ml_risk_json": ml_json, "ai_reasoning": reasoning}
+
+
+class BatchAssessRequest(BaseModel):
+    domain: Literal["banks", "lenders", "insurers", "creditfraud", "insurance"]
+    records: list[dict[str, Any]] = Field(..., description="List of transactions/applications/claims to screen")
+
+
+@app.post("/api/assess/batch")
+def assess_batch(request: BatchAssessRequest):
+    """Vectorized high-throughput batch screening endpoint."""
+    try:
+        return run_batch_ml(request.domain, request.records)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/api/assess/upload")
+async def assess_upload(file: UploadFile = File(...), domain: str = Form(...)):
+    """Upload CSV or JSON file for immediate vectorized screening."""
+    try:
+        content = await file.read()
+        filename = file.filename.lower()
+        if filename.endswith(".json"):
+            records = json.loads(content.decode("utf-8"))
+            if isinstance(records, dict) and "records" in records:
+                records = records["records"]
+            elif not isinstance(records, list):
+                records = [records]
+        elif filename.endswith(".csv"):
+            df = pd.read_csv(io.StringIO(content.decode("utf-8", errors="replace")))
+            records = df.to_dict(orient="records")
+        else:
+            raise ValueError("Unsupported file format. Please upload a valid .csv or .json file.")
+
+        return run_batch_ml(domain, records)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/samples/{domain}")
+def get_sample_records(domain: str):
+    """Retrieve preloaded demo batch records for instant 1-click testing."""
+    d = domain.lower()
+    mapping = {
+        "banks": "sample_banks_batch.csv",
+        "paysim": "sample_banks_batch.csv",
+        "lenders": "sample_lenders_batch.csv",
+        "creditfraud": "sample_lenders_batch.csv",
+        "insurers": "sample_insurers_batch.csv",
+        "insurance": "sample_insurers_batch.csv",
+    }
+    fname = mapping.get(d)
+    if not fname:
+        raise HTTPException(status_code=404, detail=f"No sample available for domain '{domain}'")
+    file_path = SAMPLES_DIR / fname
+    if not file_path.is_file():
+        raise HTTPException(status_code=404, detail="Sample file not found on server")
+    df = pd.read_csv(file_path)
+    return {
+        "domain": domain,
+        "filename": fname,
+        "total_records": len(df),
+        "records": df.to_dict(orient="records"),
+    }
+
+
+@app.get("/api/samples/download/{filename}")
+def download_sample_file(filename: str):
+    """Download template or sample CSV file."""
+    file_path = SAMPLES_DIR / filename
+    if not file_path.is_file():
+        raise HTTPException(status_code=404, detail="Requested file not found")
+    return FileResponse(file_path, filename=filename, media_type="text/csv")
+

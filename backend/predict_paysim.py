@@ -96,21 +96,29 @@ def validate_payload(payload, feature_columns):
 
 
 def make_features(transaction, feature_columns):
+    amount = float(transaction.get("amount", 0.0))
+    old_org = float(transaction.get("oldbalanceOrg", 0.0))
+    old_dest = float(transaction.get("oldbalanceDest", 0.0))
+    
     row = {
         "step": transaction["step"],
-        "amount": transaction["amount"],
-        "amount_log": float(np.log1p(transaction["amount"])),
+        "amount": amount,
+        "amount_log": float(np.log1p(amount)),
+        "oldbalanceOrg": old_org,
+        "oldbalanceDest": old_dest,
+        "drain_ratio": amount / (abs(old_org) + 1.0) if old_org > 0 else 0.0,
+        "is_dest_zero": 1 if old_dest == 0.0 else 0,
     }
-    for name in ["oldbalanceOrg", "newbalanceOrig", "oldbalanceDest", "newbalanceDest"]:
+    for name in ["newbalanceOrig", "newbalanceDest"]:
         if name in transaction:
             row[name] = transaction[name]
     if "oldbalanceOrg" in transaction:
-        row["amount_to_origin_balance"] = transaction["amount"] / (abs(transaction["oldbalanceOrg"]) + 1.0)
+        row["amount_to_origin_balance"] = amount / (abs(old_org) + 1.0)
     if "oldbalanceOrg" in transaction and "newbalanceOrig" in transaction:
-        row["balance_change_origin"] = transaction["oldbalanceOrg"] - transaction["newbalanceOrig"]
-        row["origin_balance_remaining_ratio"] = transaction["newbalanceOrig"] / (abs(transaction["oldbalanceOrg"]) + 1.0)
+        row["balance_change_origin"] = old_org - transaction["newbalanceOrig"]
+        row["origin_balance_remaining_ratio"] = transaction["newbalanceOrig"] / (abs(old_org) + 1.0)
     if "oldbalanceDest" in transaction and "newbalanceDest" in transaction:
-        row["balance_change_destination"] = transaction["newbalanceDest"] - transaction["oldbalanceDest"]
+        row["balance_change_destination"] = transaction["newbalanceDest"] - old_dest
     for category in ALLOWED_TYPES:
         row[f"type_{category}"] = int(transaction["type"] == category)
     row["type_nan"] = 0
@@ -119,7 +127,6 @@ def make_features(transaction, feature_columns):
 
 def assess_transaction(payload, artifact_path=ARTIFACT):
     """Return a JSON-serializable risk assessment for one website form payload."""
-    transaction = validate_payload(payload)
     if not Path(artifact_path).is_file():
         raise FileNotFoundError(f"Trained PaySim model not found: {artifact_path}")
     bundle = joblib.load(artifact_path)
@@ -128,9 +135,12 @@ def assess_transaction(payload, artifact_path=ARTIFACT):
     features = make_features(transaction, bundle["feature_columns"])
 
     raw_probability = float(model.predict_proba(features)[0, 1])
-    clipped = float(np.clip(raw_probability, 1e-6, 1 - 1e-6))
-    logit = np.array([[np.log(clipped / (1 - clipped))]])
-    probability = float(bundle["calibrator"].predict_proba(logit)[0, 1])
+    if bundle.get("calibrator") is not None:
+        clipped = float(np.clip(raw_probability, 1e-6, 1 - 1e-6))
+        logit = np.array([[np.log(clipped / (1 - clipped))]])
+        probability = float(bundle["calibrator"].predict_proba(logit)[0, 1])
+    else:
+        probability = raw_probability
     threshold = float(bundle["decision_threshold"])
 
     anomaly_raw = float(bundle["anomaly_model"].decision_function(features)[0])

@@ -1,0 +1,2 @@
+claim_id,claim_type,state,policyholder_tenure_years,previous_claims_count,incident_date,claim_filed_date,claim_amount,deductible
+CLM-IN-3001,home,CA,8.5,0,2025-06-10,2025-06-12,4200.0,1500.0

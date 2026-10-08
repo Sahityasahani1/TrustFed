@@ -14,13 +14,15 @@ import {
   BarChart3, 
   ChevronDown, 
   Bot, 
-  Umbrella 
+  Umbrella,
+  Upload 
 } from 'lucide-react';
 
 import { TiltedCard } from '../react-bits/TiltedCard';
 import { CountUp } from '../react-bits/CountUp';
 import { BorderBeam } from '../react-bits/BorderBeam';
 import { TabsNav } from '../tabs/TabsNav';
+import { BatchScreeningWorkbench } from './BatchScreeningWorkbench';
 import { assessRisk, checkBackendHealth } from '../../risk_api_client';
 
 export interface InsuranceRiskResult {
@@ -87,7 +89,9 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
 
   useEffect(() => {
     if (activeSubTab) {
-      if (activeSubTab.includes('metric')) {
+      if (activeSubTab.includes('batch')) {
+        setInternalSubTab('batch');
+      } else if (activeSubTab.includes('metric')) {
         setInternalSubTab('metrics');
       } else {
         setInternalSubTab('showdown');
@@ -110,7 +114,7 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
 
   const handleSubTabSwitch = (id: string) => {
     setInternalSubTab(id);
-    onSubTabChange?.(id === 'metrics' ? 'ins-metrics' : 'ins-showdown');
+    onSubTabChange?.(id === 'batch' ? 'ins-batch' : id === 'metrics' ? 'ins-metrics' : 'ins-showdown');
   };
 
   const isDirty =
@@ -304,7 +308,8 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
         <TabsNav
           tabs={[
             { id: 'showdown', label: '1. Claim Inputs & Showdown', icon: <Umbrella className="w-3.5 h-3.5" />, badge: 'Live Inference' },
-            { id: 'metrics', label: '2. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'ROC-AUC 0.793' },
+            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: '20-Claim Demo' },
+            { id: 'metrics', label: '3. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'ROC-AUC 0.793' },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -833,7 +838,25 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
           </motion.div>
         )}
 
-        {/* SUBTAB 2: BENCHMARK METRICS */}
+        {/* SUBTAB 2: BATCH SCREENING & TRIAGE WORKBENCH */}
+        {internalSubTab === 'batch' && (
+          <motion.div
+            key="subtab-batch"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <BatchScreeningWorkbench
+              domain="insurers"
+              domainTitle="Insurance Claims (SIU Fraud Detection)"
+              accentColor="teal"
+              templateFilename="template_insurers.csv"
+            />
+          </motion.div>
+        )}
+
+        {/* SUBTAB 3: BENCHMARK METRICS */}
         {internalSubTab === 'metrics' && (
           <motion.div
             key="subtab-metrics"

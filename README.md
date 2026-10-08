@@ -174,8 +174,10 @@ The platform provides an interactive sandbox for evaluating financial fraud risk
 TrustFed/
 ├── backend/                    # FastAPI Risk Engine & Machine Learning Pipelines
 │   ├── artifacts/              # Serialized ML models (GBDT, XGBoost, client silos)
+│   ├── samples/                # Production sample batches & CSV templates (Banks, Lenders, Insurers)
 │   ├── risk_api.py             # Primary entry point
-│   ├── risks_api.py            # API routes, inference pipeline & Gemini explainability
+│   ├── risks_api.py            # API routes, vectorized batch inference & Gemini explainability
+│   ├── test_batch_api.py       # Automated batch screening test suite and latency benchmark
 │   ├── predict_paysim.py       # PaySim inference engine
 │   ├── train_risk_models.py    # Federated model training suite
 │   ├── requirements.txt        # Backend dependencies
@@ -185,7 +187,9 @@ TrustFed/
 │   ├── public/                 # Static assets & typography
 │   ├── package.json            # Node dependencies & build scripts
 │   └── README.md               # Frontend documentation
-└── API_INTEGRATION.md          # API integration specifications
+├── API_INTEGRATION.md          # Complete API specifications (Single & Batch endpoints)
+├── TRD.md                      # Technical Requirements Document & Implementation Roadmap
+└── README.md                   # Platform documentation & pitch deck
 ```
 
 ---
@@ -222,10 +226,14 @@ source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
+# (Optional) Verify batch engine & latency benchmarks:
+python test_batch_api.py
+
 # Start Uvicorn server on port 8000
 python -m uvicorn risk_api:app --host 0.0.0.0 --port 8000 --reload
 ```
-*Health check:* `http://localhost:8000/health`
+*Health check:* `http://localhost:8000/health`  
+*Interactive API docs:* `http://localhost:8000/docs`
 
 ### 4. Start the Frontend Web Platform
 ```bash

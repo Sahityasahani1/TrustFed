@@ -6,7 +6,8 @@ import {
   ShieldCheck, 
   FileSpreadsheet, 
   Activity, 
-  ChevronDown 
+  ChevronDown,
+  Upload 
 } from 'lucide-react';
 
 export interface SubTabDef {
@@ -36,17 +37,24 @@ export const MAIN_TABS: MainTabDef[] = [
     subtabs: [
       {
         id: 'showdown',
-        label: '1. Transaction Feature Inputs & Showdown',
+        label: '1. Single Transaction Showdown',
         desc: 'Interactive sandbox testing step, type, amount, oldbalanceOrg & oldbalanceDest against Silo vs TrustFed models.',
         icon: <ShieldAlert className="w-4 h-4 text-emerald-600" />,
-        badge: 'PaySim Model',
+        badge: 'Single Calc',
+      },
+      {
+        id: 'batch',
+        label: '2. Batch Screening & Triage Queue',
+        desc: 'Vectorized bulk screening for PaySim transactions with real-time KPI ribbon, anomaly flags, and demo loader.',
+        icon: <Upload className="w-4 h-4 text-emerald-600" />,
+        badge: '⚡ 40-TX Demo',
       },
       {
         id: 'dictionary',
-        label: '2. Feature Dictionary & Technical Specs',
+        label: '3. Feature Dictionary & Technical Specs',
         desc: 'Official PaySim feature dictionary with Frontend Labels, technical descriptions, and input controls.',
         icon: <FileSpreadsheet className="w-4 h-4 text-cyan-600" />,
-        badge: 'Image 1 Table',
+        badge: 'Feature Specs',
       },
     ],
   },
@@ -62,11 +70,18 @@ export const MAIN_TABS: MainTabDef[] = [
         label: '1. Loan Application Inputs & Showdown',
         desc: 'Test applicant income, loan amount, annuity, and external credit ratings against XGBoost GBDT.',
         icon: <CreditCard className="w-4 h-4 text-blue-600" />,
-        badge: '500-Tree XGBoost',
+        badge: 'Single Calc',
+      },
+      {
+        id: 'cf-batch',
+        label: '2. Batch Screening & Triage Queue',
+        desc: 'High-throughput vectorized applicant screening with default risk alerts and CSV export.',
+        icon: <Upload className="w-4 h-4 text-blue-600" />,
+        badge: '⚡ 20-Loan Demo',
       },
       {
         id: 'cf-metrics',
-        label: '2. Federated Benchmark Metrics',
+        label: '3. Federated Benchmark Metrics',
         desc: '307,511 loans benchmark: ROC-AUC 0.7687, PR-AUC 0.2588, optimal cutoff 0.1557.',
         icon: <FileSpreadsheet className="w-4 h-4 text-indigo-600" />,
         badge: 'ROC-AUC 0.768',
@@ -85,11 +100,18 @@ export const MAIN_TABS: MainTabDef[] = [
         label: '1. Insurance Claim Inputs & Showdown',
         desc: 'Screen claim amount, deductible ratio, tenure, and filing delays against SIU fraud detection.',
         icon: <ShieldCheck className="w-4 h-4 text-teal-600" />,
-        badge: '54-Feature Model',
+        badge: 'Single Calc',
+      },
+      {
+        id: 'ins-batch',
+        label: '2. Batch Screening & Triage Queue',
+        desc: 'Screen claims in bulk with automated inflation and early-churn spike detection.',
+        icon: <Upload className="w-4 h-4 text-teal-600" />,
+        badge: '⚡ 20-Claim Demo',
       },
       {
         id: 'ins-metrics',
-        label: '2. Federated Benchmark Metrics',
+        label: '3. Federated Benchmark Metrics',
         desc: '1,000,000 policies benchmark: ROC-AUC 0.7933, PR-AUC 0.3161, optimal cutoff 0.1798.',
         icon: <FileSpreadsheet className="w-4 h-4 text-teal-600" />,
         badge: 'ROC-AUC 0.793',

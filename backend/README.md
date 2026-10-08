@@ -1,6 +1,6 @@
 # ⚙️ TrustFed Backend — Risk Inference & Explainability Engine
 
-High-performance FastAPI service providing federated machine learning risk assessments, SHAP driver attributions, and Google Gemini LLM audit brief explanations for financial fraud detection.
+High-performance FastAPI service providing federated machine learning risk assessments, vectorized high-throughput batch screening, SHAP driver attributions, and Google Gemini LLM audit brief explanations for financial fraud detection.
 
 ---
 
@@ -12,6 +12,13 @@ backend/
 │   ├── creditfraud/            # XGBoost GBDT (307k Home Credit applications)
 │   ├── insurance/              # 54-Feature GBDT (1M policy records) + 20 federated client silos
 │   └── paysim/                 # Platt-calibrated GBDT (PaySim financial transactions)
+├── samples/                    # Production sample batches & CSV templates
+│   ├── sample_banks_batch.csv      # 40 PaySim transactions (safe + 4 attacks)
+│   ├── sample_lenders_batch.csv    # 20 Loan applications (prime + high risk)
+│   ├── sample_insurers_batch.csv   # 20 Claims (standard + SIU spikes)
+│   ├── template_banks.csv          # Blank CSV template with headers
+│   ├── template_lenders.csv        # Blank CSV template with headers
+│   └── template_insurers.csv       # Blank CSV template with headers
 ├── check_gemini_models.py      # Diagnostic script to list & probe available Gemini models
 ├── check_insurance_ml.py       # Validation suite for insurance ML bundle
 ├── check_paysim_dataset.py     # PaySim data verification helper
@@ -23,6 +30,7 @@ backend/
 ├── requirements-ml.txt         # Scikit-learn, XGBoost & SHAP dependencies
 ├── risk_api.py                 # Primary entry point exporting FastAPI `app`
 ├── risks_api.py                # Comprehensive FastAPI route handlers & inference pipelines
+├── test_batch_api.py           # Automated test suite and latency benchmark for batch screening
 ├── train_demo_models.py        # Demo model generator
 ├── train_insurance.py          # Insurance model training runner
 ├── train_paysim.py             # PaySim model training runner
@@ -61,7 +69,14 @@ FRONTEND_ORIGINS="http://localhost:3000,http://localhost:5173"
 ```bash
 uvicorn risk_api:app --host 0.0.0.0 --port 8000 --reload
 ```
-The API will be available at `http://localhost:8000`.
+The API will be available at `http://localhost:8000`.  
+Interactive documentation at `http://localhost:8000/docs`.
+
+### 5. Running the Batch Test Suite
+Verify all single and batch inference endpoints with latency benchmarks:
+```bash
+python test_batch_api.py
+```
 
 ---
 
@@ -69,52 +84,28 @@ The API will be available at `http://localhost:8000`.
 
 ### 1. `GET /health`
 Returns system status, model artifact availability, and Gemini configuration status.
-```json
-{
-  "status": "ok",
-  "models": {
-    "banks": { "available": true, "artifact": "backend/artifacts/paysim/model.joblib" },
-    "creditfraud": { "available": true, "artifact": "backend/artifacts/creditfraud/model.joblib" },
-    "lenders": { "available": true, "artifact": "backend/artifacts/creditfraud/model.joblib" },
-    "insurance": { "available": true, "artifact": "backend/artifacts/insurance/model.joblib" },
-    "insurers": { "available": true, "artifact": "backend/artifacts/insurance/model.joblib" }
-  },
-  "gemini_configured": true
-}
-```
 
-### 2. `POST /api/assess`
-Main assessment endpoint accepting domain inputs, executing ML scoring, extracting SHAP factors, and generating plain-English LLM regulatory explanations.
+### 2. `POST /api/assess` (Single Record)
+Single transaction/application/claim risk assessment. Runs the authoritative ML model first, extracts top SHAP drivers, and queries Google Gemini for plain-English regulatory explainability.
 
-**Example Request (Banks / PaySim):**
+### 3. `POST /api/assess/batch` (Vectorized Batch Ingestion)
+High-throughput screening accepting JSON arrays of transactions or applications. Preprocesses and screens hundreds of records in bulk (<200ms) with zero LLM bottleneck.
 ```json
+POST /api/assess/batch
 {
   "domain": "banks",
-  "user_input": {
-    "step": 295,
-    "type": "CASH_OUT",
-    "amount": 172344.30,
-    "oldbalanceOrg": 172344.30,
-    "oldbalanceDest": 0.0
-  },
-  "include_ai_reasoning": true
+  "records": [
+    { "transaction_id": "TX-01", "step": 142, "type": "PAYMENT", "amount": 120.5, "oldbalanceOrg": 4500.0, "oldbalanceDest": 0.0 },
+    { "transaction_id": "TX-02", "step": 147, "type": "TRANSFER", "amount": 185000.0, "oldbalanceOrg": 185000.0, "oldbalanceDest": 0.0 }
+  ]
 }
 ```
 
-**Example Request (Insurers):**
-```json
-{
-  "domain": "insurers",
-  "user_input": {
-    "claim_type": "home",
-    "state": "CA",
-    "policyholder_tenure_years": 15.4,
-    "previous_claims_count": 1,
-    "incident_date": "2025-07-21",
-    "claim_filed_date": "2025-07-29",
-    "claim_amount": 34424.99,
-    "deductible": 2500
-  },
-  "include_ai_reasoning": true
-}
-```
+### 4. `POST /api/assess/upload` (File Upload Screening)
+Accepts `.csv` or `.json` file uploads via multipart form data (`file` and `domain`). Parses and screens all records vectorized, returning summary KPIs and flagged alerts.
+
+### 5. `GET /api/samples/{domain}`
+Fetches preloaded sample records for `banks`, `lenders`, or `insurers` as JSON for instant 1-click testing in the UI.
+
+### 6. `GET /api/samples/download/{filename}`
+Serves downloadable CSV templates or sample batch files (e.g. `template_banks.csv`, `sample_banks_batch.csv`).

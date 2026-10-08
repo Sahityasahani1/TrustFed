@@ -32,13 +32,15 @@ import {
   Bot,
   Server,
   Wifi,
-  WifiOff
+  WifiOff,
+  Upload
 } from 'lucide-react';
 
 import { TiltedCard } from '../react-bits/TiltedCard';
 import { CountUp } from '../react-bits/CountUp';
 import { BorderBeam } from '../react-bits/BorderBeam';
 import { TabsNav } from '../tabs/TabsNav';
+import { BatchScreeningWorkbench } from './BatchScreeningWorkbench';
 
 import { PAYSIM_FEATURE_DICTIONARY } from '../../constants/paysimFeatures';
 export type { PaySimFeatureDef } from '../../constants/paysimFeatures';
@@ -481,7 +483,8 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
         <TabsNav
           tabs={[
             { id: 'showdown', label: '1. Feature Inputs & Showdown', icon: <ShieldAlert className="w-3.5 h-3.5" />, badge: 'Image 2 Inputs' },
-            { id: 'dictionary', label: '2. Feature Dictionary', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'Image 1 Table' },
+            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: '40-TX Demo' },
+            { id: 'dictionary', label: '3. Feature Dictionary', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'Image 1 Table' },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -1475,7 +1478,25 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
           </motion.div>
         )}
 
-        {/* SUBTAB 2: OFFICIAL FEATURE DICTIONARY SUBTAB (IMAGE 1 & IMAGE 2) */}
+        {/* SUBTAB 2: BATCH SCREENING & TRIAGE WORKBENCH */}
+        {internalSubTab === 'batch' && (
+          <motion.div
+            key="subtab-batch"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <BatchScreeningWorkbench
+              domain="banks"
+              domainTitle="Banks & Mobile Wallets (PaySim)"
+              accentColor="emerald"
+              templateFilename="template_banks.csv"
+            />
+          </motion.div>
+        )}
+
+        {/* SUBTAB 3: OFFICIAL FEATURE DICTIONARY SUBTAB (IMAGE 1 & IMAGE 2) */}
         {internalSubTab === 'dictionary' && (
           <motion.div
             key="subtab-dictionary"

@@ -74,3 +74,78 @@ export async function assessRisk(domain, userInput, includeAiReasoning = true) {
     },
   };
 }
+
+export async function assessBatchRisk(domain, records) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const startTime = performance.now();
+
+  const response = await fetch(`${base}/api/assess/batch`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      domain,
+      records,
+    }),
+  });
+
+  const durationMs = Math.round(performance.now() - startTime);
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.detail || `Batch Risk API returned ${response.status}`);
+  }
+
+  return {
+    ...result,
+    telemetry: {
+      endpoint: base,
+      client_latency_ms: durationMs,
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
+
+export async function uploadBatchFile(domain, file) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const startTime = performance.now();
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("domain", domain);
+
+  const response = await fetch(`${base}/api/assess/upload`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const durationMs = Math.round(performance.now() - startTime);
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.detail || `File upload screening returned ${response.status}`);
+  }
+
+  return {
+    ...result,
+    telemetry: {
+      endpoint: base,
+      client_latency_ms: durationMs,
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
+
+export async function fetchSampleBatch(domain) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/samples/${domain}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch sample records for ${domain}`);
+  }
+  return await response.json();
+}
+
+export function getSampleDownloadUrl(filename) {
+  const base = cachedWorkingBase || "http://localhost:8000";
+  return `${base}/api/samples/download/${filename}`;
+}
+

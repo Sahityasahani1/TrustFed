@@ -18,13 +18,15 @@ import {
   BarChart3, 
   Zap, 
   ChevronDown, 
-  Bot 
+  Bot,
+  Upload 
 } from 'lucide-react';
 
 import { TiltedCard } from '../react-bits/TiltedCard';
 import { CountUp } from '../react-bits/CountUp';
 import { BorderBeam } from '../react-bits/BorderBeam';
 import { TabsNav } from '../tabs/TabsNav';
+import { BatchScreeningWorkbench } from './BatchScreeningWorkbench';
 import { assessRisk, checkBackendHealth } from '../../risk_api_client';
 
 export interface CreditFraudRiskResult {
@@ -93,7 +95,9 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
 
   useEffect(() => {
     if (activeSubTab) {
-      if (activeSubTab.includes('metric')) {
+      if (activeSubTab.includes('batch')) {
+        setInternalSubTab('batch');
+      } else if (activeSubTab.includes('metric')) {
         setInternalSubTab('metrics');
       } else {
         setInternalSubTab('showdown');
@@ -116,7 +120,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
 
   const handleSubTabSwitch = (id: string) => {
     setInternalSubTab(id);
-    onSubTabChange?.(id === 'metrics' ? 'cf-metrics' : 'cf-showdown');
+    onSubTabChange?.(id === 'batch' ? 'cf-batch' : id === 'metrics' ? 'cf-metrics' : 'cf-showdown');
   };
 
   const isDirty =
@@ -314,7 +318,8 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
         <TabsNav
           tabs={[
             { id: 'showdown', label: '1. Applicant Inputs & Showdown', icon: <CreditCard className="w-3.5 h-3.5" />, badge: 'Live Inference' },
-            { id: 'metrics', label: '2. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'ROC-AUC 0.768' },
+            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: '20-Loan Demo' },
+            { id: 'metrics', label: '3. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'ROC-AUC 0.768' },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -874,7 +879,25 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
           </motion.div>
         )}
 
-        {/* SUBTAB 2: BENCHMARK METRICS */}
+        {/* SUBTAB 2: BATCH SCREENING & TRIAGE WORKBENCH */}
+        {internalSubTab === 'batch' && (
+          <motion.div
+            key="subtab-batch"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <BatchScreeningWorkbench
+              domain="lenders"
+              domainTitle="Digital Lenders (Home Credit Default Risk)"
+              accentColor="blue"
+              templateFilename="template_lenders.csv"
+            />
+          </motion.div>
+        )}
+
+        {/* SUBTAB 3: BENCHMARK METRICS */}
         {internalSubTab === 'metrics' && (
           <motion.div
             key="subtab-metrics"
