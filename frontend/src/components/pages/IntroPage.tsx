@@ -17,325 +17,329 @@ import {
   Layers,
   Zap
 } from 'lucide-react';
+import { FederatedTopologyVisualizer } from '../hero/FederatedTopologyVisualizer';
 
 interface IntroPageProps {
   onStart: () => void;
   onRunSimulation: () => void;
+  onInspectDomain?: (domain: 'intelligence' | 'creditfraud' | 'insurance') => void;
 }
 
 export const IntroPage: React.FC<IntroPageProps> = ({
   onStart,
   onRunSimulation,
+  onInspectDomain,
 }) => {
   return (
     <div className="space-y-12 animate-fadeIn">
-      {/* 3D FLOATING HERO STAGE MATCHING AVELA REFERENCE */}
-      <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-blue-900/15 avela-hero-mesh border border-white/20">
-        {/* Decorative Floating Ambient Blooms */}
-        <div className="absolute top-12 left-8 w-32 h-32 rounded-full bg-gradient-to-tr from-cyan-400/40 via-blue-300/30 to-emerald-400/30 blur-2xl pointer-events-none animate-float-slow" />
-        <div className="absolute bottom-16 right-12 w-48 h-48 rounded-full bg-gradient-to-bl from-emerald-300/40 via-teal-400/30 to-blue-400/30 blur-3xl pointer-events-none animate-float-reverse" />
-        <div className="absolute -top-10 right-1/4 w-40 h-40 rounded-full bg-white/20 blur-2xl pointer-events-none animate-pulse-soft" />
+      {/* AETHER-INSPIRED COSMIC CELESTIAL HERO STAGE */}
+      <div className="relative rounded-[2.5rem] overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.8)] bg-[#02050E] border border-white/10 pt-12 pb-20 px-4 sm:px-8">
+        
+        {/* Subtle Starry Stardust Particles */}
+        <div className="absolute inset-0 pointer-events-none opacity-60">
+          <div className="absolute top-[10%] left-[16%] w-1 h-1 bg-white rounded-full animate-ping opacity-75" />
+          <div className="absolute top-[26%] left-[84%] w-1 h-1 bg-sky-300 rounded-full animate-pulse opacity-80" />
+          <div className="absolute top-[14%] right-[22%] w-1.5 h-1.5 bg-blue-300 rounded-full animate-pulse opacity-90" />
+          <div className="absolute top-[42%] left-[6%] w-1 h-1 bg-white rounded-full opacity-60" />
+          <div className="absolute top-[60%] right-[10%] w-1 h-1 bg-sky-200 rounded-full opacity-50" />
+          <div className="absolute top-[32%] right-[4%] w-1 h-1 bg-white rounded-full opacity-70" />
+          <div className="absolute top-[70%] left-[20%] w-1 h-1 bg-blue-200 rounded-full opacity-40" />
+          <div className="absolute top-[48%] right-[28%] w-1 h-1 bg-sky-400 rounded-full animate-ping opacity-60" />
+        </div>
 
-        <div className="relative z-10 px-6 sm:px-10 pt-12 pb-16 space-y-9">
-          {/* Eyebrow & Brand Name */}
-          <div className="text-center max-w-4xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-xs font-bold bg-white/20 backdrop-blur-xl border border-white/30 text-white shadow-lg shadow-black/5 animate-float-subtle">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
-              <span>Decentralized Fraud Intelligence Layer</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-ping" />
-              <span className="text-white/90 font-medium">NIST AI RMF Compliant</span>
-            </div>
+        <div className="relative z-10 max-w-5xl mx-auto space-y-7 text-center">
+          
+          {/* 1. TOP ANNOUNCEMENT CAPSULE PILL */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-xs text-slate-300 hover:border-white/20 transition-all cursor-pointer shadow-sm">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-600 text-white shadow-sm">
+              NEW
+            </span>
+            <span>TrustFed Agents 2.0: multi-institution SecAgg+ orchestration is live</span>
+            <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+          </div>
 
-            {/* Website Name in Modern Font */}
-            <div className="flex items-center justify-center gap-3">
-              <div className="h-12 w-12 rounded-2xl bg-white/20 backdrop-blur-md p-1 border border-white/40 shadow-inner flex items-center justify-center">
-                <ShieldCheck className="w-8 h-8 text-white" />
-              </div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white font-display">
-                Trust<span className="text-emerald-300">Fed</span>
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/20 text-white border border-white/30">
-                MVP v1.0
+          {/* 2. DUAL-TYPOGRAPHY HEADLINE (SANS + EDITORIAL ITALIC SERIF) */}
+          <div className="space-y-2">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white font-display">
+              Federated intelligence,
+            </h1>
+            <h2 className="text-5xl sm:text-7xl lg:text-8xl text-white font-editorial-italic leading-[1.05]">
+              collaborating while privacy holds
+            </h2>
+          </div>
+
+          {/* 3. SUBTITLE */}
+          <p className="text-sm sm:text-base text-slate-400 font-normal max-w-2xl mx-auto leading-relaxed pt-1">
+            Deploy privacy-preserving AI models that evaluate, reason and protect across institutional silos. Fully observable, governed by SecAgg+ and built to scale with zero raw customer records shared.
+          </p>
+
+          {/* 4. FLOATING ORBIT STAGE WITH WIDGETS & COMMAND CONSOLE */}
+          <div className="relative pt-6 max-w-3xl mx-auto">
+            
+            {/* Floating Cursor Pointer 1 (Top-Left: Bank Alpha) */}
+            <div className="absolute -top-3 left-2 sm:left-8 flex items-center gap-1.5 z-30 pointer-events-none animate-float-slow">
+              <svg className="w-4 h-4 text-blue-500 fill-blue-500 drop-shadow-md" viewBox="0 0 24 24">
+                <path d="M4 4l7 17 2-7 7-2L4 4z" />
+              </svg>
+              <span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-blue-600 text-white shadow-lg shadow-blue-500/40">
+                Bank Alpha
               </span>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] drop-shadow-md">
-              The intelligence layer that keeps institutions protected.
-            </h2>
-
-            <p className="text-base sm:text-lg text-white/90 font-medium max-w-2xl mx-auto leading-relaxed">
-              TrustFed enables banks, digital wallets, lenders, and insurers to train high-accuracy joint fraud models without sharing a single customer record — powered by Flower FedAvg, SecAgg+ Diffie-Hellman encryption & Rényi Differential Privacy.
-            </p>
-
-            {/* 3D ACTION BUTTONS */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
-              <button
-                onClick={onStart}
-                className="btn-3d-primary px-8 py-4 rounded-full text-sm font-bold flex items-center gap-2.5 cursor-pointer shadow-2xl"
-              >
-                <Sparkles className="w-4 h-4 text-cyan-200" />
-                <span className="text-base">Let's Start</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={onRunSimulation}
-                className="btn-3d-glass px-7 py-4 rounded-full text-sm font-bold flex items-center gap-2 cursor-pointer shadow-xl text-slate-800"
-              >
-                <Zap className="w-4 h-4 text-emerald-600" />
-                <span>⚡ Run Live Simulation</span>
-              </button>
+            {/* Floating Cursor Pointer 2 (Top-Right: Wallet Beta) */}
+            <div className="absolute -top-1 right-2 sm:right-8 flex items-center gap-1.5 z-30 pointer-events-none animate-float-reverse">
+              <svg className="w-4 h-4 text-white fill-white drop-shadow-md" viewBox="0 0 24 24">
+                <path d="M4 4l7 17 2-7 7-2L4 4z" />
+              </svg>
+              <span className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white text-slate-950 shadow-lg">
+                Wallet Beta
+              </span>
             </div>
+
+            {/* Floating Left Glass Card (Run / Consensus Status) */}
+            <div className="hidden lg:block absolute -left-44 xl:-left-56 top-1/2 -translate-y-12 w-60 p-4 rounded-2xl aether-glass-card border border-blue-500/20 text-xs font-mono space-y-2.5 z-20 text-left animate-float-subtle">
+              <div className="flex items-center justify-between text-slate-400 border-b border-white/10 pb-2">
+                <div className="flex items-center gap-1.5 text-cyan-400 font-bold">
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Consensus #4,218</span>
+                </div>
+                <span className="text-[11px] text-slate-500">00:18</span>
+              </div>
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center gap-2 text-slate-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Masked 10,000 PaySim records</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-300">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Clustered 9 cross-silo mule rings</span>
+                </div>
+                <div className="flex items-center gap-2 text-sky-400">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-sky-400 border-t-transparent animate-spin shrink-0" />
+                  <span>Aggregating gradient tensor...</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating Right Glass Card (Metric & Glowing Line Graph) */}
+            <div className="hidden lg:block absolute -right-44 xl:-right-56 top-1/2 -translate-y-12 w-60 p-4 rounded-2xl aether-glass-card border border-blue-500/20 text-xs space-y-2 z-20 text-left animate-float-slow">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-slate-400 font-medium">Fraud Prevented this cohort</span>
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold font-mono text-white">$4.8M</span>
+                <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800/80 px-1.5 py-0.5 rounded">
+                  +185% PR-AUC
+                </span>
+              </div>
+              {/* Glowing Blue Sparkline Curve */}
+              <div className="h-10 w-full pt-1">
+                <svg className="w-full h-full overflow-visible" viewBox="0 0 100 28">
+                  <defs>
+                    <linearGradient id="aetherSparkGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#38BDF8" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,24 Q20,23 35,18 T70,12 T100,4 L100,28 L0,28 Z" fill="url(#aetherSparkGrad)" />
+                  <path d="M0,24 Q20,23 35,18 T70,12 T100,4" fill="none" stroke="#38BDF8" strokeWidth="2.5" />
+                  <circle cx="100" cy="4" r="3" fill="#FFFFFF" stroke="#38BDF8" strokeWidth="2" />
+                </svg>
+              </div>
+            </div>
+
+            {/* CENTER AETHER WHITE COMMAND CONSOLE */}
+            <div className="aether-console-card rounded-2xl p-4 sm:p-5 text-slate-900 space-y-3.5 text-left relative z-20">
+              {/* Prompt Input Line */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  defaultValue="Investigate cross-institution mule ring & evaluate Home Credit default risk"
+                  readOnly
+                  className="w-full bg-transparent text-sm sm:text-base font-medium text-slate-800 placeholder-slate-400 focus:outline-none cursor-default"
+                />
+              </div>
+
+              {/* Bottom Console Toolbar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={onStart}
+                    className="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
+                  >
+                    +
+                  </button>
+                  <div className="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                    <span>Flower-FedAvg 2.0</span>
+                  </div>
+                  <div className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium flex items-center gap-1">
+                    <span>3 Silos</span>
+                  </div>
+                  <div className="hidden sm:flex px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium items-center gap-1">
+                    <span>🌐 SecAgg+</span>
+                  </div>
+                  <div className="hidden md:flex px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium items-center gap-1">
+                    <span>🛡️ DP ε=2.45</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 ml-auto">
+                  <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-amber-500" />
+                    <span>18ms</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onStart}
+                    className="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shadow-md shadow-blue-500/40 hover:scale-105 transition-all cursor-pointer"
+                    title="Launch Private Federated Inference"
+                  >
+                    <ArrowRight className="w-4 h-4 -rotate-45" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Orbiting Node Pills below console */}
+            <div className="flex items-center justify-between px-4 pt-3 text-[11px] font-mono text-slate-400">
+              <span className="hidden sm:inline-flex items-center gap-1.5 bg-[#0A1020]/80 border border-white/10 px-2.5 py-1 rounded-full text-slate-300">
+                <span className="w-3 h-3 rounded-full bg-blue-600 text-white text-[9px] flex items-center justify-center font-bold">B</span>
+                <span>Bank Alpha • active</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-[#0A1020]/80 border border-white/10 px-2.5 py-1 rounded-full text-slate-300">
+                <span className="w-3 h-3 rounded-full bg-emerald-600 text-white text-[9px] flex items-center justify-center font-bold">W</span>
+                <span>Wallet Beta • masking</span>
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1.5 bg-[#0A1020]/80 border border-white/10 px-2.5 py-1 rounded-full text-slate-300">
+                <span className="w-3 h-3 rounded-full bg-indigo-600 text-white text-[9px] flex items-center justify-center font-bold">I</span>
+                <span>Insure Gamma • verified</span>
+              </span>
+            </div>
+
           </div>
 
-          {/* 3D FLOATING CARDS STAGE */}
-          <div className="relative pt-6 max-w-5xl mx-auto">
-            {/* Floating Pill Badges with Colored Pulsing Dots */}
-            <div className="absolute -top-3 left-4 md:left-12 z-30 hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-white shadow-xl shadow-blue-900/10 text-xs font-bold text-slate-800 animate-float-slow">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              <span>Zero Raw Records Shared</span>
-            </div>
+        </div>
 
-            <div className="absolute -top-6 right-8 md:right-16 z-30 hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-white shadow-xl shadow-blue-900/10 text-xs font-bold text-slate-800 animate-float-reverse">
-              <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-              <span>SecAgg+ Masking Active</span>
-            </div>
+        {/* 5. LUMINOUS CELESTIAL HORIZON ARC (EXACT PATTERN FROM AETHER REFERENCE) */}
+        <div className="relative pt-24 overflow-hidden">
+          
+          {/* Glowing Atmospheric Arc Structure */}
+          <div className="celestial-horizon-container">
+            <div className="celestial-horizon-glow" />
+            <div className="celestial-horizon-line" />
+            <div className="celestial-horizon-body" />
+          </div>
 
-            <div className="absolute -bottom-4 left-1/4 z-30 hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-white shadow-xl shadow-blue-900/10 text-xs font-bold text-slate-800 animate-float-subtle">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              <span>+22% PR-AUC Improvement</span>
-            </div>
-
-            <div className="absolute -bottom-4 right-1/4 z-30 hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-white shadow-xl shadow-blue-900/10 text-xs font-bold text-slate-800 animate-float-slow">
-              <span className="w-2 h-2 rounded-full bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.8)]" />
-              <span>Rényi DP Safe: ε = 2.45</span>
-            </div>
-
-            {/* 3D Overlapping Floating Cards Deck */}
-            <div className="relative flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-0 perspective-1500 preserve-3d py-4">
-              
-              {/* Card 1: Left Tilted (Apex Tier-1 Bank) */}
-              <div 
-                className="w-full md:w-[320px] rounded-3xl p-5 bg-white/85 backdrop-blur-2xl border border-white/90 shadow-2xl shadow-blue-950/15 transition-all duration-500 hover:scale-105 hover:z-40 order-2 md:order-1 md:-mr-8 md:rotate-[-6deg] md:-translate-y-2"
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 shadow-sm">
-                      <Building2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900">Apex Tier-1 Bank</h4>
-                      <span className="text-[10px] text-slate-500">Local Silo Boundary</span>
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full font-bold bg-blue-100/80 text-blue-700">
-                    Silo #1
-                  </span>
-                </div>
-
-                <div className="py-3.5 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Wire Amount:</span>
-                    <span className="font-mono font-bold text-slate-900">$84,500.00</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Local Silo Score:</span>
-                    <span className="font-mono font-bold text-emerald-600">18 / 100</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Local Model Verdict:</span>
-                    <span className="font-semibold text-emerald-600">Approved</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-2xl bg-amber-50/90 border border-amber-200/80 flex items-start gap-2 text-[11px] text-amber-800">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>False Negative:</strong> Silo cannot detect rapid cross-border wallet mule hops without TrustFed.
-                  </span>
-                </div>
-              </div>
-
-              {/* Card 2: Center Elevated Hero (TrustFed Global Consensus Core) */}
-              <div 
-                className="w-full md:w-[380px] rounded-[2rem] p-6 bg-white/95 backdrop-blur-3xl border-2 border-emerald-400 shadow-[0_25px_60px_-15px_rgba(16,185,129,0.35)] transition-all duration-500 hover:scale-105 z-20 order-1 md:order-2 md:-translate-y-5"
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-emerald-500 text-white shadow-md shadow-emerald-500/25">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-extrabold text-slate-900">
-                        TrustFed Global Engine
-                      </h3>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] text-emerald-700 font-semibold">Federated SecAgg+ v10</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <span className="text-[10px] font-mono px-2.5 py-1 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    Global Core
-                  </span>
-                </div>
-
-                <div className="py-4 space-y-3">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-xs text-slate-500 font-medium">Collaborative Fraud Risk:</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-rose-600">89</span>
-                      <span className="text-xs text-slate-400 font-bold">/ 100</span>
-                    </div>
-                  </div>
-
-                  {/* Risk Progress Bar */}
-                  <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500 rounded-full w-[89%]" />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2 pt-1 text-center font-mono">
-                    <div className="p-2 rounded-xl bg-blue-50/80 border border-blue-100">
-                      <span className="text-[10px] text-slate-500 block">PR-AUC Score</span>
-                      <span className="text-xs font-bold text-blue-700">0.842 (+22%)</span>
-                    </div>
-                    <div className="p-2 rounded-xl bg-emerald-50/80 border border-emerald-100">
-                      <span className="text-[10px] text-slate-500 block">SecAgg Leakage</span>
-                      <span className="text-xs font-bold text-emerald-700">0.000 (0 bytes)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-2xl bg-emerald-50/90 border border-emerald-200/80 flex items-start gap-2.5 text-[11px] text-emerald-950 font-medium">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Attack Blocked:</strong> Intercepted multi-institution coordinated account takeover via encrypted weights!
-                  </span>
-                </div>
-              </div>
-
-              {/* Card 3: Right Tilted (FlashPay Digital Wallet) */}
-              <div 
-                className="w-full md:w-[320px] rounded-3xl p-5 bg-white/85 backdrop-blur-2xl border border-white/90 shadow-2xl shadow-emerald-950/15 transition-all duration-500 hover:scale-105 hover:z-40 order-3 md:-ml-8 md:rotate-[6deg] md:-translate-y-2"
-                style={{ transformStyle: 'preserve-3d' }}
-              >
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm">
-                      <Wallet className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900">FlashPay Wallet</h4>
-                      <span className="text-[10px] text-slate-500">Local Silo Boundary</span>
-                    </div>
-                  </div>
-                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full font-bold bg-emerald-100/80 text-emerald-700">
-                    Silo #2
-                  </span>
-                </div>
-
-                <div className="py-3.5 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Mobile Device Velocity:</span>
-                    <span className="font-mono font-bold text-rose-600">5 SIM hops / 10m</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Encrypted Delta:</span>
-                    <span className="font-mono font-bold text-teal-600">ΔW masked (DH)</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Rényi Budget Spent:</span>
-                    <span className="font-semibold text-slate-700">ε_spent = 0.245</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-2 text-[11px] text-slate-600">
-                  <Lock className="w-3.5 h-3.5 text-teal-600 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Private Gradient:</strong> Raw transaction details remain on-premise behind client firewall.
-                  </span>
-                </div>
-              </div>
-
+          {/* Institutional Trust Ribbon (Seated gracefully above the horizon) */}
+          <div className="relative z-10 text-center space-y-4 pt-6">
+            <span className="text-[10px] font-mono uppercase font-semibold text-slate-400 tracking-[0.25em]">
+              TRUSTED BY FINANCIAL OPERATORS AT
+            </span>
+            <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 text-slate-400 font-bold tracking-wider text-xs sm:text-sm">
+              <span className="hover:text-white transition-colors flex items-center gap-1.5">
+                <span className="font-extrabold text-blue-400 font-mono">N</span> NORTHWIND
+              </span>
+              <span className="hover:text-white transition-colors flex items-center gap-1.5">
+                <span className="text-cyan-400">●</span> LUMEN
+              </span>
+              <span className="hover:text-white transition-colors flex items-center gap-1.5">
+                <span className="text-sky-400">▲</span> KESTREL
+              </span>
+              <span className="hover:text-white transition-colors text-base font-editorial-italic font-normal tracking-normal text-slate-300">
+                Halcyon
+              </span>
+              <span className="hover:text-white transition-colors flex items-center gap-1.5">
+                <span className="text-blue-400">⁘</span> QUADRANT
+              </span>
+              <span className="hover:text-white transition-colors tracking-widest font-mono text-slate-300">
+                VERTEX
+              </span>
             </div>
           </div>
 
         </div>
+
       </div>
 
+      {/* INTERACTIVE FEDERATED TOPOLOGY VISUALIZER */}
+      <FederatedTopologyVisualizer onInspectDomain={onInspectDomain} />
+
       {/* CORE CAPABILITIES HIGHLIGHT SECTION */}
-      <div className="space-y-6 pt-4">
-        <div className="text-center max-w-3xl mx-auto space-y-2">
-          <span className="text-xs font-mono uppercase text-blue-700 font-bold tracking-wider px-3 py-1 rounded-full bg-blue-50 border border-blue-200">
-            • How TrustFed Works
+      <div className="space-y-6 pt-8">
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <span className="text-[11px] font-mono uppercase text-cyan-300 font-bold tracking-widest px-3.5 py-1 rounded-full bg-cyan-950/50 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)] inline-flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            How TrustFed Works
           </span>
-          <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Collaborate on intelligence, never on customer records.
+          <h3 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Collaborate on intelligence,{' '}
+            <span className="font-editorial-italic font-normal text-cyan-300 text-3xl sm:text-5xl">
+              never on customer records.
+            </span>
           </h3>
-          <p className="text-sm text-slate-600 font-medium leading-relaxed">
+          <p className="text-sm text-slate-400 font-normal leading-relaxed max-w-2xl mx-auto">
             Explore the 3 foundational pillars of the TrustFed architecture designed specifically to solve cross-institutional financial fraud without privacy compromise.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
           {/* Card 1 */}
-          <div className="p-6 rounded-3xl space-y-4 border-2 border-blue-200/90 bg-gradient-to-b from-white/95 to-blue-50/50 shadow-xl shadow-blue-500/10 hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/20 transition-all duration-300">
-            <div className="h-12 w-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center border border-blue-200 shadow-sm">
+          <div className="p-6 rounded-3xl space-y-4 border border-white/10 bg-[#070D1E]/75 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:border-cyan-500/40 hover:shadow-[0_12px_40px_rgba(6,182,212,0.15)] transition-all duration-300 group">
+            <div className="h-12 w-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20 shadow-inner group-hover:scale-105 transition-transform">
               <Database className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-mono uppercase text-blue-600 font-bold tracking-wider">Module 01</span>
-              <h4 className="text-base font-bold text-slate-900 mt-1">Data Silos & Boundary Isolation</h4>
-              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">
+              <span className="text-[10px] font-mono uppercase text-cyan-400 font-bold tracking-wider">Module 01</span>
+              <h4 className="text-base font-bold text-white mt-1">Data Silos & Boundary Isolation</h4>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                 Institutional silo boundaries with zero leakage. Raw customer records remain quarantined behind local bank and wallet firewalls.
               </p>
             </div>
             <div className="pt-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 font-mono">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 font-mono bg-emerald-950/50 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 Zero Raw Records Shared
               </span>
             </div>
           </div>
 
           {/* Card 2 */}
-          <div className="p-6 rounded-3xl space-y-4 border-2 border-teal-200/90 bg-gradient-to-b from-white/95 to-teal-50/50 shadow-xl shadow-teal-500/10 hover:border-teal-400 hover:shadow-2xl hover:shadow-teal-500/20 transition-all duration-300">
-            <div className="h-12 w-12 rounded-2xl bg-teal-100 text-teal-600 flex items-center justify-center border border-teal-200 shadow-sm">
+          <div className="p-6 rounded-3xl space-y-4 border border-white/10 bg-[#070D1E]/75 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:border-blue-500/40 hover:shadow-[0_12px_40px_rgba(59,130,246,0.15)] transition-all duration-300 group">
+            <div className="h-12 w-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 shadow-inner group-hover:scale-105 transition-transform">
               <Cpu className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-mono uppercase text-teal-600 font-bold tracking-wider">Module 02</span>
-              <h4 className="text-base font-bold text-slate-900 mt-1">Federated SecAgg+ & Rényi DP</h4>
-              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">
+              <span className="text-[10px] font-mono uppercase text-blue-400 font-bold tracking-wider">Module 02</span>
+              <h4 className="text-base font-bold text-white mt-1">Federated SecAgg+ & Rényi DP</h4>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                 Flower FedAvg rounds with Diffie-Hellman pair-wise masks. Coordinator reconstructs global model weight sums without seeing client gradients.
               </p>
             </div>
             <div className="pt-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-700 font-mono">
-                <Lock className="w-3.5 h-3.5 text-teal-600" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-300 font-mono bg-blue-950/50 px-2.5 py-1 rounded-full border border-blue-500/30">
+                <Lock className="w-3.5 h-3.5 text-cyan-400" />
                 Rényi Budget: ε = 2.45
               </span>
             </div>
           </div>
 
           {/* Card 3 */}
-          <div className="p-6 rounded-3xl space-y-4 border-2 border-emerald-200/90 bg-gradient-to-b from-white/95 to-emerald-50/50 shadow-xl shadow-emerald-500/10 hover:border-emerald-400 hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300">
-            <div className="h-12 w-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center border border-emerald-200 shadow-sm">
+          <div className="p-6 rounded-3xl space-y-4 border border-white/10 bg-[#070D1E]/75 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] hover:border-emerald-500/40 hover:shadow-[0_12px_40px_rgba(16,185,129,0.15)] transition-all duration-300 group">
+            <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 shadow-inner group-hover:scale-105 transition-transform">
               <Layers className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-mono uppercase text-emerald-600 font-bold tracking-wider">Module 03</span>
-              <h4 className="text-base font-bold text-slate-900 mt-1">The Fraud Showdown & Explainability</h4>
-              <p className="text-xs text-slate-600 mt-1.5 leading-relaxed font-medium">
+              <span className="text-[10px] font-mono uppercase text-emerald-400 font-bold tracking-wider">Module 03</span>
+              <h4 className="text-base font-bold text-white mt-1">The Fraud Showdown & Explainability</h4>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                 Direct side-by-side comparison: Bank silo misses attack (13/100) vs TrustFed catches it (87/100) with plain-language SHAP waterfall reason codes.
               </p>
             </div>
             <div className="pt-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 font-mono">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-500" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 font-mono bg-emerald-950/50 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                 PR-AUC 0.842 (+22% Lift)
               </span>
             </div>
@@ -344,22 +348,29 @@ export const IntroPage: React.FC<IntroPageProps> = ({
       </div>
 
       {/* BOTTOM "LET'S START" LAUNCH BANNER */}
-      <div className="rounded-3xl p-8 sm:p-10 bg-gradient-to-r from-blue-700 via-cyan-700 to-emerald-600 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 border-2 border-emerald-300/40">
-        <div className="space-y-2 text-center md:text-left">
-          <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Ready to test privacy-preserving federated intelligence?
+      <div className="relative overflow-hidden rounded-3xl p-8 sm:p-12 border border-white/15 bg-gradient-to-b from-[#0C152E]/90 via-[#070D1F]/90 to-[#030611] backdrop-blur-2xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="absolute -top-24 -left-24 w-80 h-80 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-500/20 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="relative z-10 space-y-2 text-center md:text-left">
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Ready to test{' '}
+            <span className="font-editorial-italic font-normal text-cyan-300 text-3xl sm:text-4xl">
+              privacy-preserving
+            </span>{' '}
+            federated intelligence?
           </h3>
-          <p className="text-sm text-white/90 max-w-xl font-medium leading-relaxed">
+          <p className="text-sm text-slate-300 max-w-xl font-normal leading-relaxed">
             Enter the interactive feature studio to inspect PaySim silo partitions, execute real Flower FL rounds, and test live transaction showdowns with 3D tactile controls.
           </p>
         </div>
 
         <button
           onClick={onStart}
-          className="btn-3d-primary shrink-0 px-8 py-4 rounded-full text-sm font-bold flex items-center gap-3 cursor-pointer shadow-2xl bg-white text-emerald-950 hover:bg-slate-50"
+          className="relative z-10 shrink-0 px-8 py-3.5 rounded-full text-sm font-bold flex items-center gap-3 cursor-pointer bg-white text-slate-950 hover:bg-slate-100 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all shadow-xl shadow-white/10"
         >
-          <span className="text-base">Let's Start Now</span>
-          <ArrowRight className="w-5 h-5 text-emerald-400" />
+          <span className="text-sm font-bold">Let's Start Now</span>
+          <ArrowRight className="w-4 h-4 text-blue-600" />
         </button>
       </div>
     </div>

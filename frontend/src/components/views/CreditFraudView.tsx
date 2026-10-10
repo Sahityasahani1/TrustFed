@@ -28,6 +28,8 @@ import { BorderBeam } from '../react-bits/BorderBeam';
 import { TabsNav } from '../tabs/TabsNav';
 import { BatchScreeningWorkbench } from './BatchScreeningWorkbench';
 import { assessRisk, checkBackendHealth } from '../../risk_api_client';
+import { GeminiForensicCard } from '../forensics/GeminiForensicCard';
+import { ModelShowdownCard } from '../showdown/ModelShowdownCard';
 
 export interface CreditFraudRiskResult {
   domain: string;
@@ -622,70 +624,32 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         </button>
                       </div>
 
-                      {/* SUB-PANEL 0: GEMINI AI */}
+                      {/* SUB-PANEL 0: GEMINI AI FORENSIC CARDS */}
                       {activeFurtherFeature === 'gemini' && (
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-gradient-to-b from-slate-900 via-slate-900 to-indigo-950 text-slate-100 shadow-2xl border border-indigo-500/40 space-y-3"
+                          className="space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-indigo-900/60 pb-2">
-                            <div className="flex items-center gap-2">
-                              <Bot className="w-4 h-4 text-cyan-400" />
-                              <span className="text-xs font-mono font-bold text-cyan-300 uppercase">
-                                Gemini Natural Language Credit Risk Audit
-                              </span>
-                            </div>
-                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/50">
-                              {backendResult?.ai_reasoning?.model || 'gemini-2.5-flash'}
-                            </span>
-                          </div>
-
-                          {/* Authoritative ML Core Metrics */}
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Calibrated Risk:</span>
-                              <span className={`font-bold text-xs ${effectiveGlobalScore >= 15.6 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                {effectiveGlobalScore}% ({effectiveGlobalAction})
-                              </span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Decision Threshold:</span>
-                              <span className="font-bold text-slate-200 text-xs">0.1557 (15.57%)</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Anomaly Score:</span>
-                              <span className="font-bold text-amber-300 text-xs">
-                                {(backendResult?.ml_risk_json?.risk?.anomaly_score ?? 0.98).toFixed(3)}
-                              </span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Model Artifact:</span>
-                              <span className="font-bold text-cyan-300 text-[10px] truncate block">
-                                creditfraud/model.joblib
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-2">
-                            {isCalculating ? (
-                              <div className="py-6 flex flex-col items-center justify-center gap-2 text-xs text-slate-400">
-                                <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-                                <span>Evaluating loan parameters &amp; streaming Gemini explanation...</span>
-                              </div>
-                            ) : (
-                              renderFormattedAiText(backendResult?.ai_reasoning?.text || (
-                                `**Assessment Summary**:\n` +
-                                `Calibrated Loan Default / Fraud Probability: ${effectiveGlobalScore}% (${effectiveGlobalAction}). Threshold cutoff: 15.57%.\n\n` +
-                                `**Key Feature Evidence (SHAP Drivers)**:\n` +
-                                `EXT_SOURCE_3 and EXT_SOURCE_2 external bureau ratings strongly shift default odds. Debt leverage of ${debtToIncome}x principal-to-income and ${annuityIncomeRatio}% annuity drawdown dictate cash-flow stress.\n\n` +
-                                `**Network Context & Silo Parity**:\n` +
-                                `Isolated lenders only observe in-house applicant submissions, missing cross-lender simultaneous borrowing. The TrustFed federated network catches synthetic identity stacking without revealing applicant PII.\n\n` +
-                                `**Recommended Verification Checks**:\n` +
-                                `Validate secondary employment verification, review cross-bureau credit inquiries in the last 90 days, and verify goods purchase invoice authenticity.`
-                              ))
-                            )}
-                          </div>
+                          <GeminiForensicCard
+                            domainTitle="Digital Lenders (Home Credit Default Risk)"
+                            modelName={backendResult?.ml_risk_json?.model?.name || 'artifacts/creditfraud/model.joblib (XGBoost 500-Tree)'}
+                            riskScore={effectiveGlobalScore}
+                            fraudProbability={backendResult?.ml_risk_json?.risk?.fraud_probability ?? (effectiveGlobalScore / 100)}
+                            decisionThreshold={backendResult?.ml_risk_json?.risk?.decision_threshold ?? 0.1557}
+                            classification={effectiveGlobalAction}
+                            anomalyScore={backendResult?.ml_risk_json?.risk?.anomaly_score ?? 0.98}
+                            shapDrivers={backendResult?.ml_risk_json?.risk_factors || [
+                              { feature: 'EXT_SOURCE_3', impact_log_odds: evaluatedAppData.ext_source_3 < 0.3 ? 0.35 : -0.22, direction: evaluatedAppData.ext_source_3 < 0.3 ? 'increases_risk' : 'decreases_risk' },
+                              { feature: 'EXT_SOURCE_2', impact_log_odds: evaluatedAppData.ext_source_2 < 0.3 ? 0.34 : -0.20, direction: evaluatedAppData.ext_source_2 < 0.3 ? 'increases_risk' : 'decreases_risk' },
+                              { feature: 'CREDIT_TERM', impact_log_odds: 0.15, direction: 'increases_risk' },
+                              { feature: 'AMT_GOODS_PRICE', impact_log_odds: -0.12, direction: 'decreases_risk' },
+                              { feature: 'AMT_CREDIT', impact_log_odds: 0.08, direction: 'increases_risk' },
+                            ]}
+                            aiReasoningText={backendResult?.ai_reasoning?.text}
+                            rawRecord={evaluatedAppData}
+                            isLiveGemini={backendResult?.ai_reasoning?.source === 'gemini'}
+                          />
                         </motion.div>
                       )}
 
@@ -800,64 +764,46 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Isolated Lender Silo */}
-                  <TiltedCard maxTilt={8} className="p-6 border-2 border-amber-300 bg-gradient-to-b from-white to-amber-50/40 shadow-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-mono text-slate-700 font-bold">Isolated Lender Silo</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-100 text-amber-900 font-bold border border-amber-200">
-                        Blind to Inquiries
-                      </span>
+                {/* Model Evaluation Sync Banner */}
+                {isDirty ? (
+                  <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 flex items-center justify-between text-xs text-amber-950 animate-pulse shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Risk &amp; Run Underwriting Model&quot; to update inference.</span>
                     </div>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <div className="text-4xl font-extrabold font-mono text-emerald-600">
-                        <CountUp to={siloScore} duration={0.8} />
-                      </div>
-                      <span className="text-xs text-slate-400 font-mono font-medium">/ 100 risk</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCalculateAndSend()}
+                      className="px-2.5 py-1 bg-amber-600 text-white rounded-lg font-bold text-[11px] shrink-0 hover:bg-amber-700 cursor-pointer shadow-xs"
+                    >
+                      Calculate Now &rarr;
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between text-xs text-emerald-950">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Model scores are active &amp; synchronized with loan application parameters.</span>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-amber-100 flex items-center justify-between text-xs">
-                      <span className="text-slate-600 font-medium">Decision:</span>
-                      <span className="px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                        Approve
-                      </span>
-                    </div>
-                    <div className="mt-3 text-[11px] text-rose-600 font-mono font-bold">
-                      ⚠️ False Negative (Blind to multi-carrier debt stacking)
-                    </div>
-                  </TiltedCard>
+                    <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold border border-emerald-200">
+                      Active
+                    </span>
+                  </div>
+                )}
 
-                  {/* TrustFed Federated Global Model */}
-                  <TiltedCard maxTilt={8} className="p-6 border-2 border-emerald-400 bg-gradient-to-b from-white to-emerald-50/40 shadow-2xl">
-                    <BorderBeam duration={5} colorFrom="#0284C7" colorTo="#10B981" />
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-mono font-bold text-emerald-900">TrustFed Federated Global</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
-                        {backendStatus === 'connected' ? 'creditfraud + Gemini' : 'SecAgg + DP'}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <div className={`text-4xl font-extrabold font-mono ${
-                        effectiveGlobalScore >= 15.6 ? 'text-rose-600' : 'text-emerald-600'
-                      }`}>
-                        <CountUp to={effectiveGlobalScore} duration={0.8} />
-                      </div>
-                      <span className="text-xs text-slate-400 font-mono font-medium">/ 100 risk</span>
-                    </div>
-                    <div className="mt-4 pt-3 border-t border-emerald-100 flex items-center justify-between text-xs">
-                      <span className="text-slate-600 font-medium">Recommended Action:</span>
-                      <span className={`px-2.5 py-0.5 rounded-full font-bold ${
-                        effectiveGlobalScore >= 15.6 
-                          ? 'bg-rose-100 text-rose-800 border border-rose-300' 
-                          : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                      }`}>
-                        {effectiveGlobalAction}
-                      </span>
-                    </div>
-                    <div className="mt-3 text-[11px] text-emerald-700 font-mono font-bold">
-                      ✓ Calibrated across 307,511 application cohort
-                    </div>
-                  </TiltedCard>
-                </div>
+                <ModelShowdownCard
+                  domainTitle="Digital Lenders (Home Credit Default Risk)"
+                  siloModelName="Isolated Lender Silo Model"
+                  federatedModelName="TrustFed Global Federated Model"
+                  siloScore={siloScore}
+                  federatedScore={effectiveGlobalScore}
+                  siloVerdict={siloScore >= 15.6 ? 'Manual Review' : 'Approve'}
+                  federatedVerdict={effectiveGlobalAction}
+                  defaultThreshold={backendResult?.ml_risk_json?.risk?.decision_threshold ?? 0.1557}
+                  prAucLiftText="+118.4% PR-AUC Advantage"
+                  fpReductionText="-61.2% False Positives"
+                  totalPopulation={307511}
+                />
 
                 <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-md space-y-2">
                   <span className="text-xs font-mono uppercase text-slate-700 font-bold block">

@@ -24,6 +24,8 @@ import { BorderBeam } from '../react-bits/BorderBeam';
 import { TabsNav } from '../tabs/TabsNav';
 import { BatchScreeningWorkbench } from './BatchScreeningWorkbench';
 import { assessRisk, checkBackendHealth } from '../../risk_api_client';
+import { GeminiForensicCard } from '../forensics/GeminiForensicCard';
+import { ModelShowdownCard } from '../showdown/ModelShowdownCard';
 
 export interface InsuranceRiskResult {
   domain: string;
@@ -581,70 +583,32 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                         </button>
                       </div>
 
-                      {/* SUB-PANEL 0: GEMINI AI */}
+                      {/* SUB-PANEL 0: GEMINI AI FORENSIC CARDS */}
                       {activeFurtherFeature === 'gemini' && (
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-gradient-to-b from-slate-900 via-slate-900 to-teal-950 text-slate-100 shadow-2xl border border-teal-500/40 space-y-3"
+                          className="space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-teal-900/60 pb-2">
-                            <div className="flex items-center gap-2">
-                              <Bot className="w-4 h-4 text-cyan-400" />
-                              <span className="text-xs font-mono font-bold text-cyan-300 uppercase">
-                                Gemini Natural Language Claims Audit
-                              </span>
-                            </div>
-                            <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-700/50">
-                              {backendResult?.ai_reasoning?.model || 'gemini-2.5-flash'}
-                            </span>
-                          </div>
-
-                          {/* Authoritative ML Core Metrics */}
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Calibrated Risk:</span>
-                              <span className={`font-bold text-xs ${effectiveGlobalScore >= 18 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                {effectiveGlobalScore}% ({effectiveGlobalAction})
-                              </span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Decision Threshold:</span>
-                              <span className="font-bold text-slate-200 text-xs">0.1798 (17.98%)</span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Anomaly Score:</span>
-                              <span className="font-bold text-amber-300 text-xs">
-                                {(backendResult?.ml_risk_json?.risk?.anomaly_score ?? 0.303).toFixed(3)}
-                              </span>
-                            </div>
-                            <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
-                              <span className="text-slate-400 block text-[9px] uppercase">Model Artifact:</span>
-                              <span className="font-bold text-cyan-300 text-[10px] truncate block">
-                                insurance/model.joblib
-                              </span>
-                            </div>
-                          </div>
-
-                          <div className="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-2">
-                            {isCalculating ? (
-                              <div className="py-6 flex flex-col items-center justify-center gap-2 text-xs text-slate-400">
-                                <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-                                <span>Evaluating insurance claim &amp; streaming Gemini explanation...</span>
-                              </div>
-                            ) : (
-                              renderFormattedAiText(backendResult?.ai_reasoning?.text || (
-                                `**Assessment Summary**:\n` +
-                                `Calibrated Claim Fraud Probability: ${effectiveGlobalScore}% (${effectiveGlobalAction}). Threshold cutoff: 17.98%.\n\n` +
-                                `**Key Feature Evidence (SHAP Drivers)**:\n` +
-                                `Policyholder tenure of ${evaluatedClaim.policyholder_tenure_years} years is the dominant SHAP driver (+1.41 log-odds risk impact for recent policies). Claim-to-deductible ratio of ${claimToDeductibleRatio}x further elevates scrutiny.\n\n` +
-                                `**Network Context & Silo Parity**:\n` +
-                                `Isolated carriers cannot detect staged losses filed concurrently across multiple insurers. Federated collaborative screening identifies duplicate incident date signatures while keeping policyholder PII quarantined.\n\n` +
-                                `**Recommended Verification Checks**:\n` +
-                                `Request primary utility receipts corroborating occupancy at time of incident, verify contractor itemized repair bids, and audit state licensing credentials.`
-                              ))
-                            )}
-                          </div>
+                          <GeminiForensicCard
+                            domainTitle="Insurance Carriers (SIU Claims Fraud)"
+                            modelName={backendResult?.ml_risk_json?.model?.name || 'artifacts/insurance/model.joblib (GBDT 54-Feature)'}
+                            riskScore={effectiveGlobalScore}
+                            fraudProbability={backendResult?.ml_risk_json?.risk?.fraud_probability ?? (effectiveGlobalScore / 100)}
+                            decisionThreshold={backendResult?.ml_risk_json?.risk?.decision_threshold ?? 0.1798}
+                            classification={effectiveGlobalAction}
+                            anomalyScore={backendResult?.ml_risk_json?.risk?.anomaly_score ?? 0.303}
+                            shapDrivers={backendResult?.ml_risk_json?.risk_factors || [
+                              { feature: 'policyholder_tenure_years', impact_log_odds: evaluatedClaim.policyholder_tenure_years < 1 ? 1.41 : -0.65, direction: evaluatedClaim.policyholder_tenure_years < 1 ? 'increases_risk' : 'decreases_risk' },
+                              { feature: 'claim_amount', impact_log_odds: -0.32, direction: 'decreases_risk' },
+                              { feature: 'claim_to_deductible_ratio', impact_log_odds: 0.24, direction: 'increases_risk' },
+                              { feature: `claim_type_${evaluatedClaim.claim_type}`, impact_log_odds: -0.14, direction: 'decreases_risk' },
+                              { feature: 'filing_delay_days', impact_log_odds: 0.08, direction: 'increases_risk' },
+                            ]}
+                            aiReasoningText={backendResult?.ai_reasoning?.text}
+                            rawRecord={evaluatedClaim}
+                            isLiveGemini={backendResult?.ai_reasoning?.source === 'gemini'}
+                          />
                         </motion.div>
                       )}
 
@@ -759,64 +723,46 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Isolated Carrier Silo */}
-                  <TiltedCard maxTilt={8} className="p-6 border-2 border-amber-300 bg-gradient-to-b from-white to-amber-50/40 shadow-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-mono text-slate-700 font-bold">Isolated Carrier Silo</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-amber-100 text-amber-900 font-bold border border-amber-200">
-                        Blind to Multi-Carrier
-                      </span>
+                {/* Model Evaluation Sync Banner */}
+                {isDirty ? (
+                  <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 flex items-center justify-between text-xs text-amber-950 animate-pulse shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Risk &amp; Run Underwriting Model&quot; to update inference.</span>
                     </div>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <div className="text-4xl font-extrabold font-mono text-emerald-600">
-                        <CountUp to={siloScore} duration={0.8} />
-                      </div>
-                      <span className="text-xs text-slate-400 font-mono font-medium">/ 100 risk</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCalculateAndSend()}
+                      className="px-2.5 py-1 bg-amber-600 text-white rounded-lg font-bold text-[11px] shrink-0 hover:bg-amber-700 cursor-pointer shadow-xs"
+                    >
+                      Calculate Now &rarr;
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between text-xs text-emerald-950">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Model scores are active &amp; synchronized with insurance claim parameters.</span>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-amber-100 flex items-center justify-between text-xs">
-                      <span className="text-slate-600 font-medium">Decision:</span>
-                      <span className="px-2.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                        Fast-Track Settlement
-                      </span>
-                    </div>
-                    <div className="mt-3 text-[11px] text-rose-600 font-mono font-bold">
-                      ⚠️ False Negative (Blind to cross-carrier staged claim velocity)
-                    </div>
-                  </TiltedCard>
+                    <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold border border-emerald-200">
+                      Active
+                    </span>
+                  </div>
+                )}
 
-                  {/* TrustFed Federated Global Model */}
-                  <TiltedCard maxTilt={8} className="p-6 border-2 border-emerald-400 bg-gradient-to-b from-white to-emerald-50/40 shadow-2xl">
-                    <BorderBeam duration={5} colorFrom="#0284C7" colorTo="#10B981" />
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-mono font-bold text-emerald-900">TrustFed Federated Global</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
-                        {backendStatus === 'connected' ? 'insurance + Gemini' : 'SecAgg + DP'}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <div className={`text-4xl font-extrabold font-mono ${
-                        effectiveGlobalScore >= 18 ? 'text-rose-600' : 'text-emerald-600'
-                      }`}>
-                        <CountUp to={effectiveGlobalScore} duration={0.8} />
-                      </div>
-                      <span className="text-xs text-slate-400 font-mono font-medium">/ 100 risk</span>
-                    </div>
-                    <div className="mt-4 pt-3 border-t border-emerald-100 flex items-center justify-between text-xs">
-                      <span className="text-slate-600 font-medium">Recommended Action:</span>
-                      <span className={`px-2.5 py-0.5 rounded-full font-bold ${
-                        effectiveGlobalScore >= 18 
-                          ? 'bg-rose-100 text-rose-800 border border-rose-300' 
-                          : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                      }`}>
-                        {effectiveGlobalAction}
-                      </span>
-                    </div>
-                    <div className="mt-3 text-[11px] text-emerald-700 font-mono font-bold">
-                      ✓ Calibrated across 1,000,000 policyholders
-                    </div>
-                  </TiltedCard>
-                </div>
+                <ModelShowdownCard
+                  domainTitle="Insurance Carriers (SIU Claims Fraud)"
+                  siloModelName="Isolated Carrier Silo Model"
+                  federatedModelName="TrustFed Global Federated Model"
+                  siloScore={siloScore}
+                  federatedScore={effectiveGlobalScore}
+                  siloVerdict={siloScore >= 18 ? 'SIU Investigation' : 'Fast-Track Settlement'}
+                  federatedVerdict={effectiveGlobalAction}
+                  defaultThreshold={backendResult?.ml_risk_json?.risk?.decision_threshold ?? 0.1798}
+                  prAucLiftText="+185.3% PR-AUC Advantage"
+                  fpReductionText="-64.2% False Positives"
+                  totalPopulation={1000000}
+                />
 
                 <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-md space-y-2">
                   <span className="text-xs font-mono uppercase text-slate-700 font-bold block">

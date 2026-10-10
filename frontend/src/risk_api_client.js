@@ -4,7 +4,9 @@
 
 const CANDIDATE_BASES = [
   "http://localhost:8000",
-  "http://127.0.0.1:8000"
+  "http://127.0.0.1:8000",
+  "http://localhost:8001",
+  "http://127.0.0.1:8001"
 ];
 
 let cachedWorkingBase = null;
@@ -18,8 +20,11 @@ async function getWorkingBase() {
       const res = await fetch(`${base}/health`, { signal: controller.signal });
       clearTimeout(timer);
       if (res.ok) {
-        cachedWorkingBase = base;
-        return base;
+        const data = await res.json();
+        if (data && (data.models || data.status === 'ok')) {
+          cachedWorkingBase = base;
+          return base;
+        }
       }
     } catch (_) {}
   }
@@ -34,13 +39,15 @@ export async function checkBackendHealth() {
       const response = await fetch(`${base}/health`, { signal: controller.signal });
       clearTimeout(timer);
       if (response.ok) {
-        cachedWorkingBase = base;
         const data = await response.json();
-        return { ...data, endpoint: base };
+        if (data && (data.models || data.status === 'ok')) {
+          cachedWorkingBase = base;
+          return { ...data, endpoint: base };
+        }
       }
     } catch (_) {}
   }
-  return { status: "offline", error: "Failed to connect to backend on localhost:8000 or 127.0.0.1:8000" };
+  return { status: "offline", error: "Failed to connect to backend on localhost:8000 or 8001" };
 }
 
 export async function assessRisk(domain, userInput, includeAiReasoning = true) {

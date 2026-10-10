@@ -148,21 +148,24 @@ export const ModernTabsWithHover: React.FC<ModernTabsWithHoverProps> = ({
 
   return (
     <div className="relative z-30">
-      {/* Main Tab Container: 3 Columns Grid */}
-      <div className="w-full p-2.5 rounded-2xl bg-white/90 border-2 border-blue-200/90 backdrop-blur-2xl shadow-2xl shadow-emerald-500/15">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+      {/* Main Tab Container: 3 Columns Bento Grid */}
+      <div className="w-full p-2 rounded-3xl bg-white/90 dark:bg-slate-900/90 border border-slate-200/90 dark:border-white/10 backdrop-blur-2xl shadow-xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
           {MAIN_TABS.map((tab) => {
             const isActive = activeMainTab === tab.id;
             const isMenuOpen = hoveredTabId === tab.id || clickedOpenTabId === tab.id;
 
-            const activeGradient = 
-              'bg-gradient-to-r from-blue-600 via-cyan-600 to-emerald-600 text-white shadow-[0_4px_0_#047857,0_12px_24px_-2px_rgba(16,185,129,0.45)] border-green-300/60';
+            const activeGradient = tab.id === 'intelligence'
+              ? 'bg-gradient-to-r from-cyan-600 via-teal-600 to-emerald-600 text-white shadow-lg shadow-cyan-500/25 border-cyan-400/60'
+              : tab.id === 'creditfraud'
+              ? 'bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25 border-indigo-400/60'
+              : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-lg shadow-emerald-500/25 border-emerald-400/60';
 
             const inactiveStyle = 
-              'bg-gradient-to-r from-slate-50 via-white to-blue-50/50 border-2 border-slate-200/80 text-slate-800 hover:border-blue-400 hover:shadow-md';
+              'bg-slate-50/70 hover:bg-slate-100/80 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 text-slate-800 dark:text-slate-100';
 
-            const iconColor = tab.id === 'intelligence' ? 'text-emerald-600' : tab.id === 'creditfraud' ? 'text-blue-600' : 'text-teal-600';
-            const badgeStyle = 'bg-slate-100 text-slate-700 border-slate-200';
+            const iconColor = tab.id === 'intelligence' ? 'text-cyan-500' : tab.id === 'creditfraud' ? 'text-indigo-500' : 'text-emerald-500';
+            const badgeStyle = 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700';
 
             return (
               <div
@@ -178,7 +181,7 @@ export const ModernTabsWithHover: React.FC<ModernTabsWithHoverProps> = ({
                     onSelectTab(tab.id, tab.subtabs[0].id);
                     setClickedOpenTabId((prev) => (prev === tab.id ? null : tab.id));
                   }}
-                  className={`w-full relative flex items-center justify-between p-3.5 rounded-xl transition-all duration-200 text-left cursor-pointer group border ${
+                  className={`w-full relative flex items-center justify-between p-3.5 rounded-2xl transition-all duration-200 text-left cursor-pointer group border ${
                     isActive
                       ? `${activeGradient} -translate-y-0.5`
                       : `${inactiveStyle}`
@@ -189,16 +192,16 @@ export const ModernTabsWithHover: React.FC<ModernTabsWithHoverProps> = ({
                       className={`p-2 rounded-xl transition-transform duration-300 group-hover:scale-110 shrink-0 ${
                         isActive
                           ? 'bg-white/20 text-white shadow-inner backdrop-blur-sm'
-                          : `bg-white border border-slate-200/80 ${iconColor} shadow-sm`
+                          : `bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 ${iconColor} shadow-sm`
                       }`}
                     >
                       {tab.icon}
                     </div>
                     <div className="min-w-0">
-                      <span className={`text-xs sm:text-sm font-bold tracking-tight block truncate ${isActive ? 'text-white' : 'text-slate-900'}`}>
+                      <span className={`text-xs sm:text-sm font-bold tracking-tight block truncate ${isActive ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
                         {tab.label}
                       </span>
-                      <span className={`text-[10px] sm:text-[11px] block truncate mt-0.5 ${isActive ? 'text-white/90' : 'text-slate-500'}`}>
+                      <span className={`text-[10px] sm:text-[11px] block truncate mt-0.5 ${isActive ? 'text-white/90' : 'text-slate-500 dark:text-slate-400'}`}>
                         {tab.subtitle}
                       </span>
                     </div>
@@ -232,9 +235,9 @@ export const ModernTabsWithHover: React.FC<ModernTabsWithHoverProps> = ({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 6, scale: 0.98 }}
                       transition={{ duration: 0.18, ease: 'easeOut' }}
-                      className="absolute top-full left-0 right-0 mt-2 p-3 rounded-2xl bg-white/95 border-2 border-blue-200/90 backdrop-blur-3xl shadow-2xl shadow-slate-900/15 z-50 space-y-2 min-w-[280px]"
+                      className="absolute top-full left-0 right-0 mt-2 p-3 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-700/80 backdrop-blur-3xl shadow-2xl z-50 space-y-2 min-w-[280px]"
                     >
-                      <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 flex items-center justify-between border-b border-blue-100 pb-1.5">
+                      <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-blue-700 dark:text-cyan-400 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
                         <span className="flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                           Sub-Modules ({tab.subtabs.length})
@@ -256,25 +259,25 @@ export const ModernTabsWithHover: React.FC<ModernTabsWithHoverProps> = ({
                               }}
                               className={`p-2 rounded-xl transition-all duration-200 cursor-pointer flex items-start gap-2.5 text-left ${
                                 isSubActive
-                                  ? 'bg-gradient-to-r from-blue-100/90 to-emerald-100/90 border border-emerald-300 shadow-sm'
-                                  : 'hover:bg-slate-50 border border-transparent hover:border-slate-200'
+                                  ? 'bg-blue-50 dark:bg-blue-950/60 border border-blue-300 dark:border-blue-700 shadow-sm'
+                                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
                               }`}
                             >
-                              <div className="p-1.5 rounded-lg bg-white border border-slate-200 shadow-xs shrink-0 mt-0.5">
+                              <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs shrink-0 mt-0.5">
                                 {sub.icon}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between">
-                                  <span className={`text-xs font-bold truncate ${isSubActive ? 'text-indigo-950 font-black' : 'text-slate-900'}`}>
+                                  <span className={`text-xs font-bold truncate ${isSubActive ? 'text-blue-900 dark:text-cyan-300 font-black' : 'text-slate-900 dark:text-slate-100'}`}>
                                     {sub.label}
                                   </span>
                                   {sub.badge && (
-                                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold bg-slate-100 text-slate-600 border border-slate-200 shrink-0 ml-1">
+                                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0 ml-1">
                                       {sub.badge}
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-[10px] text-slate-500 leading-snug mt-0.5 line-clamp-1">
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug mt-0.5 line-clamp-1">
                                   {sub.desc}
                                 </p>
                               </div>

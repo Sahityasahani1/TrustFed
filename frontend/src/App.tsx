@@ -19,6 +19,9 @@ import { InsuranceClaimsView } from './components/views/InsuranceClaimsView';
 import { Hero3DStage } from './components/hero/Hero3DStage';
 import { IntroPage } from './components/pages/IntroPage';
 import { ArrowLeft, ArrowRight, Home } from 'lucide-react';
+import { TopNavHUD } from './components/navigation/TopNavHUD';
+import { CommandPalette } from './components/common/CommandPalette';
+import { ToastProvider } from './components/common/ToastNotification';
 
 export function App() {
   const parseHash = () => {
@@ -47,8 +50,27 @@ export function App() {
   const [activeMainTab, setActiveMainTab] = useState<string>(initialParsed.main);
   const [activeSubTab, setActiveSubTab] = useState<string>(initialParsed.sub);
 
-  // Typography Combination State (Auge Complete Family vs Inter vs Plus Jakarta)
-  const [fontCombo, setFontCombo] = useState<'auge' | 'inter' | 'jakarta'>('auge');
+  // Dark Mode / Studio Light Theme State
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('trustfed-theme');
+      if (saved) return saved === 'dark';
+    }
+    return true; // Default to Obsidian command center theme
+  });
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('trustfed-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('trustfed-theme', 'light');
+    }
+  }, [isDark]);
 
   // Blue & Green Color Theme Palette Vibe
   const [colorVibe, setColorVibe] = useState<'ocean-mint' | 'emerald-cyan'>('ocean-mint');
@@ -138,111 +160,35 @@ export function App() {
   };
 
   return (
-    <div className={`relative min-h-screen bg-transparent text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-900 ${colorVibe === 'emerald-cyan' ? 'vibe-emerald-cyan' : 'vibe-ocean-mint'} ${fontCombo === 'auge' ? 'font-combo-auge' : fontCombo === 'inter' ? 'font-combo-inter' : 'font-combo-jakarta'}`}>
-      {/* Dynamic Luminous Floating Pastel Orbs */}
-      <ParticlesBackground quantity={45} />
+    <ToastProvider>
+      <div className={`relative min-h-screen bg-transparent text-slate-900 dark:text-slate-100 selection:bg-emerald-500/20 selection:text-emerald-900 transition-colors duration-200`}>
+        {/* Dynamic Luminous Floating Particles */}
+        <ParticlesBackground quantity={isDark ? 30 : 45} />
 
-      {/* Main Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-6">
-        
-        {/* Floating Top Navigation Bar matching Avela Reference */}
-        <header className="sticky top-4 z-40 flex items-center justify-between p-3.5 px-6 rounded-full bg-white/90 backdrop-blur-2xl border-2 border-blue-200/90 shadow-2xl shadow-emerald-500/15">
-          {/* Logo & Platform Name */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleGoToIntro}
-              className="flex items-center gap-3 cursor-pointer group text-left"
-            >
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-emerald-500 p-0.5 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
-                <div className="h-full w-full bg-white rounded-[10px] flex items-center justify-center text-emerald-600">
-                  <ShieldCheck className="w-5 h-5 animate-pulse" />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl font-extrabold tracking-tight text-slate-900 font-display">
-                  Trust<span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-emerald-500 bg-clip-text text-transparent">Fed</span>
-                </span>
-                <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-gradient-to-r from-blue-100 to-emerald-100 text-emerald-800 border border-emerald-300">
-                  MVP v1.0
-                </span>
-              </div>
-            </button>
-          </div>
+        {/* Global Command Palette Modal */}
+        <CommandPalette
+          isOpen={isCommandPaletteOpen}
+          onClose={() => setIsCommandPaletteOpen(false)}
+          onSelectTab={handleSelectTab}
+          onToggleTheme={() => setIsDark((prev) => !prev)}
+          isDark={isDark}
+          onStartPitch={handleToggleAutoDemo}
+        />
 
-          {/* Center: Live Privacy Telemetry Pills + Font & Color Live Switchers */}
-          <div className="hidden lg:flex items-center gap-2 text-xs font-mono">
-            {/* Blue & Green Color Palette Live Switcher */}
-            <button
-              onClick={() => setColorVibe(prev => prev === 'ocean-mint' ? 'emerald-cyan' : 'ocean-mint')}
-              className="btn-3d-glass px-3.5 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer text-emerald-800 hover:text-emerald-950 shadow-sm border-2 border-emerald-200 bg-emerald-50/60"
-              title="Click to toggle between bright Blue and Green themes: Ocean Mint and Emerald Cyan"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-tr from-blue-500 to-emerald-400 animate-pulse" />
-              <span className="text-[10px] uppercase font-bold text-slate-400">Color:</span>
-              <span className="font-extrabold text-emerald-700">
-                {colorVibe === 'ocean-mint' ? '🌊 Ocean Mint' : '🌲 Emerald Cyan'}
-              </span>
-            </button>
-
-            {/* Font Combination Live Toggle Button */}
-            <button
-              onClick={() => setFontCombo(prev => prev === 'auge' ? 'inter' : prev === 'inter' ? 'jakarta' : 'auge')}
-              className="btn-3d-glass px-3.5 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer text-blue-800 hover:text-blue-950 shadow-sm border-2 border-blue-200 bg-blue-50/60"
-              title="Click to toggle font family between Auge, Inter, and Plus Jakarta"
-            >
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              <span className="text-[10px] uppercase font-bold text-slate-400">Font:</span>
-              <span className="font-extrabold text-blue-700">
-                {fontCombo === 'auge' ? 'Auge Complete' : fontCombo === 'inter' ? 'Inter + Mono' : 'Jakarta + DM'}
-              </span>
-            </button>
-
-            <div className="px-3 py-1.5 rounded-full bg-emerald-50 border-2 border-emerald-300 shadow-sm flex items-center gap-1.5 font-bold text-emerald-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-emerald-700 font-medium">Raw Records:</span>
-              <span className="text-emerald-600 font-extrabold">0</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-full bg-blue-50 border-2 border-blue-300 shadow-sm flex items-center gap-1.5 font-bold text-blue-800">
-              <Lock className="w-3 h-3 text-blue-600" />
-              <span className="text-blue-700 font-medium">SecAgg+:</span>
-              <span className="text-blue-700 font-extrabold">3/3</span>
-            </div>
-            <div className="px-3 py-1.5 rounded-full bg-teal-50 border-2 border-teal-300 shadow-sm flex items-center gap-1.5 font-bold text-teal-800">
-              <span className="text-teal-700 font-medium">DP:</span>
-              <span className="text-teal-700 font-extrabold">ε=2.45</span>
-            </div>
-          </div>
-
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-3">
-            {pageMode === 'features' ? (
-              <>
-                <button
-                  onClick={handleGoToIntro}
-                  className="btn-3d-glass px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 cursor-pointer text-slate-700"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Intro</span>
-                </button>
-                <button
-                  onClick={handleToggleAutoDemo}
-                  className="btn-3d-primary px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>{isRunningAutoDemo ? 'Pitch Playing...' : 'Run 3-Min Pitch'}</span>
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={handleGoToFeatures}
-                className="btn-3d-primary px-5 py-2 rounded-full text-xs font-bold flex items-center gap-2 cursor-pointer shadow-lg"
-              >
-                <span>Let's Start</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-        </header>
+        {/* Main Container */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-6">
+          
+          {/* Floating Top Navigation HUD */}
+          <TopNavHUD
+            pageMode={pageMode}
+            onGoToIntro={handleGoToIntro}
+            onGoToFeatures={handleGoToFeatures}
+            isDark={isDark}
+            onToggleTheme={() => setIsDark((prev) => !prev)}
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            isRunningPitch={isRunningAutoDemo}
+            onTogglePitch={handleToggleAutoDemo}
+          />
 
         {/* PAGE CONTENT ROUTER: INTRO PAGE VS FEATURES PLATFORM */}
         <AnimatePresence mode="wait" initial={false}>
@@ -257,6 +203,7 @@ export function App() {
               <IntroPage
                 onStart={handleGoToFeatures}
                 onRunSimulation={handleRunSimulationFromHero}
+                onInspectDomain={(domain) => handleSelectTab(domain)}
               />
             </motion.div>
           ) : (
@@ -271,8 +218,8 @@ export function App() {
               {/* 3 Main Tabs with Floating Hover Subtab Mega-Preview */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between px-2">
-                  <span className="text-xs font-mono uppercase text-blue-700 font-bold tracking-wider flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-600" />
+                  <span className="text-xs font-mono uppercase text-blue-700 dark:text-cyan-400 font-bold tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-cyan-400 animate-pulse" />
                     Interactive Platform Modules (Hover to preview all subtabs)
                   </span>
                   <span className="text-xs text-slate-400 font-medium hidden sm:inline">
@@ -321,39 +268,40 @@ export function App() {
           )}
         </AnimatePresence>
 
-        {/* Sleek Modern Footer matching reference image */}
-        <footer className="pt-12 pb-8 border-t border-slate-200/80 space-y-6">
+        {/* Sleek Modern Footer with High-Tech Telemetry Badges */}
+        <footer className="pt-12 pb-8 border-t border-slate-200/80 dark:border-white/10 space-y-6">
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 shadow-sm text-slate-700 flex items-center gap-2">
+            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
               Zero Customer Records Transmitted
             </span>
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 shadow-sm text-slate-700 flex items-center gap-2">
+            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-cyan-500" />
               Diffie-Hellman SecAgg+ Masking
             </span>
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 shadow-sm text-slate-700 flex items-center gap-2">
+            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-teal-500" />
               Rényi DP Differential Privacy (ε=2.45)
             </span>
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 shadow-sm text-slate-700 flex items-center gap-2">
+            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-blue-500" />
               NIST AI RMF Fairness & Drift Monitored
             </span>
           </div>
 
-          <div className="text-center text-xs text-slate-500 space-y-1">
-            <p className="font-bold text-slate-800">
-              TrustFed • Privacy-Preserving Federated Fraud Intelligence Architecture
+          <div className="text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
+            <p className="font-bold text-slate-800 dark:text-slate-200">
+              TrustFed • Privacy-Preserving Federated Fraud Intelligence Command Center
             </p>
-            <p className="text-[11px] text-slate-400 font-mono">
-              "Institutions collaborate on intelligence, never on customer records." Designed for the ENIGMA Hackathon.
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+              "Institutions collaborate on intelligence, never on customer records." Press ⌘K for Command Bar.
             </p>
           </div>
         </footer>
 
       </div>
     </div>
+    </ToastProvider>
   );
 }
 

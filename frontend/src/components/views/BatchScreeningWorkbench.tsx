@@ -30,6 +30,8 @@ import {
   getSampleDownloadUrl,
   assessRisk 
 } from '../../risk_api_client';
+import { GeminiForensicCard } from '../forensics/GeminiForensicCard';
+import { useToast } from '../common/ToastNotification';
 
 export interface BatchScreeningWorkbenchProps {
   domain: 'banks' | 'lenders' | 'insurers';
@@ -558,92 +560,59 @@ export const BatchScreeningWorkbench: React.FC<BatchScreeningWorkbenchProps> = (
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-              className="w-full max-w-2xl h-full bg-white shadow-2xl p-6 overflow-y-auto space-y-6 flex flex-col justify-between"
+              className="w-full max-w-2xl h-full bg-slate-900 text-slate-100 border-l border-slate-700 shadow-2xl p-6 overflow-y-auto space-y-6 flex flex-col justify-between"
             >
               <div className="space-y-6">
                 {/* Drawer Header */}
-                <div className="flex items-start justify-between pb-4 border-b border-slate-200">
+                <div className="flex items-start justify-between pb-4 border-b border-slate-800">
                   <div>
-                    <span className="text-[10px] font-mono uppercase font-bold text-blue-600 tracking-wider">
+                    <span className="text-[10px] font-mono uppercase font-bold text-cyan-400 tracking-wider">
                       Authoritative Regulatory Brief
                     </span>
-                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-0.5">
-                      <Bot className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2 mt-0.5">
+                      <Bot className="w-5 h-5 text-cyan-400" />
                       AI Audit Inspection — {selectedRecord.record_id}
                     </h3>
                   </div>
 
                   <button
                     onClick={() => { setSelectedRecord(null); setAiAssessment(null); }}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
 
-                {/* Record Metadata Chip */}
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">Screened Parameters</span>
-                  <p className="text-xs font-semibold text-slate-800">{selectedRecord.summary}</p>
-                  <div className="flex items-center gap-4 text-xs font-mono pt-1 text-slate-600">
-                    <span>Score: <b>{selectedRecord.risk_score}/100</b></span>
-                    <span>Probability: <b>{(selectedRecord.fraud_probability * 100).toFixed(1)}%</b></span>
-                    <span>Status: <b className={selectedRecord.classification === 'fraud' ? 'text-rose-600' : 'text-emerald-600'}>{selectedRecord.classification.toUpperCase()}</b></span>
-                  </div>
-                </div>
-
-                {/* AI Narrative Section */}
+                {/* AI Loading State */}
                 {aiLoading ? (
                   <div className="p-12 text-center space-y-3">
-                    <RefreshCw className="w-6 h-6 text-blue-600 animate-spin mx-auto" />
-                    <p className="text-xs font-bold text-slate-700">Synthesizing Google Gemini Audit Narrative...</p>
+                    <RefreshCw className="w-6 h-6 text-cyan-400 animate-spin mx-auto" />
+                    <p className="text-xs font-bold text-slate-200">Synthesizing Google Gemini Audit Narrative...</p>
                     <p className="text-[11px] text-slate-400">Translating statistical SHAP attributions into NIST-compliant regulatory language</p>
                   </div>
-                ) : aiAssessment?.ai_reasoning?.text ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-xs font-mono text-slate-500">
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                        Model: {aiAssessment.ai_reasoning.model || 'Gemini 2.5 Flash'}
-                      </span>
-                      <span>Source: {aiAssessment.ai_reasoning.source}</span>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 text-xs text-slate-800 space-y-3 leading-relaxed whitespace-pre-wrap font-sans">
-                      {aiAssessment.ai_reasoning.text}
-                    </div>
-
-                    {/* SHAP Factor Table */}
-                    {aiAssessment.ml_risk_json?.risk_factors && (
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                          <Cpu className="w-3.5 h-3.5 text-blue-600" />
-                          Top SHAP Statistical Drivers
-                        </h4>
-                        <div className="space-y-1.5">
-                          {aiAssessment.ml_risk_json.risk_factors.map((f: any, idx: number) => (
-                            <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 text-xs">
-                              <span className="font-mono font-medium text-slate-700">{f.feature}</span>
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
-                                f.direction === 'increases_risk' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'
-                              }`}>
-                                {f.direction} ({f.impact_log_odds > 0 ? '+' : ''}{f.impact_log_odds.toFixed(3)})
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                ) : aiAssessment ? (
+                  <GeminiForensicCard
+                    domainTitle={domainTitle}
+                    modelName={aiAssessment.ml_risk_json?.model?.name || domainTitle}
+                    riskScore={aiAssessment.ml_risk_json?.risk?.risk_score ?? selectedRecord.risk_score}
+                    fraudProbability={aiAssessment.ml_risk_json?.risk?.fraud_probability ?? selectedRecord.fraud_probability}
+                    decisionThreshold={aiAssessment.ml_risk_json?.risk?.decision_threshold ?? summary?.decision_threshold ?? 0.4}
+                    classification={aiAssessment.ml_risk_json?.risk?.classification ?? selectedRecord.classification}
+                    anomalyScore={aiAssessment.ml_risk_json?.risk?.anomaly_score ?? selectedRecord.anomaly_score}
+                    shapDrivers={aiAssessment.ml_risk_json?.risk_factors || []}
+                    aiReasoningText={aiAssessment.ai_reasoning?.text}
+                    rawRecord={selectedRecord.raw_record}
+                    isLiveGemini={aiAssessment.ai_reasoning?.source === 'gemini'}
+                  />
                 ) : (
-                  <div className="p-8 text-center text-xs text-slate-500">
+                  <div className="p-8 text-center text-xs text-slate-500 font-mono">
                     Click Inspect to query Google Gemini for this transaction.
                   </div>
                 )}
               </div>
 
               {/* Drawer Footer */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+              <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400 font-mono">
                 <span>Rényi DP (ε=2.45, δ=1e-5)</span>
                 <span>NIST AI RMF Compliant</span>
               </div>
