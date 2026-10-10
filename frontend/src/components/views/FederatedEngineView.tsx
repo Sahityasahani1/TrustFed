@@ -172,10 +172,10 @@ export const FederatedEngineView: React.FC<FederatedEngineViewProps> = ({
                   <button
                     onClick={runTrainingSimulation}
                     disabled={isTraining}
-                    className={`px-5 py-2.5 rounded-full text-xs font-bold flex items-center gap-2 cursor-pointer shadow-lg ${
+                    className={`px-5 py-2.5 rounded-xl text-xs font-mono font-medium flex items-center gap-2 cursor-pointer shadow-xs transition-colors ${
                       isTraining
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200 cursor-not-allowed'
-                        : 'btn-3d-gradient'
+                        ? 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700 cursor-not-allowed'
+                        : 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200'
                     }`}
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
@@ -184,7 +184,7 @@ export const FederatedEngineView: React.FC<FederatedEngineViewProps> = ({
 
                   <button
                     onClick={resetTraining}
-                    className="btn-3d-glass p-2.5 rounded-full cursor-pointer flex items-center justify-center"
+                    className="p-2.5 rounded-xl border border-zinc-200 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400 cursor-pointer flex items-center justify-center transition-colors"
                     title="Reset Experiments"
                   >
                     <RotateCcw className="w-4 h-4" />

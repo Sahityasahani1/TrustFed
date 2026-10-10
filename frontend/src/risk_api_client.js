@@ -156,3 +156,141 @@ export function getSampleDownloadUrl(filename) {
   return `${base}/api/samples/download/${filename}`;
 }
 
+/**
+ * Stream Gemini 2.5 Flash tokens in real-time using SSE (Server-Sent Events)
+ * with low TTFT (< 300ms) and live typewriter feedback.
+ */
+export async function streamRiskAssessment(domain, userInput, callbacks = {}) {
+  const { onToken, onMeta, onDone, onError, signal } = callbacks;
+  const base = cachedWorkingBase || (await getWorkingBase());
+
+  try {
+    const response = await fetch(`${base}/api/assess/stream`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        domain,
+        user_input: userInput,
+      }),
+      signal,
+    });
+
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => ({}));
+      throw new Error(errJson.detail || `Streaming failed with HTTP ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n\n");
+      // Keep unfinished segment in buffer
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("data: ")) {
+          try {
+            const parsed = JSON.parse(trimmed.slice(6));
+            if (parsed.type === "meta" && onMeta) {
+              onMeta(parsed);
+            } else if (parsed.type === "token" && onToken) {
+              onToken(parsed.token);
+            } else if (parsed.type === "done" && onDone) {
+              onDone(parsed);
+            }
+          } catch (e) {
+            console.warn("Failed to parse SSE line:", trimmed, e);
+          }
+        }
+      }
+    }
+
+    if (onDone) {
+      onDone({ done: true });
+    }
+  } catch (err) {
+    if (signal?.aborted) return;
+    if (onError) onError(err);
+    else throw err;
+  }
+}
+
+/**
+ * Get instantaneous telemetry snapshot over HTTP.
+ */
+export async function getTelemetrySnapshot() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  try {
+    const res = await fetch(`${base}/api/telemetry`);
+    if (res.ok) return await res.json();
+  } catch (_) {}
+  return null;
+}
+
+/**
+ * High-frequency WebSocket subscriber for live inference telemetry (P50/P95, throughput, SecAgg).
+ */
+export function connectTelemetryWebSocket(onTelemetry, onError) {
+  let isClosed = false;
+  let socket = null;
+  let retryTimer = null;
+
+  async function init() {
+    if (isClosed) return;
+    const base = cachedWorkingBase || (await getWorkingBase());
+    const wsUrl = base.replace(/^http/, "ws") + "/ws/telemetry";
+
+    try {
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        // Send initial ping to fetch instant snapshot
+        socket.send("refresh");
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (onTelemetry) onTelemetry(data);
+        } catch (_) {}
+      };
+
+      socket.onerror = (err) => {
+        if (onError) onError(err);
+      };
+
+      socket.onclose = () => {
+        if (!isClosed) {
+          retryTimer = setTimeout(init, 3000);
+        }
+      };
+    } catch (err) {
+      if (!isClosed) {
+        retryTimer = setTimeout(init, 3000);
+      }
+    }
+  }
+
+  init();
+
+  return () => {
+    isClosed = true;
+    if (retryTimer) clearTimeout(retryTimer);
+    if (socket) {
+      try {
+        socket.close();
+      } catch (_) {}
+    }
+  };
+}
+
+

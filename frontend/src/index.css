@@ -61,38 +61,12 @@
   body {
     font-family: var(--font-body);
     font-weight: 400;
-    background-color: #F8FAFC;
-    background-image: 
-      radial-gradient(at 10% 12%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-      radial-gradient(at 90% 10%, rgba(6, 182, 212, 0.08) 0px, transparent 50%),
-      radial-gradient(at 50% 45%, rgba(16, 185, 129, 0.05) 0px, transparent 55%),
-      radial-gradient(at 85% 85%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
-      radial-gradient(at 15% 85%, rgba(6, 182, 212, 0.06) 0px, transparent 50%);
+    background-color: #FAFAFA;
+    background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
     background-attachment: fixed;
-    color: #0F172A;
+    color: #09090B;
     overflow-x: hidden;
-  }
-
-  .vibe-ocean-mint {
-    background-color: #F0FDFA !important;
-    background-image: 
-      radial-gradient(at 8% 12%, rgba(37, 99, 235, 0.40) 0px, transparent 55%),
-      radial-gradient(at 88% 8%, rgba(52, 211, 153, 0.40) 0px, transparent 52%),
-      radial-gradient(at 50% 45%, rgba(6, 182, 212, 0.35) 0px, transparent 60%),
-      radial-gradient(at 85% 82%, rgba(16, 185, 129, 0.38) 0px, transparent 55%),
-      radial-gradient(at 12% 82%, rgba(14, 165, 233, 0.38) 0px, transparent 55%),
-      radial-gradient(at 50% 92%, rgba(4, 120, 87, 0.30) 0px, transparent 45%) !important;
-  }
-
-  .vibe-emerald-cyan {
-    background-color: #ECFDF5 !important;
-    background-image: 
-      radial-gradient(at 8% 12%, rgba(6, 182, 212, 0.42) 0px, transparent 55%),
-      radial-gradient(at 88% 8%, rgba(16, 185, 129, 0.42) 0px, transparent 52%),
-      radial-gradient(at 50% 45%, rgba(59, 130, 246, 0.32) 0px, transparent 60%),
-      radial-gradient(at 85% 82%, rgba(13, 148, 136, 0.38) 0px, transparent 55%),
-      radial-gradient(at 12% 82%, rgba(34, 197, 94, 0.35) 0px, transparent 55%),
-      radial-gradient(at 50% 92%, rgba(14, 165, 233, 0.32) 0px, transparent 45%) !important;
   }
 
   /* Headings: Auge Bold/ExtraBold OR Inter OR Plus Jakarta */
@@ -155,99 +129,76 @@
   }
 }
 
-/* 3D Tactile Buttons in Modern Tech Palette */
+/* Clean Enterprise Button Utilities */
 .btn-3d-primary {
-  background: linear-gradient(180deg, #6366F1 0%, #4F46E5 100%);
-  box-shadow: 0 4px 0 #3730A3, 0 12px 24px -2px rgba(99, 102, 241, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-  border: 1px solid #4338CA;
-  color: white;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #18181B;
+  color: #FAFAFA;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+.dark .btn-3d-primary {
+  background-color: #FAFAFA;
+  color: #18181B;
 }
 .btn-3d-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 #3730A3, 0 16px 28px -2px rgba(99, 102, 241, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.6);
-}
-.btn-3d-primary:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 #3730A3, 0 4px 8px -2px rgba(99, 102, 241, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  opacity: 0.9;
 }
 
 .btn-3d-gradient {
-  background: linear-gradient(135deg, #6366F1 0%, #06B6D4 50%, #10B981 100%);
-  box-shadow: 0 4px 0 #0E7490, 0 12px 24px -2px rgba(6, 182, 212, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  border: 1px solid #0891B2;
-  color: white;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #18181B;
+  color: #FAFAFA;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.15s ease;
+}
+.dark .btn-3d-gradient {
+  background-color: #FAFAFA;
+  color: #18181B;
 }
 .btn-3d-gradient:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 #0E7490, 0 16px 28px -2px rgba(6, 182, 212, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.6);
-}
-.btn-3d-gradient:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 #0E7490, 0 4px 8px -2px rgba(6, 182, 212, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  opacity: 0.9;
 }
 
 .btn-3d-glass {
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-  box-shadow: 0 3px 0 #E2E8F0, 0 6px 14px -2px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9);
-  border: 1px solid #CBD5E1;
-  color: #0F172A;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #FFFFFF;
+  border: 1px solid #E4E4E7;
+  color: #18181B;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease;
 }
 .dark .btn-3d-glass {
-  background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
-  box-shadow: 0 3px 0 #0A0F1D, 0 6px 14px -2px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #F8FAFC;
+  background-color: #18181B;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #FAFAFA;
 }
 .btn-3d-glass:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 #CBD5E1, 0 10px 18px -2px rgba(99, 102, 241, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.9);
-  border-color: #818CF8;
+  background-color: #F4F4F5;
 }
 .dark .btn-3d-glass:hover {
-  box-shadow: 0 5px 0 #0A0F1D, 0 10px 18px -2px rgba(99, 102, 241, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  border-color: rgba(99, 102, 241, 0.4);
-}
-.btn-3d-glass:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 #E2E8F0, 0 2px 6px -1px rgba(0, 0, 0, 0.04);
-}
-.dark .btn-3d-glass:active {
-  box-shadow: 0 1px 0 #0A0F1D, 0 2px 6px -1px rgba(0, 0, 0, 0.3);
+  background-color: #27272A;
 }
 
 .btn-3d-danger {
-  background: linear-gradient(180deg, #F43F5E 0%, #E11D48 100%);
-  box-shadow: 0 3.5px 0 #9F1239, 0 8px 16px -2px rgba(244, 63, 94, 0.40), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  background-color: #E11D48;
+  color: #FFFFFF;
   border: 1px solid #BE123C;
-  color: white;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px 0 rgba(225, 29, 72, 0.2);
+  transition: all 0.15s ease;
 }
 .btn-3d-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5.5px 0 #9F1239, 0 12px 20px -2px rgba(244, 63, 94, 0.50), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-}
-.btn-3d-danger:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 #9F1239, 0 3px 6px -1px rgba(244, 63, 94, 0.25);
+  background-color: #BE123C;
 }
 
 .btn-3d-success {
-  background: linear-gradient(180deg, #10B981 0%, #059669 100%);
-  box-shadow: 0 3.5px 0 #065F46, 0 8px 16px -2px rgba(16, 185, 129, 0.40), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  background-color: #059669;
+  color: #FFFFFF;
   border: 1px solid #047857;
-  color: white;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px 0 rgba(5, 150, 105, 0.2);
+  transition: all 0.15s ease;
 }
 .btn-3d-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5.5px 0 #065F46, 0 12px 20px -2px rgba(16, 185, 129, 0.50), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-}
-.btn-3d-success:active {
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 #065F46, 0 3px 6px -1px rgba(16, 185, 129, 0.25);
+  background-color: #047857;
 }
 
 /* Custom scrollbars */
@@ -399,134 +350,82 @@
 }
 
 /* ========================================================================= */
-/* NEXT-GEN CELESTIAL HORIZON & AETHER COSMIC THEME ARCHITECTURE             */
+/* MINIMALIST OBSIDIAN & STUDIO LIGHT DESIGN SYSTEM                          */
 /* ========================================================================= */
 
-/* Obsidian Cosmic Space Surface Base */
+/* Obsidian Dark Surface Base */
 .dark body,
 body.dark,
 [data-theme="dark"] {
-  background-color: #02050E !important;
-  background-image: 
-    radial-gradient(at 50% 0%, rgba(30, 58, 138, 0.22) 0px, transparent 60%),
-    radial-gradient(at 15% 25%, rgba(59, 130, 246, 0.10) 0px, transparent 45%),
-    radial-gradient(at 85% 25%, rgba(14, 165, 233, 0.10) 0px, transparent 45%),
-    radial-gradient(at 50% 100%, rgba(37, 99, 235, 0.18) 0px, transparent 55%) !important;
-  color: #F8FAFC !important;
+  background-color: #09090B !important;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
+  background-attachment: fixed !important;
+  color: #FAFAFA !important;
 }
 
-/* Luminous Celestial Atmospheric Earth Arc (from reference) */
-.celestial-horizon-container {
-  position: absolute;
-  bottom: -220px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 150%;
-  max-width: 1700px;
-  height: 520px;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.celestial-horizon-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(96, 165, 250, 0.95) 0%, rgba(37, 99, 235, 0.55) 25%, rgba(14, 165, 233, 0.3) 50%, transparent 75%);
-  filter: blur(32px);
-}
-
-.celestial-horizon-line {
-  position: absolute;
-  top: 0;
-  left: 3%;
-  right: 3%;
-  height: 2px;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, transparent 0%, rgba(96, 165, 250, 0.5) 15%, #ffffff 50%, rgba(96, 165, 250, 0.5) 85%, transparent 100%);
-  box-shadow: 0 0 25px 5px rgba(147, 197, 253, 0.95), 0 0 60px 15px rgba(59, 130, 246, 0.7);
-}
-
-.celestial-horizon-body {
-  position: absolute;
-  top: 1px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  background: radial-gradient(ellipse at 50% 0%, #030712 0%, #02040A 50%, #010206 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.35);
-}
-
-/* Aether Glass Cards */
+/* Minimal Glass Cards */
 .aether-glass-card {
-  background: rgba(10, 16, 32, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(18, 18, 21, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 35px -5px rgba(37, 99, 235, 0.2);
-}
-
-/* Aether Center Command Console */
-.aether-console-card {
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(255, 255, 255, 1);
-  box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.7), 0 0 60px -5px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
 }
 
 .dark .dark-glass-header {
-  background: rgba(8, 13, 26, 0.82) !important;
+  background: rgba(9, 9, 11, 0.85) !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 25px -5px rgba(59, 130, 246, 0.15) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
 }
 
 .dark .bento-panel {
-  background: rgba(15, 23, 42, 0.82) !important;
-  border-color: rgba(255, 255, 255, 0.10) !important;
-  color: #F8FAFC !important;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5) !important;
+  background: rgba(18, 18, 21, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #FAFAFA !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3) !important;
 }
 
 .dark .bento-card-sub {
-  background: rgba(30, 41, 59, 0.65) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: #E2E8F0 !important;
+  background: rgba(24, 24, 27, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  color: #E4E4E7 !important;
 }
 
 .dark .text-slate-900 {
-  color: #F8FAFC !important;
+  color: #FAFAFA !important;
 }
 
 .dark .text-slate-800 {
-  color: #F1F5F9 !important;
+  color: #F4F4F5 !important;
 }
 
 .dark .text-slate-700 {
-  color: #E2E8F0 !important;
+  color: #E4E4E7 !important;
 }
 
 .dark .text-slate-600 {
-  color: #CBD5E1 !important;
+  color: #A1A1AA !important;
 }
 
 .dark .text-slate-500 {
-  color: #94A3B8 !important;
+  color: #71717A !important;
 }
 
 .dark .bg-white {
-  background-color: rgba(15, 23, 42, 0.85) !important;
+  background-color: #121215 !important;
 }
 
 .dark .bg-slate-50 {
-  background-color: rgba(30, 41, 59, 0.5) !important;
+  background-color: #18181B !important;
 }
 
 .dark .border-slate-200 {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .dark .border-slate-100 {
-  border-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Tabular Numerics for Crypto / Model Loss / PR-AUC Telemetry */

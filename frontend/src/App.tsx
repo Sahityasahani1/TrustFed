@@ -8,8 +8,6 @@ import {
   Database
 } from 'lucide-react';
 
-import { ParticlesBackground } from './components/react-bits/ParticlesBackground';
-import { ModernTabsWithHover } from './components/tabs/ModernTabsWithHover';
 import { JudgeDemoBar } from './components/demo/JudgeDemoBar';
 
 import { IntelligenceAndGovView } from './components/views/IntelligenceAndGovView';
@@ -127,9 +125,9 @@ export function App() {
 
   const handleSelectDemoStep = (step: number) => {
     setDemoStep(step);
-    if (step === 1) handleSelectTab('silos', 'upload');
-    if (step === 2) handleSelectTab('engine', 'training');
-    if (step === 3) handleSelectTab('intelligence', 'showdown');
+    if (step === 1) handleSelectTab('intelligence', 'showdown');
+    if (step === 2) handleSelectTab('creditfraud', 'cf-showdown');
+    if (step === 3) handleSelectTab('insurance', 'ins-showdown');
   };
 
   const handleToggleAutoDemo = () => {
@@ -156,15 +154,13 @@ export function App() {
   };
 
   const handleRunSimulationFromHero = () => {
-    handleSelectTab('engine', 'training');
+    handleSelectTab('intelligence', 'showdown');
   };
 
   return (
     <ToastProvider>
-      <div className={`relative min-h-screen bg-transparent text-slate-900 dark:text-slate-100 selection:bg-emerald-500/20 selection:text-emerald-900 transition-colors duration-200`}>
-        {/* Dynamic Luminous Floating Particles */}
-        <ParticlesBackground quantity={isDark ? 30 : 45} />
-
+      <div className="relative min-h-screen bg-transparent text-zinc-900 dark:text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-900 transition-colors duration-200">
+        
         {/* Global Command Palette Modal */}
         <CommandPalette
           isOpen={isCommandPaletteOpen}
@@ -175,14 +171,22 @@ export function App() {
           onStartPitch={handleToggleAutoDemo}
         />
 
-        {/* Main Container */}
+        {/* Main Application Container */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-6">
           
-          {/* Floating Top Navigation HUD */}
+          {/* Floating Top Navigation Island Header */}
           <TopNavHUD
             pageMode={pageMode}
+            activeMainTab={activeMainTab}
             onGoToIntro={handleGoToIntro}
             onGoToFeatures={handleGoToFeatures}
+            onSelectDomain={(domain) => {
+              if (domain === 'intro') {
+                handleGoToIntro();
+              } else {
+                handleSelectTab(domain);
+              }
+            }}
             isDark={isDark}
             onToggleTheme={() => setIsDark((prev) => !prev)}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
@@ -190,117 +194,93 @@ export function App() {
             onTogglePitch={handleToggleAutoDemo}
           />
 
-        {/* PAGE CONTENT ROUTER: INTRO PAGE VS FEATURES PLATFORM */}
-        <AnimatePresence mode="wait" initial={false}>
-          {pageMode === 'intro' ? (
-            <motion.div
-              key="intro-page-container"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25 }}
-            >
-              <IntroPage
-                onStart={handleGoToFeatures}
-                onRunSimulation={handleRunSimulationFromHero}
-                onInspectDomain={(domain) => handleSelectTab(domain)}
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="features-page-container"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-6"
-            >
-              {/* 3 Main Tabs with Floating Hover Subtab Mega-Preview */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between px-2">
-                  <span className="text-xs font-mono uppercase text-blue-700 dark:text-cyan-400 font-bold tracking-wider flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-cyan-400 animate-pulse" />
-                    Interactive Platform Modules (Hover to preview all subtabs)
-                  </span>
-                  <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-                    Zero Raw Customer Records Shared • PRD §9-§13
-                  </span>
-                </div>
-
-                <ModernTabsWithHover
-                  activeMainTab={activeMainTab}
-                  activeSubTab={activeSubTab}
-                  onSelectTab={handleSelectTab}
+          {/* Page View Routing: Intro Overview vs Domain Features */}
+          <AnimatePresence mode="wait" initial={false}>
+            {pageMode === 'intro' ? (
+              <motion.div
+                key="intro-page-container"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <IntroPage
+                  onStart={handleGoToFeatures}
+                  onRunSimulation={handleRunSimulationFromHero}
+                  onInspectDomain={(domain) => handleSelectTab(domain)}
                 />
-              </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="features-page-container"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-6"
+              >
+                {/* Active Domain Viewport */}
+                <main className="min-h-[520px]">
+                  {activeMainTab === 'intelligence' && (
+                    <IntelligenceAndGovView
+                      activeSubTab={activeSubTab}
+                      onSubTabChange={(subId) => {
+                        setActiveSubTab(subId);
+                        if (typeof window !== 'undefined') window.location.hash = `intelligence/${subId}`;
+                      }}
+                    />
+                  )}
+                  {activeMainTab === 'creditfraud' && (
+                    <CreditFraudView
+                      activeSubTab={activeSubTab}
+                      onSubTabChange={(subId) => {
+                        setActiveSubTab(subId);
+                        if (typeof window !== 'undefined') window.location.hash = `creditfraud/${subId}`;
+                      }}
+                    />
+                  )}
+                  {activeMainTab === 'insurance' && (
+                    <InsuranceClaimsView
+                      activeSubTab={activeSubTab}
+                      onSubTabChange={(subId) => {
+                        setActiveSubTab(subId);
+                        if (typeof window !== 'undefined') window.location.hash = `insurance/${subId}`;
+                      }}
+                    />
+                  )}
+                </main>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-              {/* Dynamic Main View: Tab 1 (PaySim), Tab 2 (CreditFraud), Tab 3 (Insurance) */}
-              <main className="min-h-[520px] pt-2">
-                {activeMainTab === 'intelligence' && (
-                  <IntelligenceAndGovView
-                    activeSubTab={activeSubTab}
-                    onSubTabChange={(subId) => {
-                      setActiveSubTab(subId);
-                      if (typeof window !== 'undefined') window.location.hash = `intelligence/${subId}`;
-                    }}
-                  />
-                )}
-                {activeMainTab === 'creditfraud' && (
-                  <CreditFraudView
-                    activeSubTab={activeSubTab}
-                    onSubTabChange={(subId) => {
-                      setActiveSubTab(subId);
-                      if (typeof window !== 'undefined') window.location.hash = `creditfraud/${subId}`;
-                    }}
-                  />
-                )}
-                {activeMainTab === 'insurance' && (
-                  <InsuranceClaimsView
-                    activeSubTab={activeSubTab}
-                    onSubTabChange={(subId) => {
-                      setActiveSubTab(subId);
-                      if (typeof window !== 'undefined') window.location.hash = `insurance/${subId}`;
-                    }}
-                  />
-                )}
-              </main>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Minimalist Enterprise Footer */}
+          <footer className="pt-10 pb-6 border-t border-zinc-200 dark:border-white/10 space-y-4">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Raw Records Transmitted: 0
+              </span>
+              <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                SecAgg+ Masking: Active
+              </span>
+              <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                Differential Privacy: ε=2.45
+              </span>
+              <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                NIST AI RMF Parity
+              </span>
+            </div>
 
-        {/* Sleek Modern Footer with High-Tech Telemetry Badges */}
-        <footer className="pt-12 pb-8 border-t border-slate-200/80 dark:border-white/10 space-y-6">
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              Zero Customer Records Transmitted
-            </span>
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-500" />
-              Diffie-Hellman SecAgg+ Masking
-            </span>
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-teal-500" />
-              Rényi DP Differential Privacy (ε=2.45)
-            </span>
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
-              NIST AI RMF Fairness & Drift Monitored
-            </span>
-          </div>
+            <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+              TrustFed Federated Intelligence Platform • Zero Plain-Text Data Leakage • Press ⌘K for Command Bar
+            </div>
+          </footer>
 
-          <div className="text-center text-xs text-slate-500 dark:text-slate-400 space-y-1">
-            <p className="font-bold text-slate-800 dark:text-slate-200">
-              TrustFed • Privacy-Preserving Federated Fraud Intelligence Command Center
-            </p>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
-              "Institutions collaborate on intelligence, never on customer records." Press ⌘K for Command Bar.
-            </p>
-          </div>
-        </footer>
-
+        </div>
       </div>
-    </div>
     </ToastProvider>
   );
 }

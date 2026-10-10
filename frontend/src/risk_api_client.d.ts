@@ -21,3 +21,24 @@ export declare function fetchSampleBatch(
 ): Promise<any>;
 
 export declare function getSampleDownloadUrl(filename: string): string;
+
+export interface StreamCallbacks {
+  onToken?: (token: string) => void;
+  onMeta?: (meta: any) => void;
+  onDone?: (result: any) => void;
+  onError?: (error: any) => void;
+  signal?: AbortSignal;
+}
+
+export declare function streamRiskAssessment(
+  domain: 'banks' | 'lenders' | 'insurers' | 'creditfraud' | 'insurance',
+  userInput: Record<string, any>,
+  callbacks?: StreamCallbacks
+): Promise<void>;
+
+export declare function getTelemetrySnapshot(): Promise<any>;
+
+export declare function connectTelemetryWebSocket(
+  onTelemetry: (data: any) => void,
+  onError?: (error: any) => void
+): () => void;

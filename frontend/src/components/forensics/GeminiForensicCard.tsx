@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bot, 
   Sparkles, 
@@ -12,7 +11,6 @@ import {
   Download, 
   Flag, 
   Scale, 
-  Lock, 
   ExternalLink,
   ChevronDown,
   Info
@@ -38,6 +36,7 @@ export interface GeminiForensicCardProps {
   aiReasoningText?: string;
   rawRecord?: Record<string, any>;
   isLiveGemini?: boolean;
+  isStreaming?: boolean;
 }
 
 export const GeminiForensicCard: React.FC<GeminiForensicCardProps> = ({
@@ -52,17 +51,17 @@ export const GeminiForensicCard: React.FC<GeminiForensicCardProps> = ({
   aiReasoningText = '',
   rawRecord,
   isLiveGemini = true,
+  isStreaming = false,
 }) => {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const [isFlagged, setIsFlagged] = useState(false);
-  const [activeTab, setActiveTab] = useState<'narrative' | 'shap' | 'compliance'>('narrative');
 
-  const isHighRisk = riskScore >= 70 || classification.includes('HIGH') || classification.includes('CRITICAL');
+  const isHighRisk = riskScore >= 70 || classification.toLowerCase().includes('fraud') || classification.includes('HIGH');
   const isElevated = riskScore >= 40 && !isHighRisk;
 
   // SVG Gauge calculations
-  const radius = 42;
+  const radius = 32;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (riskScore / 100) * circumference;
 
@@ -83,7 +82,7 @@ ${aiReasoningText || 'Standard calibrated baseline evaluation.'}`;
     setCopied(true);
     toast({
       title: 'Forensic Digest Copied',
-      description: 'Audit brief ready for ticket or compliance archive.',
+      description: 'Audit brief copied to clipboard for tickets and compliance logs.',
       type: 'success',
     });
     setTimeout(() => setCopied(false), 2000);
@@ -110,7 +109,7 @@ ${aiReasoningText || 'Evaluated against multi-party federated model.'}
 ${shapDrivers
   .map(
     (d, i) =>
-      `${i + 1}. **${d.feature}**: ${d.impact_log_odds > 0 ? '+' : ''}${d.impact_log_odds.toFixed(4)} log-odds (${d.direction || 'impact'})`
+      `${i + 1}. **${d.feature}**: ${d.impact_log_odds > 0 ? '+' : ''}${d.impact_log_odds.toFixed(4)} log-odds (${d.direction || (d.impact_log_odds > 0 ? 'increases risk' : 'decreases risk')})`
   )
   .join('\n')}
 
@@ -118,7 +117,7 @@ ${shapDrivers
 
 ## 3. Statutory Compliance Alignment
 - **NIST AI RMF 1.0 (GOVERN-1.2):** Validated cross-silo differential privacy epsilon bounds (ε=2.45).
-- **US Equal Credit Opportunity Act (ECOA) / FCRA:** Deterministic principal risk factor disclosure.
+- **US Equal Credit Opportunity Act (ECOA) / FCRA §609:** Deterministic principal risk factor disclosure.
 - **EU AI Act Title III (High-Risk AI Systems):** Auditable human oversight loop and zero plain-text record leakage.
 `;
 
@@ -140,7 +139,7 @@ ${shapDrivers
   const handleToggleFlag = () => {
     setIsFlagged(!isFlagged);
     toast({
-      title: !isFlagged ? 'Flagged for Secondary SIU Review' : 'Review Flag Cleared',
+      title: !isFlagged ? 'Flagged for SIU Review' : 'Review Flag Cleared',
       description: !isFlagged
         ? 'Transaction routed to senior compliance officer queue.'
         : 'Status returned to standard queue.',
@@ -169,281 +168,269 @@ ${shapDrivers
 
   const sections = parseSections(aiReasoningText);
 
+  // Maximum impact for SHAP scaling
+  const maxShapAbs = Math.max(...shapDrivers.map((d) => Math.abs(d.impact_log_odds)), 1);
+
   return (
-    <div className="rounded-3xl border border-white/10 bg-[#060D1E]/85 text-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur-2xl space-y-5 p-6 sm:p-7">
+    <div className="rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 shadow-xs space-y-6 p-5 sm:p-6 transition-colors">
       
-      {/* 1. FORENSIC HEADER WITH RADIAL PROGRESS GAUGE */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-2xl bg-gradient-to-tr from-indigo-500 via-violet-500 to-cyan-400 text-white shadow-lg shadow-indigo-500/25">
-            <Bot className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-bold text-white font-mono tracking-tight">
-                Google Gemini Forensic Intelligence Panel
-              </h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-950/80 text-cyan-300 border border-indigo-700/60 shadow-xs">
-                {isLiveGemini ? 'gemini-2.5-flash' : 'Deterministic Mode'}
+      {/* 1. HEADER: AUDIT BRIEF IDENTITY & AUTHORITATIVE RISK METRICS */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/80 dark:border-white/10 pb-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+              Autonomous Intelligence
+            </span>
+            {isStreaming ? (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 flex items-center gap-1.5 animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+                SSE Stream (TTFT &lt; 300ms)
               </span>
-            </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Authoritative ML evaluation calibrated by cross-institutional federated weights.
-            </p>
+            ) : (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60">
+                {isLiveGemini ? 'Gemini 2.5 Flash' : 'Deterministic Mode'}
+              </span>
+            )}
           </div>
+          <h3 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 font-sans">
+            Regulatory Forensic Brief &amp; Attribution
+          </h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Calibrated on multi-party federated model ({modelName}) with differential privacy guarantees.
+          </p>
         </div>
 
-        {/* RADIAL SCORE GAUGE */}
-        <div className="flex items-center gap-4 bg-[#030713]/80 px-4 py-2.5 rounded-2xl border border-white/10 shrink-0">
-          <div className="relative w-16 h-16 flex items-center justify-center">
-            <svg className="w-16 h-16 transform -rotate-90">
+        {/* RISK SCORE & GAUGE HUD */}
+        <div className="flex items-center gap-4 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-white/5 shrink-0">
+          <div className="relative w-14 h-14 flex items-center justify-center">
+            <svg className="w-14 h-14 transform -rotate-90">
               <circle
-                cx="32"
-                cy="32"
+                cx="28"
+                cy="28"
                 r={radius}
-                stroke="#1e293b"
-                strokeWidth="6"
+                stroke="currentColor"
+                className="text-zinc-200 dark:text-zinc-700"
+                strokeWidth="5"
                 fill="none"
               />
               <circle
-                cx="32"
-                cy="32"
+                cx="28"
+                cy="28"
                 r={radius}
                 stroke={isHighRisk ? '#f43f5e' : isElevated ? '#f59e0b' : '#10b981'}
-                strokeWidth="6"
+                strokeWidth="5"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
                 strokeLinecap="round"
                 fill="none"
-                className="score-gauge-circle"
+                className="score-gauge-circle transition-all duration-700"
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center font-mono">
-              <span className={`text-sm font-black tabular-nums ${isHighRisk ? 'text-rose-400' : isElevated ? 'text-amber-400' : 'text-emerald-400'}`}>
+              <span className={`text-xs font-bold tabular-nums ${isHighRisk ? 'text-rose-600 dark:text-rose-400' : isElevated ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                 {riskScore}
               </span>
-              <span className="text-[8px] text-slate-400 font-bold uppercase leading-none">
+              <span className="text-[7px] text-zinc-400 font-medium uppercase leading-none">
                 Score
               </span>
             </div>
           </div>
 
-          <div className="space-y-0.5 font-mono">
-            <div className={`text-xs font-black uppercase tracking-wider ${isHighRisk ? 'text-rose-400' : isElevated ? 'text-amber-400' : 'text-emerald-400'}`}>
+          <div className="space-y-0.5 font-mono text-left">
+            <div className={`text-xs font-bold uppercase tracking-wider ${isHighRisk ? 'text-rose-600 dark:text-rose-400' : isElevated ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
               {classification}
             </div>
-            <div className="text-[10px] text-slate-400">
-              Cutoff: <span className="text-slate-200">{(decisionThreshold * 100).toFixed(1)}%</span>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              Cutoff: <span className="text-zinc-700 dark:text-zinc-300 tabular-nums">{(decisionThreshold * 100).toFixed(1)}%</span>
             </div>
-            <div className="text-[10px] text-slate-400">
-              Prob: <span className="text-slate-200">{(fraudProbability * 100).toFixed(2)}%</span>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              Prob: <span className="text-zinc-700 dark:text-zinc-300 tabular-nums">{(fraudProbability * 100).toFixed(2)}%</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. SUBTAB CONTROLS */}
-      <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-        <button
-          onClick={() => setActiveTab('narrative')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
-            activeTab === 'narrative'
-              ? 'bg-white/10 text-white border border-white/20 shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 border border-transparent'
-          }`}
-        >
-          📌 Executive Narrative
-        </button>
-        <button
-          onClick={() => setActiveTab('shap')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
-            activeTab === 'shap'
-              ? 'bg-white/10 text-white border border-white/20 shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 border border-transparent'
-          }`}
-        >
-          ⚡ SHAP Driver Waterfall ({shapDrivers.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('compliance')}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-mono font-bold transition-all cursor-pointer ${
-            activeTab === 'compliance'
-              ? 'bg-white/10 text-white border border-white/20 shadow-sm'
-              : 'text-slate-400 hover:text-slate-200 border border-transparent'
-          }`}
-        >
-          🛡️ Statutory Alignment
-        </button>
+      {/* 2. CONTINUOUS REPORT SECTION 1: EXECUTIVE FORENSIC NARRATIVE */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-zinc-200/60 dark:border-white/5">
+          <span className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+            1. Executive Forensic Narrative
+          </span>
+          {isStreaming && (
+            <span className="text-[11px] font-mono text-cyan-600 dark:text-cyan-400">
+              Streaming Tokens...
+            </span>
+          )}
+        </div>
+
+        {sections.length === 0 ? (
+          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 text-xs text-zinc-500 font-mono">
+            Awaiting model inference and executive narrative generation...
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {sections.map((sec, idx) => (
+              <div
+                key={idx}
+                className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 text-zinc-800 dark:text-zinc-200 space-y-1.5"
+              >
+                <div className="font-mono text-xs font-semibold text-zinc-700 dark:text-zinc-300">
+                  {sec.title}
+                </div>
+                <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed font-sans whitespace-pre-line">
+                  {sec.body}
+                  {isStreaming && idx === sections.length - 1 && (
+                    <span className="inline-block font-mono text-cyan-500 ml-1 animate-pulse font-bold">
+                      ▋
+                    </span>
+                  )}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* 3. SUBTAB CONTENT */}
-      <AnimatePresence mode="wait">
-        {activeTab === 'narrative' && (
-          <motion.div
-            key="tab-narrative"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="space-y-3.5"
-          >
-            {sections.map((sec, idx) => {
-              const lower = sec.title.toLowerCase();
-              const isSummary = lower.includes('summary');
-              const isEvidence = lower.includes('evidence') || lower.includes('shap');
-              const isNetwork = lower.includes('network') || lower.includes('silo') || lower.includes('parity');
-              const isChecks = lower.includes('verification') || lower.includes('check');
+      {/* 3. CONTINUOUS REPORT SECTION 2: DIVERGENT SHAP WATERFALL */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-zinc-200/60 dark:border-white/5">
+          <span className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            2. SHAP Feature Attribution Waterfall ({shapDrivers.length} Factors)
+          </span>
+          <span className="text-[11px] font-mono text-zinc-400">
+            GBDT Log-Odds Decomposition
+          </span>
+        </div>
+
+        {shapDrivers.length === 0 ? (
+          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 text-xs text-zinc-500 font-mono text-center">
+            No local SHAP factors returned for this evaluation.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {shapDrivers.map((driver, idx) => {
+              const impact = driver.impact_log_odds;
+              const isRiskPusher = impact > 0;
+              const percentage = Math.min(100, Math.round((Math.abs(impact) / maxShapAbs) * 100));
 
               return (
                 <div
                   key={idx}
-                  className="p-4 rounded-2xl border border-white/10 bg-[#030713]/80 transition-all text-slate-200 shadow-sm"
+                  className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-1.5 text-xs font-mono"
                 >
-                  <div className="flex items-center gap-2 mb-1.5 font-mono text-xs font-bold uppercase tracking-wider text-cyan-400">
-                    <span>{isSummary ? '📊' : isEvidence ? '⚡' : isNetwork ? '🌐' : '🛡️'}</span>
-                    <span>{sec.title}</span>
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-zinc-800 dark:text-zinc-200">{driver.feature}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`font-bold tabular-nums ${isRiskPusher ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                        {impact > 0 ? '+' : ''}{impact.toFixed(4)}
+                      </span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded font-medium ${
+                        isRiskPusher 
+                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' 
+                          : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                      }`}>
+                        {isRiskPusher ? 'Fraud Driver' : 'Mitigating'}
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans whitespace-pre-line">
-                    {sec.body}
-                  </p>
+
+                  {/* Divergent Waterfall Bar */}
+                  <div className="w-full h-1.5 rounded-full bg-zinc-200 dark:bg-zinc-700/60 overflow-hidden flex">
+                    {isRiskPusher ? (
+                      <div
+                        className="h-full bg-rose-500 rounded-full transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    ) : (
+                      <div
+                        className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    )}
+                  </div>
                 </div>
               );
             })}
-          </motion.div>
+          </div>
         )}
+      </div>
 
-        {activeTab === 'shap' && (
-          <motion.div
-            key="tab-shap"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="space-y-3"
-          >
-            <div className="text-xs text-slate-400 font-mono flex items-center justify-between pb-1 border-b border-white/10">
-              <span>Feature Impact Attribution (|SHAP| log-odds contribution)</span>
-              <span className="text-[10px] text-slate-500">Authoritative GBDT Decomposition</span>
+      {/* 4. CONTINUOUS REPORT SECTION 3: STATUTORY COMPLIANCE ALIGNMENT */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-zinc-200/60 dark:border-white/5">
+          <span className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+            3. Statutory Compliance Alignment
+          </span>
+          <span className="text-[11px] font-mono text-zinc-400">
+            NIST AI RMF • FCRA §609 • EU AI Act
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-1">
+            <div className="font-mono font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+              <Scale className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+              <span>NIST AI RMF 1.0</span>
             </div>
+            <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug">
+              GOVERN-1.2 &amp; MEASURE-2.5 parity: Rényi DP (ε=2.45, δ=1e-5) guaranteed zero customer record leakage.
+            </p>
+          </div>
 
-            {shapDrivers.length === 0 ? (
-              <div className="py-8 text-center text-xs font-mono text-slate-500">
-                No SHAP factors returned for this evaluation.
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                {shapDrivers.map((driver, idx) => {
-                  const impact = driver.impact_log_odds;
-                  const isRiskPusher = impact > 0;
-                  const maxAbs = Math.max(...shapDrivers.map((d) => Math.abs(d.impact_log_odds)), 1);
-                  const barWidth = Math.min(100, Math.round((Math.abs(impact) / maxAbs) * 100));
-
-                  return (
-                    <div
-                      key={idx}
-                      className="p-3 rounded-xl bg-[#030713]/80 border border-white/10 space-y-1.5"
-                    >
-                      <div className="flex items-center justify-between text-xs font-mono">
-                        <span className="font-bold text-slate-200">{driver.feature}</span>
-                        <div className="flex items-center gap-2">
-                          <span className={`font-black tabular-nums ${isRiskPusher ? 'text-rose-400' : 'text-emerald-400'}`}>
-                            {impact > 0 ? '+' : ''}{impact.toFixed(3)}
-                          </span>
-                          <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold uppercase ${
-                            isRiskPusher ? 'bg-rose-950/80 text-rose-300 border border-rose-800' : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800'
-                          }`}>
-                            {isRiskPusher ? 'Fraud Driver' : 'Mitigating Factor'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Visual Waterfall Bar */}
-                      <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden flex">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            isRiskPusher
-                              ? 'bg-gradient-to-r from-rose-500 to-amber-500'
-                              : 'bg-gradient-to-r from-emerald-500 to-cyan-500'
-                          }`}
-                          style={{ width: `${barWidth}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {activeTab === 'compliance' && (
-          <motion.div
-            key="tab-compliance"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            className="space-y-3 text-xs"
-          >
-            <div className="p-3.5 rounded-2xl bg-[#030713]/80 border border-white/10 space-y-1.5">
-              <div className="flex items-center gap-2 font-mono font-bold text-cyan-400">
-                <Scale className="w-4 h-4" />
-                <span>NIST AI RMF 1.0 (GOVERN-1.2 & MEASURE-2.5)</span>
-              </div>
-              <p className="text-slate-300 leading-relaxed">
-                Cryptographic differential privacy enforcement (Rényi DP with ε=2.45, δ=1e-5). Cross-institution training satisfies non-leakage standards without plain-text record exposure.
-              </p>
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-1">
+            <div className="font-mono font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+              <ExternalLink className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>FCRA §609 / ECOA</span>
             </div>
+            <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug">
+              Adverse action defensibility via deterministic top-4 SHAP attributions disclosed to applicants.
+            </p>
+          </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#030713]/80 border border-white/10 space-y-1.5">
-              <div className="flex items-center gap-2 font-mono font-bold text-blue-400">
-                <ExternalLink className="w-4 h-4" />
-                <span>Fair Credit Reporting Act (FCRA) §609 & ECOA Reg B</span>
-              </div>
-              <p className="text-slate-300 leading-relaxed">
-                Adverse action defensibility enabled via deterministic SHAP decomposition. Top 4 principal contributing features are disclosed directly to applicants.
-              </p>
+          <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-1">
+            <div className="font-mono font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>EU AI Act Title III</span>
             </div>
+            <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug">
+              High-Risk AI System conformity: immutable batch logging, human-in-the-loop audit trail.
+            </p>
+          </div>
+        </div>
+      </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#030713]/80 border border-white/10 space-y-1.5">
-              <div className="flex items-center gap-2 font-mono font-bold text-emerald-400">
-                <ShieldCheck className="w-4 h-4" />
-                <span>EU AI Act Title III (High-Risk Financial AI Conformity)</span>
-              </div>
-              <p className="text-slate-300 leading-relaxed">
-                Full technical documentation, automatic logging of batch inferences, and verifiable human-in-the-loop review actions.
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* 4. COMPLIANCE ACTION TOOLBAR */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+      {/* 5. AUDIT ACTION TOOLBAR */}
+      <div className="flex flex-wrap items-center justify-between gap-2.5 pt-3 border-t border-zinc-200/80 dark:border-white/10">
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopyDigest}
-            className="px-4 py-2 rounded-full text-xs font-mono font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 flex items-center gap-1.5 cursor-pointer transition-all shadow-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]"
+            className="px-3 py-1.5 rounded-lg text-xs font-mono font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/60 flex items-center gap-1.5 cursor-pointer transition-colors"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-cyan-400" />}
-            <span>{copied ? 'Copied' : 'Copy Forensic Digest'}</span>
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5 text-zinc-500" />}
+            <span>{copied ? 'Copied' : 'Copy Digest'}</span>
           </button>
 
           <button
             onClick={handleExportBrief}
-            className="px-4 py-2 rounded-full text-xs font-mono font-bold bg-white/10 hover:bg-white/15 text-white border border-white/15 flex items-center gap-1.5 cursor-pointer transition-all shadow-sm hover:shadow-[0_0_15px_rgba(255,255,255,0.15)]"
+            className="px-3 py-1.5 rounded-lg text-xs font-mono font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700/60 flex items-center gap-1.5 cursor-pointer transition-colors"
           >
-            <Download className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Export Regulatory Brief (.md)</span>
+            <Download className="w-3.5 h-3.5 text-zinc-500" />
+            <span>Export Brief (.md)</span>
           </button>
         </div>
 
         <button
           onClick={handleToggleFlag}
-          className={`px-4 py-2 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer transition-all border ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 cursor-pointer transition-colors border ${
             isFlagged
-              ? 'bg-rose-950 text-rose-300 border-rose-700 shadow-[0_0_15px_rgba(244,63,94,0.3)]'
-              : 'bg-white/10 hover:bg-white/15 text-slate-300 border-white/15'
+              ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+              : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700/60'
           }`}
         >
-          <Flag className={`w-3.5 h-3.5 ${isFlagged ? 'fill-current text-rose-400' : 'text-slate-400'}`} />
+          <Flag className={`w-3.5 h-3.5 ${isFlagged ? 'fill-current text-rose-500' : 'text-zinc-400'}`} />
           <span>{isFlagged ? 'Flagged for SIU Review' : 'Flag for Secondary Review'}</span>
         </button>
       </div>

@@ -172,35 +172,35 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-md"
+            className="fixed inset-0 bg-zinc-950/40 dark:bg-zinc-950/70 backdrop-blur-md"
           />
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: -10 }}
+            initial={{ opacity: 0, scale: 0.97, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -10 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="relative w-full max-w-2xl rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-slate-100 overflow-hidden z-10"
+            exit={{ opacity: 0, scale: 0.97, y: -10 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-white/10 shadow-2xl text-zinc-900 dark:text-zinc-100 overflow-hidden z-10"
           >
             {/* Search Input Bar */}
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-800">
-              <Search className="w-5 h-5 text-cyan-400 shrink-0" />
+            <div className="flex items-center gap-3 px-5 py-3.5 border-b border-zinc-200 dark:border-white/10">
+              <Search className="w-4 h-4 text-zinc-400 shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Type a command, search vertical sandbox or press ESC..."
-                className="w-full bg-transparent text-sm sm:text-base font-sans text-white placeholder-slate-400 focus:outline-none"
+                className="w-full bg-transparent text-sm font-sans text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none"
               />
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                   ESC
                 </span>
                 <button
                   onClick={onClose}
-                  className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-lg transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -210,40 +210,40 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             {/* Command Results List */}
             <div className="max-h-[380px] overflow-y-auto p-3 space-y-4">
               {filteredCommands.length === 0 ? (
-                <div className="py-12 text-center text-slate-400 text-xs font-mono">
+                <div className="py-12 text-center text-zinc-400 text-xs font-mono">
                   No matching command or module found for "{query}".
                 </div>
               ) : (
                 filteredCommands.map((cat) => (
                   <div key={cat.category} className="space-y-1.5">
-                    <div className="px-3 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+                    <div className="px-3 text-[10px] font-mono uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">
                       {cat.category}
                     </div>
                     {cat.items.map((item) => (
                       <button
                         key={item.id}
                         onClick={item.action}
-                        className="w-full flex items-center justify-between p-3 rounded-2xl hover:bg-slate-800/90 text-left transition-all duration-150 cursor-pointer group border border-transparent hover:border-slate-700/60"
+                        className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800/80 text-left transition-all duration-150 cursor-pointer group border border-transparent hover:border-zinc-200 dark:hover:border-zinc-700/60"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-xl bg-slate-800 border border-slate-700 group-hover:bg-slate-700 group-hover:border-slate-600 transition-colors">
+                          <div className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition-colors">
                             {item.icon}
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center gap-2">
+                            <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-2">
                               <span>{item.title}</span>
                               {item.badge && (
-                                <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-800/60">
+                                <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
                                   {item.badge}
                                 </span>
                               )}
                             </div>
-                            <div className="text-[11px] text-slate-400 mt-0.5 leading-tight">
+                            <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-tight">
                               {item.desc}
                             </div>
                           </div>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-slate-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        <ArrowRight className="w-4 h-4 text-zinc-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                       </button>
                     ))}
                   </div>
@@ -252,12 +252,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             </div>
 
             {/* Footer Quick Shortcuts */}
-            <div className="flex items-center justify-between px-5 py-2.5 bg-slate-950 border-t border-slate-800/90 text-[11px] font-mono text-slate-400">
+            <div className="flex items-center justify-between px-5 py-2.5 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-white/10 text-[11px] font-mono text-zinc-500 dark:text-zinc-400">
               <div className="flex items-center gap-3">
-                <span>Navigate: <kbd className="text-slate-300">↑↓</kbd></span>
-                <span>Select: <kbd className="text-slate-300">↵</kbd></span>
+                <span>Navigate: <kbd className="text-zinc-700 dark:text-zinc-300">↑↓</kbd></span>
+                <span>Select: <kbd className="text-zinc-700 dark:text-zinc-300">↵</kbd></span>
               </div>
-              <span className="text-cyan-400/90 font-bold">TrustFed Cryptographic Command Center</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-medium">TrustFed Federated Command</span>
             </div>
           </motion.div>
         </div>

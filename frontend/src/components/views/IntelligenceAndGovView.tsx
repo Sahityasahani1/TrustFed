@@ -469,24 +469,24 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Subtab Navigation Pill */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="space-y-5">
+      {/* Subtab Navigation */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-cyan-400" />
-            <span>PaySim Intelligence & Governance Studio</span>
+          <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 font-sans tracking-tight">
+            <ShieldAlert className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
+            <span>PaySim Intelligence &amp; Governance Studio</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5 font-normal">
-            Test live transactions with 5 PaySim features, inspect the Feature Dictionary, and audit NIST trustworthy AI parity.
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+            Test live transactions across 5 PaySim features, inspect dictionary, and audit NIST AI parity.
           </p>
         </div>
 
         <TabsNav
           tabs={[
-            { id: 'showdown', label: '1. Feature Inputs & Showdown', icon: <ShieldAlert className="w-3.5 h-3.5" />, badge: 'Image 2 Inputs' },
-            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: '40-TX Demo' },
-            { id: 'dictionary', label: '3. Feature Dictionary', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'Image 1 Table' },
+            { id: 'showdown', label: '1. Feature Inputs & Showdown', icon: <ShieldAlert className="w-3.5 h-3.5" />, badge: '5 Features' },
+            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: 'Vectorized' },
+            { id: 'dictionary', label: '3. Feature Dictionary', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -503,91 +503,85 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="space-y-6"
+            className="space-y-5"
           >
             {/* Quick Scenario Preset Selector */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4.5 rounded-3xl border border-white/10 bg-[#060D1E]/90 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
-              <div>
-                <span className="text-xs font-mono uppercase text-cyan-300 font-bold tracking-wider block">
-                  Interactive Scenario Presets:
-                </span>
-                <span className="text-xs text-slate-400 font-normal">
-                  Load real PaySim benchmark attack vs routine patterns
-                </span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 text-xs font-mono shadow-xs">
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                Scenario Presets:
+              </span>
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <button
                   onClick={() => loadPreset('drain')}
-                  className="px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 bg-rose-950/70 border border-rose-500/40 text-rose-300 hover:bg-rose-900/80 shadow-[0_0_15px_rgba(244,63,94,0.2)] transition-all"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20"
                 >
-                  <span>⚡ Account Drain (TRANSFER)</span>
+                  ⚡ Account Drain (TRANSFER)
                 </button>
                 <button
                   onClick={() => loadPreset('mule')}
-                  className="px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 bg-amber-950/70 border border-amber-500/40 text-amber-300 hover:bg-amber-900/80 shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20"
                 >
-                  <span>⚡ Mule Cash-Out (CASH_OUT)</span>
+                  ⚡ Mule Cash-Out (CASH_OUT)
                 </button>
                 <button
                   onClick={() => loadPreset('payment')}
-                  className="px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/80 shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
                 >
-                  <span>✓ Merchant Payment</span>
+                  ✓ Merchant Payment
                 </button>
                 <button
                   onClick={() => loadPreset('deposit')}
-                  className="px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 bg-blue-950/70 border border-blue-500/40 text-blue-300 hover:bg-blue-900/80 shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60 hover:bg-zinc-200"
                 >
-                  <span>✓ Payroll Deposit</span>
+                  ✓ Payroll Deposit
                 </button>
               </div>
             </div>
 
-            {/* Main Interactive Grid: Left 5 Inputs (Image 2) vs Right Showdown */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Main Interactive Grid: Left 5 Inputs vs Right Showdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               {/* Left Column: Transaction Sandbox Inputs (6 cols) */}
-              <div className="lg:col-span-6 rounded-3xl border border-white/10 bg-[#060D1E]/85 p-6 space-y-5 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl text-slate-100">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-cyan-400" />
-                    <span>Transaction Input Sandbox (5 Features)</span>
+              <div className="lg:col-span-6 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 p-5 space-y-4 shadow-xs text-zinc-900 dark:text-zinc-100">
+                <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2.5">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                    <span>Transaction Parameters (5 PaySim Features)</span>
                   </h3>
-                  <span className="text-[11px] font-mono text-cyan-300 bg-cyan-950/60 px-2.5 py-0.5 rounded-full border border-cyan-500/30 font-bold">
-                    Image 2 Controls
+                  <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700/60">
+                    Live Inputs
                   </span>
                 </div>
 
                 {/* 1. Transaction Time-Step (step) */}
-                <div className="p-3.5 rounded-2xl border border-white/10 bg-[#030713]/80 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm">⏱️</span>
-                      <label className="text-xs font-bold text-white">
-                        Transaction Time-Step <code className="text-[11px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/30">step</code>
+                      <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                        Timeline Step <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">step</code>
                       </label>
                       <button
                         onClick={() => setActiveInfoTooltip(activeInfoTooltip === 'step' ? null : 'step')}
-                        className="text-slate-400 hover:text-cyan-400 cursor-pointer"
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                         title="Click for description"
                       >
                         <Info className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-slate-400">
-                      Positive whole number (1..744)
+                    <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
+                      Hour {tx.step} (Day {Math.ceil(tx.step / 24)})
                     </span>
                   </div>
 
                   {activeInfoTooltip === 'step' && (
-                    <div className="text-[11px] text-slate-300 bg-[#070D1E] p-2 rounded-xl border border-white/10 leading-snug">
-                      <strong>Image 1 Spec:</strong> The point in the transaction timeline when this transaction occurred. It helps the model understand the transaction's position in the activity sequence.
+                    <div className="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 p-2 rounded-lg border border-zinc-200 dark:border-zinc-700/60 leading-snug">
+                      Hour index in the transaction sequence (1..744). Helps model distinguish business vs off-peak hours.
                     </div>
                   )}
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => setTx(prev => ({ ...prev, step: Math.max(1, prev.step - 1) }))}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 font-mono text-xs font-bold text-slate-200 hover:bg-white/10 cursor-pointer shadow-sm"
+                      className="px-2 py-1 rounded-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 cursor-pointer"
                     >
                       -1
                     </button>
@@ -597,58 +591,52 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                       max="744"
                       value={tx.step}
                       onChange={(e) => setTx(prev => ({ ...prev, step: Math.max(1, Math.min(744, parseInt(e.target.value) || 1)) }))}
-                      className="w-24 text-center font-mono font-bold text-sm bg-[#070D1E] border border-white/15 rounded-lg py-1 px-2 text-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                      className="w-20 text-center font-mono font-medium text-xs bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 rounded-md py-1 px-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                     />
                     <button
                       onClick={() => setTx(prev => ({ ...prev, step: Math.min(744, prev.step + 1) }))}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 font-mono text-xs font-bold text-slate-200 hover:bg-white/10 cursor-pointer shadow-sm"
+                      className="px-2 py-1 rounded-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 font-mono text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 cursor-pointer"
                     >
                       +1
                     </button>
-                    <span className="text-xs text-slate-400 font-mono font-medium">
-                      Hour {tx.step} (Day {Math.ceil(tx.step / 24)})
-                    </span>
+                    <input
+                      type="range"
+                      min="1"
+                      max="744"
+                      value={tx.step}
+                      onChange={(e) => setTx(prev => ({ ...prev, step: parseInt(e.target.value) }))}
+                      className="flex-1 accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
+                    />
                   </div>
-
-                  <input
-                    type="range"
-                    min="1"
-                    max="744"
-                    value={tx.step}
-                    onChange={(e) => setTx(prev => ({ ...prev, step: parseInt(e.target.value) }))}
-                    className="w-full accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
-                  />
                 </div>
 
                 {/* 2. Transaction Type (type) */}
-                <div className="p-3.5 rounded-2xl border border-white/10 bg-[#030713]/80 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm">🔀</span>
-                      <label className="text-xs font-bold text-white">
-                        Transaction Type <code className="text-[11px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/30">type</code>
+                      <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                        Transaction Type <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">type</code>
                       </label>
                       <button
                         onClick={() => setActiveInfoTooltip(activeInfoTooltip === 'type' ? null : 'type')}
-                        className="text-slate-400 hover:text-cyan-400 cursor-pointer"
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                         title="Click for description"
                       >
                         <Info className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-slate-400">
-                      One of 5 PaySim Categories
+                    <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
+                      PaySim Category
                     </span>
                   </div>
 
                   {activeInfoTooltip === 'type' && (
-                    <div className="text-[11px] text-slate-300 bg-[#070D1E] p-2 rounded-xl border border-white/10 leading-snug">
-                      <strong>Image 1 Spec:</strong> The category of transaction being performed. Select the type that best describes the transaction.
+                    <div className="text-[11px] text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 p-2 rounded-lg border border-zinc-200 dark:border-zinc-700/60 leading-snug">
+                      High fraud risks typically concentrate in TRANSFER and CASH_OUT categories.
                     </div>
                   )}
 
-                  {/* 5 Tactile 3D Buttons for all 5 PaySim Categories */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
                     {(['TRANSFER', 'CASH_OUT', 'PAYMENT', 'CASH_IN', 'DEBIT'] as const).map((typeOption) => {
                       const isSel = tx.type === typeOption;
                       const isHighRisk = typeOption === 'TRANSFER' || typeOption === 'CASH_OUT';
@@ -657,17 +645,17 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                           key={typeOption}
                           type="button"
                           onClick={() => setTx(prev => ({ ...prev, type: typeOption }))}
-                          className={`py-2 px-2.5 rounded-xl font-mono text-[11px] font-bold cursor-pointer transition-all flex flex-col items-center justify-center gap-0.5 border ${
+                          className={`py-1.5 px-2 rounded-lg font-mono text-[11px] font-medium cursor-pointer transition-colors flex flex-col items-center justify-center border ${
                             isSel
                               ? isHighRisk 
-                                ? 'bg-rose-950/80 border-rose-500/60 text-white shadow-[0_0_15px_rgba(244,63,94,0.3)]' 
-                                : 'bg-emerald-950/80 border-emerald-500/60 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                              : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                                ? 'bg-rose-500/10 border-rose-500/40 text-rose-600 dark:text-rose-400 font-bold' 
+                                : 'bg-emerald-500/10 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-bold'
+                              : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
                           }`}
                         >
                           <span>{typeOption}</span>
-                          <span className={`text-[9px] font-sans ${isSel ? 'text-white/90' : isHighRisk ? 'text-rose-400' : 'text-emerald-400'}`}>
-                            {isHighRisk ? '⚠️ High Fraud Vector' : '✓ Routine Low Risk'}
+                          <span className={`text-[8px] ${isHighRisk ? 'text-rose-500' : 'text-emerald-500'}`}>
+                            {isHighRisk ? 'High Risk' : 'Routine'}
                           </span>
                         </button>
                       );
@@ -676,41 +664,34 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                 </div>
 
                 {/* 3. Transaction Amount (amount) */}
-                <div className="p-3.5 rounded-2xl border border-white/10 bg-[#030713]/80 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm">💵</span>
-                      <label className="text-xs font-bold text-white">
-                        Transaction Amount <code className="text-[11px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/30">amount</code>
+                      <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                        Amount <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">amount</code>
                       </label>
                       <button
                         onClick={() => setActiveInfoTooltip(activeInfoTooltip === 'amount' ? null : 'amount')}
-                        className="text-slate-400 hover:text-cyan-400 cursor-pointer"
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                         title="Click for description"
                       >
                         <Info className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <span className="font-mono text-cyan-400 font-bold text-sm">
+                    <span className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold text-xs tabular-nums">
                       ${tx.amount.toLocaleString()}
                     </span>
                   </div>
 
-                  {activeInfoTooltip === 'amount' && (
-                    <div className="text-[11px] text-slate-300 bg-[#070D1E] p-2 rounded-xl border border-white/10 leading-snug">
-                      <strong>Image 1 Spec:</strong> The amount of money involved in this transaction. The model compares this amount with the account balances to identify unusual transaction patterns.
-                    </div>
-                  )}
-
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-400 font-mono">$</span>
+                    <span className="text-xs text-zinc-400 font-mono">$</span>
                     <input
                       type="number"
                       min="0"
                       step="50"
                       value={tx.amount}
                       onChange={(e) => setTx(prev => ({ ...prev, amount: Math.max(0, parseFloat(e.target.value) || 0) }))}
-                      className="w-full font-mono font-bold text-sm bg-[#070D1E] border border-white/15 rounded-lg py-1 px-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                      className="w-full font-mono font-medium text-xs bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 rounded-md py-1 px-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                     />
                   </div>
 
@@ -721,17 +702,17 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                     step="250"
                     value={tx.amount}
                     onChange={(e) => setTx(prev => ({ ...prev, amount: Number(e.target.value) }))}
-                    className="w-full accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+                    className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                   />
 
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] text-slate-400 font-medium">Quick values:</span>
+                    <span className="text-[10px] text-zinc-400">Quick:</span>
                     {[100, 1500, 14850, 50000].map(amt => (
                       <button
                         key={amt}
                         type="button"
                         onClick={() => setTx(prev => ({ ...prev, amount: amt }))}
-                        className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 border border-white/10 hover:border-cyan-400 hover:text-white text-slate-300 font-bold cursor-pointer transition-colors"
+                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 font-medium cursor-pointer"
                       >
                         ${amt.toLocaleString()}
                       </button>
@@ -740,41 +721,34 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                 </div>
 
                 {/* 4. Sender Balance Before Transaction (oldbalanceOrg) */}
-                <div className="p-3.5 rounded-2xl border border-white/10 bg-[#030713]/80 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm">🏦</span>
-                      <label className="text-xs font-bold text-white">
-                        Sender Balance Before Transaction <code className="text-[11px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/30">oldbalanceOrg</code>
+                      <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                        Sender Initial Balance <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">oldbalanceOrg</code>
                       </label>
                       <button
                         onClick={() => setActiveInfoTooltip(activeInfoTooltip === 'oldbalanceOrg' ? null : 'oldbalanceOrg')}
-                        className="text-slate-400 hover:text-cyan-400 cursor-pointer"
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                         title="Click for description"
                       >
                         <Info className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <span className="font-mono text-emerald-400 font-bold text-sm">
+                    <span className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold text-xs tabular-nums">
                       ${tx.oldbalanceOrg.toLocaleString()}
                     </span>
                   </div>
 
-                  {activeInfoTooltip === 'oldbalanceOrg' && (
-                    <div className="text-[11px] text-slate-300 bg-[#070D1E] p-2 rounded-xl border border-white/10 leading-snug">
-                      <strong>Image 1 Spec:</strong> The amount available in the sender's account immediately before this transaction. This helps the model assess how large the transaction is relative to the sender's available balance.
-                    </div>
-                  )}
-
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-400 font-mono">$</span>
+                    <span className="text-xs text-zinc-400 font-mono">$</span>
                     <input
                       type="number"
                       min="0"
                       step="100"
                       value={tx.oldbalanceOrg}
                       onChange={(e) => setTx(prev => ({ ...prev, oldbalanceOrg: Math.max(0, parseFloat(e.target.value) || 0) }))}
-                      className="w-full font-mono font-bold text-sm bg-[#070D1E] border border-white/15 rounded-lg py-1 px-3 text-white focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                      className="w-full font-mono font-medium text-xs bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 rounded-md py-1 px-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                     />
                   </div>
 
@@ -785,55 +759,48 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                     step="500"
                     value={tx.oldbalanceOrg}
                     onChange={(e) => setTx(prev => ({ ...prev, oldbalanceOrg: Number(e.target.value) }))}
-                    className="w-full accent-emerald-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+                    className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                   />
 
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400">
-                      Balance drained: <strong className={drainRatio > 80 ? 'text-rose-400' : 'text-slate-200'}>{drainRatio.toFixed(1)}%</strong>
+                  <div className="flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-zinc-500">
+                      Drained: <strong className={drainRatio > 80 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-700 dark:text-zinc-300'}>{drainRatio.toFixed(1)}%</strong>
                     </span>
-                    <span className="font-mono text-slate-300">
+                    <span className="text-zinc-500">
                       Remaining: ${newbalanceOrig.toLocaleString()}
                     </span>
                   </div>
                 </div>
 
                 {/* 5. Receiver Balance Before Transaction (oldbalanceDest) */}
-                <div className="p-3.5 rounded-2xl border border-white/10 bg-[#030713]/80 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-sm">🎯</span>
-                      <label className="text-xs font-bold text-white">
-                        Receiver Balance Before Transaction <code className="text-[11px] font-mono text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/30">oldbalanceDest</code>
+                      <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                        Receiver Initial Balance <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">oldbalanceDest</code>
                       </label>
                       <button
                         onClick={() => setActiveInfoTooltip(activeInfoTooltip === 'oldbalanceDest' ? null : 'oldbalanceDest')}
-                        className="text-slate-400 hover:text-cyan-400 cursor-pointer"
+                        className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
                         title="Click for description"
                       >
                         <Info className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <span className="font-mono text-cyan-400 font-bold text-sm">
+                    <span className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold text-xs tabular-nums">
                       ${tx.oldbalanceDest.toLocaleString()}
                     </span>
                   </div>
 
-                  {activeInfoTooltip === 'oldbalanceDest' && (
-                    <div className="text-[11px] text-slate-300 bg-[#070D1E] p-2 rounded-xl border border-white/10 leading-snug">
-                      <strong>Image 1 Spec:</strong> The amount available in the receiver's account immediately before this transaction. This helps the model understand the transaction in relation to the receiver's existing balance.
-                    </div>
-                  )}
-
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-400 font-mono">$</span>
+                    <span className="text-xs text-zinc-400 font-mono">$</span>
                     <input
                       type="number"
                       min="0"
                       step="100"
                       value={tx.oldbalanceDest}
                       onChange={(e) => setTx(prev => ({ ...prev, oldbalanceDest: Math.max(0, parseFloat(e.target.value) || 0) }))}
-                      className="w-full font-mono font-bold text-sm bg-[#070D1E] border border-white/15 rounded-lg py-1 px-3 text-white focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                      className="w-full font-mono font-medium text-xs bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700/60 rounded-md py-1 px-2 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-zinc-400"
                     />
                   </div>
 
@@ -844,69 +811,68 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                     step="500"
                     value={tx.oldbalanceDest}
                     onChange={(e) => setTx(prev => ({ ...prev, oldbalanceDest: Number(e.target.value) }))}
-                    className="w-full accent-cyan-400 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
+                    className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                   />
 
-                  <div className="flex items-center justify-between text-[11px]">
+                  <div className="flex items-center justify-between text-[11px] font-mono">
                     <button
                       type="button"
                       onClick={() => setTx(prev => ({ ...prev, oldbalanceDest: 0 }))}
-                      className="px-2 py-0.5 rounded bg-rose-950/60 border border-rose-500/40 text-rose-300 font-bold hover:bg-rose-900/60 cursor-pointer"
+                      className="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 font-medium hover:bg-rose-500/20 cursor-pointer"
                     >
-                      ⚠️ Set $0 (Mule Account Flag)
+                      Set $0 (Mule Flag)
                     </button>
-                    <span className="font-mono text-slate-300">
+                    <span className="text-zinc-500">
                       Receiver after: ${newbalanceDest.toLocaleString()}
                     </span>
                   </div>
                 </div>
 
-                {/* 6. PRIMARY 3D CALCULATION BUTTON & MODEL DISPATCH */}
-                <div className="pt-2 space-y-3">
+                {/* 6. PRIMARY EVALUATION BUTTON */}
+                <div className="pt-1 space-y-2.5">
                   <button
                     type="button"
                     onClick={() => handleCalculateAndSend()}
                     disabled={isCalculating}
-                    className={`w-full py-4 px-5 rounded-full font-black text-sm tracking-wide flex items-center justify-center gap-3 transition-all cursor-pointer shadow-xl select-none relative overflow-hidden ${
+                    className={`w-full py-2.5 px-4 rounded-xl font-medium text-xs tracking-wide flex items-center justify-center gap-2 transition-colors cursor-pointer select-none ${
                       isCalculating
-                        ? 'bg-slate-800 text-slate-300 cursor-wait border border-white/10'
+                        ? 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-wait'
                         : isDirty
-                        ? 'bg-white text-slate-950 hover:bg-slate-100 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]'
-                        : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-900/80 shadow-[0_0_20px_rgba(16,185,129,0.2)]'
+                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-xs'
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs'
                     }`}
                   >
                     {isCalculating ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-slate-400 border-t-white rounded-full animate-spin shrink-0" />
-                        <span className="font-mono text-xs sm:text-sm">Encrypting &amp; Sending Data to Model...</span>
+                        <div className="w-4 h-4 border-2 border-zinc-400 border-t-zinc-900 dark:border-t-white rounded-full animate-spin shrink-0" />
+                        <span className="font-mono">Evaluating Model...</span>
                       </>
                     ) : isDirty ? (
                       <>
-                        <Cpu className="w-5 h-5 text-blue-600 shrink-0" />
-                        <span className="font-extrabold text-xs sm:text-sm uppercase">Calculate Risk &amp; Send Data to Model</span>
-                        <span className="ml-auto text-[10px] font-mono font-bold bg-slate-200 text-slate-900 border border-slate-300 px-2 py-0.5 rounded-full uppercase">
-                          New Inputs Ready
+                        <Cpu className="w-4 h-4 shrink-0" />
+                        <span>Calculate Risk &amp; Send to Model</span>
+                        <span className="ml-auto text-[10px] font-mono font-medium bg-white/20 px-1.5 py-0.2 rounded">
+                          Modified
                         </span>
                       </>
                     ) : (
                       <>
-                        <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                        <span className="font-extrabold text-xs sm:text-sm">✓ Evaluated by Model (Click to Re-calculate)</span>
-                        <span className="ml-auto text-[10px] font-mono font-bold bg-emerald-900/80 px-2 py-0.5 rounded-full text-emerald-300 border border-emerald-500/40">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>✓ Evaluated by Model (Click to Re-calculate)</span>
+                        <span className="ml-auto text-[10px] font-mono font-medium bg-emerald-700 px-1.5 py-0.2 rounded">
                           Synced
                         </span>
                       </>
                     )}
                   </button>
 
-                  {/* Client-Side Encryption & Differential Privacy Assurance */}
-                  <div className="p-3 rounded-2xl bg-[#030713]/80 border border-white/10 flex items-center justify-between text-[11px] text-slate-300 shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span><strong>SecAgg+ Encrypted Mask:</strong> Evaluated privately with zero plain-text leakage.</span>
+                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400 font-mono">
+                    <div className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span>SecAgg+ Masking: Zero Plain-Text Leaked</span>
                     </div>
-                    <span className="font-mono text-[10px] text-cyan-300 bg-cyan-950/80 px-2 py-0.5 rounded-full border border-cyan-500/30 font-bold shrink-0 shadow-xs">
-                      DP ε = 2.45
+                    <span className="text-[10px] text-zinc-500">
+                      DP ε=2.45
                     </span>
                   </div>
                 </div>
@@ -919,17 +885,17 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="pt-3 border-t border-white/10 space-y-3"
+                      className="pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-700/60 space-y-3"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-cyan-400" />
-                          <h4 className="text-xs font-mono uppercase font-black text-white tracking-wider">
-                            Proceed with Further Features
+                        <div className="flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
+                          <h4 className="text-xs font-mono uppercase font-semibold text-zinc-700 dark:text-zinc-300 tracking-wider">
+                            Further Forensic Diagnostics
                           </h4>
                         </div>
-                        <span className="text-[10px] font-mono text-emerald-300 font-bold bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/40">
-                          Model Outputs Active
+                        <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          Outputs Active
                         </span>
                       </div>
 
@@ -938,69 +904,69 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'gemini' ? null : 'gemini')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'gemini'
-                              ? 'bg-white/10 border-white/25 text-white shadow-md shadow-cyan-500/10'
-                              : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <Bot className={`w-4 h-4 ${activeFurtherFeature === 'gemini' ? 'text-cyan-300' : 'text-slate-400'}`} />
+                            <Bot className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight flex items-center gap-1">
+                              <span className="text-xs font-medium block leading-tight flex items-center gap-1">
                                 <span>1. Gemini AI</span>
-                                <span className={`text-[9px] px-1.5 py-0.2 rounded font-mono font-bold ${activeFurtherFeature === 'gemini' ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40' : 'bg-white/10 text-slate-300'}`}>
+                                <span className={`text-[9px] px-1.5 py-0.2 rounded font-mono ${activeFurtherFeature === 'gemini' ? 'bg-white/20' : 'bg-zinc-200 dark:bg-zinc-700'}`}>
                                   {backendResult?.ai_reasoning?.source === 'gemini' ? 'Live' : 'Ready'}
                                 </span>
                               </span>
-                              <span className={`text-[10px] ${activeFurtherFeature === 'gemini' ? 'text-slate-300' : 'text-slate-500'}`}>
-                                Natural Explanation
+                              <span className="text-[10px] opacity-70">
+                                Explanation
                               </span>
                             </div>
                           </div>
-                          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'gemini' ? 'rotate-180 text-white' : 'text-slate-400'}`} />
+                          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'gemini' ? 'rotate-180' : ''}`} />
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'shap' ? null : 'shap')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'shap'
-                              ? 'bg-white/10 border-white/25 text-white shadow-md shadow-cyan-500/10'
-                              : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <BarChart3 className={`w-4 h-4 ${activeFurtherFeature === 'shap' ? 'text-cyan-300' : 'text-slate-400'}`} />
+                            <BarChart3 className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">2. SHAP Waterfall</span>
-                              <span className={`text-[10px] ${activeFurtherFeature === 'shap' ? 'text-slate-300' : 'text-slate-500'}`}>
-                                Feature Risk Attribution
+                              <span className="text-xs font-medium block leading-tight">2. SHAP Waterfall</span>
+                              <span className="text-[10px] opacity-70">
+                                Attribution
                               </span>
                             </div>
                           </div>
-                          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'shap' ? 'rotate-180 text-white' : 'text-slate-400'}`} />
+                          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'shap' ? 'rotate-180' : ''}`} />
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'audit' ? null : 'audit')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'audit'
-                              ? 'bg-white/10 border-white/25 text-white shadow-md shadow-cyan-500/10'
-                              : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <ShieldCheck className={`w-4 h-4 ${activeFurtherFeature === 'audit' ? 'text-cyan-300' : 'text-slate-400'}`} />
+                            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">3. NIST SP 1270</span>
-                              <span className={`text-[10px] ${activeFurtherFeature === 'audit' ? 'text-slate-300' : 'text-slate-500'}`}>
-                                Quorum Certificate
+                              <span className="text-xs font-medium block leading-tight">3. NIST SP 1270</span>
+                              <span className="text-[10px] opacity-70">
+                                Quorum Proof
                               </span>
                             </div>
                           </div>
-                          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'audit' ? 'rotate-180 text-white' : 'text-slate-400'}`} />
+                          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'audit' ? 'rotate-180' : ''}`} />
                         </button>
                       </div>
 
@@ -1037,46 +1003,46 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-slate-900 text-slate-100 shadow-xl border border-slate-800 space-y-3"
+                          className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-white/10 space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                          <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2">
                             <div>
-                              <span className="text-xs font-mono font-bold text-cyan-400 uppercase flex items-center gap-1.5">
-                                <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                              <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                                <Activity className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                                 Local SHAP Waterfall Decomposition
                               </span>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
+                              <p className="text-[11px] text-zinc-500 mt-0.5">
                                 Mathematical feature contribution for evaluated transaction ({evaluatedTx.type}, ${evaluatedTx.amount.toLocaleString()})
                               </p>
                             </div>
-                            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/50">
+                            <span className="font-mono text-xs font-medium px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
                               Base: +{shapData.baseRate}%
                             </span>
                           </div>
 
                           {/* Live TreeExplainer Kernel Factors from artifacts/paysim/model.joblib */}
                           {backendResult?.ml_risk_json?.risk_factors && backendResult.ml_risk_json.risk_factors.length > 0 && (
-                            <div className="p-3 rounded-xl bg-slate-950/80 border border-indigo-500/40 space-y-2">
+                            <div className="p-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5 space-y-2">
                               <div className="flex items-center justify-between text-[11px] font-mono">
-                                <span className="text-cyan-300 font-bold flex items-center gap-1.5">
-                                  <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+                                <span className="font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                                  <Cpu className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                                   <span>Live TreeExplainer Attribution (from artifacts/paysim/model.joblib)</span>
                                 </span>
-                                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-700/50">
+                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                                   Authoritative GBDT
                                 </span>
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] font-mono">
                                 {backendResult.ml_risk_json.risk_factors.map((rf, idx) => (
-                                  <div key={idx} className="p-2 rounded-lg bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                                  <div key={idx} className="p-2 rounded-md bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 flex items-center justify-between">
                                     <div className="flex items-center gap-1.5 truncate">
-                                      <span className={rf.impact_log_odds > 0 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
+                                      <span className={rf.impact_log_odds > 0 ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-emerald-600 dark:text-emerald-400 font-bold'}>
                                         {rf.impact_log_odds > 0 ? '▲' : '▼'}
                                       </span>
-                                      <span className="text-slate-200 font-bold truncate"><code>{rf.feature}</code></span>
+                                      <span className="text-zinc-800 dark:text-zinc-200 font-medium truncate"><code>{rf.feature}</code></span>
                                     </div>
-                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                      rf.impact_log_odds > 0 ? 'bg-rose-950 text-rose-300 border border-rose-800/40' : 'bg-emerald-950 text-emerald-300 border border-emerald-800/40'
+                                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-medium ${
+                                      rf.impact_log_odds > 0 ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                     }`}>
                                       {rf.impact_log_odds > 0 ? `+${rf.impact_log_odds.toFixed(2)}` : rf.impact_log_odds.toFixed(2)} log-odds
                                     </span>
@@ -1090,31 +1056,30 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                             {shapData.factors.map((factor) => {
                               const isPositive = factor.delta > 0;
                               return (
-                                <div key={factor.name} className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                                <div key={factor.name} className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5 space-y-1.5">
                                   <div className="flex items-center justify-between text-xs">
                                     <div className="flex items-center gap-1.5">
                                       <span>{factor.icon}</span>
-                                      <span className="font-bold text-slate-200">{factor.label}</span>
-                                      <span className="text-[10px] font-mono text-slate-400">({factor.val})</span>
+                                      <span className="font-semibold text-zinc-800 dark:text-zinc-200">{factor.label}</span>
+                                      <span className="text-[10px] font-mono text-zinc-500">({factor.val})</span>
                                     </div>
-                                    <span className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
+                                    <span className={`font-mono font-medium text-xs px-1.5 py-0.2 rounded ${
                                       isPositive 
-                                        ? 'bg-rose-950/80 text-rose-300 border border-rose-800/60' 
-                                        : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
+                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' 
+                                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                     }`}>
                                       {isPositive ? `+${factor.delta}%` : `${factor.delta}%`}
                                     </span>
                                   </div>
 
-                                  {/* Progress bar visualizing positive or negative pull */}
-                                  <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden flex">
+                                  <div className="w-full bg-zinc-200 dark:bg-zinc-700 h-1.5 rounded-full overflow-hidden flex">
                                     <div 
-                                      className={`h-full transition-all duration-500 rounded-full ${isPositive ? 'bg-gradient-to-r from-amber-500 to-rose-500' : 'bg-gradient-to-r from-emerald-500 to-teal-400'}`}
+                                      className={`h-full transition-all duration-500 rounded-full ${isPositive ? 'bg-rose-500' : 'bg-emerald-500'}`}
                                       style={{ width: `${Math.min(100, Math.abs(factor.delta) * 2.5)}%` }}
                                     />
                                   </div>
 
-                                  <p className="text-[10px] text-slate-400 font-mono leading-tight">
+                                  <p className="text-[10px] text-zinc-500 font-mono leading-tight">
                                     {factor.note}
                                   </p>
                                 </div>
@@ -1122,9 +1087,9 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                             })}
                           </div>
 
-                          <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs font-mono">
-                            <span className="text-slate-400">Net Assembled Global Risk:</span>
-                            <span className={`font-bold text-sm ${effectiveGlobalScore >= 70 ? 'text-rose-400' : effectiveGlobalScore >= 40 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                          <div className="pt-2 border-t border-zinc-200/60 dark:border-white/5 flex items-center justify-between text-xs font-mono">
+                            <span className="text-zinc-500">Net Assembled Global Risk:</span>
+                            <span className={`font-semibold text-sm ${effectiveGlobalScore >= 70 ? 'text-rose-600 dark:text-rose-400' : effectiveGlobalScore >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                               {effectiveGlobalScore} / 100 ({effectiveGlobalAction})
                             </span>
                           </div>
@@ -1136,22 +1101,22 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-[#030713]/90 border border-white/10 shadow-xl space-y-3"
+                          className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-white/10 space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                          <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2">
                             <div>
-                              <span className="text-xs font-mono font-bold text-emerald-300 uppercase flex items-center gap-1.5">
-                                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                              <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                                <ShieldCheck className="w-4 h-4 text-emerald-500" />
                                 NIST SP 1270 Auditable Certificate
                               </span>
-                              <p className="text-[11px] text-slate-400">
+                              <p className="text-[11px] text-zinc-500">
                                 Cryptographic proof of privacy-preserving federated consensus
                               </p>
                             </div>
                             <button
                               type="button"
                               onClick={handleCopyCert}
-                              className="px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 cursor-pointer bg-white/10 hover:bg-white/15 text-white border border-white/20 transition-all"
+                              className="px-2 py-1 rounded-md text-[11px] font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 flex items-center gap-1 cursor-pointer transition-colors"
                             >
                               {copiedCert ? (
                                 <>
@@ -1160,7 +1125,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                                 </>
                               ) : (
                                 <>
-                                  <Copy className="w-3.5 h-3.5 text-cyan-400" />
+                                  <Copy className="w-3.5 h-3.5" />
                                   <span>Copy Proof</span>
                                 </>
                               )}
@@ -1168,25 +1133,25 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                           </div>
 
                           <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                            <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                              <span className="text-slate-400 block text-[10px]">Certificate ID:</span>
-                              <span className="font-bold text-white">NIST-SP1270-TF-9824</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Certificate ID:</span>
+                              <span className="font-semibold text-zinc-900 dark:text-zinc-100">NIST-SP1270-TF-9824</span>
                             </div>
-                            <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                              <span className="text-slate-400 block text-[10px]">Silo Consensus Quorum:</span>
-                              <span className="font-bold text-emerald-400">3/3 Nodes Verified</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Silo Consensus Quorum:</span>
+                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">3/3 Nodes Verified</span>
                             </div>
-                            <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                              <span className="text-slate-400 block text-[10px]">Differential Privacy:</span>
-                              <span className="font-bold text-cyan-400">ε = 2.45, δ = 10⁻⁵</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Differential Privacy:</span>
+                              <span className="font-semibold text-cyan-600 dark:text-cyan-400">ε = 2.45, δ = 10⁻⁵</span>
                             </div>
-                            <div className="p-2 rounded-xl bg-white/5 border border-white/10">
-                              <span className="text-slate-400 block text-[10px]">Audit Trail Status:</span>
-                              <span className="font-bold text-emerald-400">✓ Cryptographically Sealed</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Audit Trail Status:</span>
+                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">✓ Cryptographically Sealed</span>
                             </div>
                           </div>
 
-                          <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-[11px] text-emerald-300 leading-snug">
+                          <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-700 dark:text-emerald-300 leading-snug">
                             <strong>Compliance Notice:</strong> This inference meets EU AI Act Article 14 (Human Oversight) and NIST AI Risk Management Framework SP 1270 governing explainable credit &amp; fraud automated decisions.
                           </div>
                         </motion.div>
@@ -1196,41 +1161,41 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                 </AnimatePresence>
               </div>
 
-              {/* Right Column: 3D Side-by-Side Showdown (6 cols) */}
+              {/* Right Column: Side-by-Side Showdown (6 cols) */}
               <div className="lg:col-span-6 space-y-4">
-                <div className="p-4 rounded-2xl bg-[#060D1E]/90 border border-white/10 flex items-center justify-between text-white">
+                <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 flex items-center justify-between text-zinc-900 dark:text-zinc-100 shadow-xs">
                   <div>
-                    <span className="text-xs font-mono font-bold text-white uppercase">Live Model Showdown</span>
-                    <p className="text-[11px] text-slate-400">Evaluating 5 PaySim features simultaneously</p>
+                    <span className="text-xs font-mono font-semibold uppercase">Live Model Showdown</span>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Evaluating 5 PaySim features simultaneously</p>
                   </div>
-                  <span className="text-xs font-mono text-emerald-300 bg-emerald-950/80 px-3 py-1 rounded-full border border-emerald-500/40 font-bold">
-                    PR-AUC +104% Advantage
+                  <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20 font-semibold">
+                    +104% PR-AUC
                   </span>
                 </div>
 
                 {/* Model Evaluation Sync Banner */}
                 {isDirty ? (
-                  <div className="p-3 rounded-2xl bg-amber-950/40 border border-amber-500/40 flex items-center justify-between text-xs text-amber-200 animate-pulse shadow-sm">
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs text-amber-700 dark:text-amber-300">
                     <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Risk &amp; Send Data to Model&quot; to update inference.</span>
+                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Risk &amp; Send to Model&quot; to update inference.</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleCalculateAndSend()}
-                      className="px-3 py-1 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-full font-bold text-[11px] shrink-0 cursor-pointer shadow-xs transition-colors"
+                      className="px-2.5 py-1 bg-amber-500 hover:bg-amber-400 text-zinc-900 rounded-md font-semibold text-[11px] shrink-0 cursor-pointer transition-colors"
                     >
                       Calculate Now &rarr;
                     </button>
                   </div>
                 ) : (
-                  <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between text-xs text-emerald-300">
+                  <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-300 font-mono">
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Model scores are active &amp; synchronized with evaluated transaction parameters.</span>
+                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>Model scores synchronized with active transaction parameters.</span>
                     </div>
-                    <span className="font-mono text-[10px] text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded font-bold border border-emerald-500/40">
-                      Active
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                      Synced
                     </span>
                   </div>
                 )}
@@ -1250,44 +1215,44 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                 />
 
                 {/* Live Derived Feature Breakdown */}
-                <div className="p-4 rounded-3xl bg-[#060D1E]/85 border border-white/10 shadow-md space-y-3">
-                  <span className="text-xs font-mono uppercase text-cyan-300 font-bold block">
-                    Feature Interaction Insights:
+                <div className="p-4 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 shadow-xs space-y-2.5">
+                  <span className="text-xs font-mono uppercase font-semibold text-zinc-700 dark:text-zinc-300 block">
+                    Derived Feature Metrics
                   </span>
                   
-                  <div className="space-y-2 text-xs">
-                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#030713]/80 border border-white/10">
-                      <span className="text-slate-300">Account Depletion Ratio:</span>
-                      <span className={`font-mono font-bold ${evalDrainRatio >= 80 ? 'text-rose-400' : 'text-slate-200'}`}>
-                        {evalDrainRatio.toFixed(1)}% of sender funds
+                  <div className="space-y-1.5 text-xs font-mono">
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                      <span className="text-zinc-600 dark:text-zinc-400">Account Depletion Ratio:</span>
+                      <span className={`font-semibold tabular-nums ${evalDrainRatio >= 80 ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-800 dark:text-zinc-200'}`}>
+                        {evalDrainRatio.toFixed(1)}% of balance
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#030713]/80 border border-white/10">
-                      <span className="text-slate-300">Destination Account Status:</span>
-                      <span className={`font-mono font-bold ${evaluatedTx.oldbalanceDest === 0 ? 'text-rose-400' : 'text-emerald-300'}`}>
-                        {evaluatedTx.oldbalanceDest === 0 ? '⚠️ Zero Balance (Mule / Burner)' : `✓ Established ($${evaluatedTx.oldbalanceDest.toLocaleString()})`}
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                      <span className="text-zinc-600 dark:text-zinc-400">Destination Account:</span>
+                      <span className={`font-semibold ${evaluatedTx.oldbalanceDest === 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                        {evaluatedTx.oldbalanceDest === 0 ? '⚠️ Zero Balance ($0 Mule Flag)' : `✓ Established ($${evaluatedTx.oldbalanceDest.toLocaleString()})`}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#030713]/80 border border-white/10">
-                      <span className="text-slate-300">Temporal Schedule:</span>
-                      <span className="font-mono text-slate-200">
-                        Hour {evaluatedTx.step} (Simulated 30-day timeline)
+                    <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                      <span className="text-zinc-600 dark:text-zinc-400">Sequence Hour:</span>
+                      <span className="text-zinc-800 dark:text-zinc-200 tabular-nums">
+                        Step {evaluatedTx.step} (Hour {evaluatedTx.step % 24}:00)
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Callout to Feature Dictionary */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/60 to-cyan-950/60 border border-white/10 text-xs text-slate-300 flex items-center justify-between shadow-md">
+                <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 text-xs text-zinc-700 dark:text-zinc-300 flex items-center justify-between shadow-xs">
                   <div>
-                    <span className="font-bold text-white block">Inspect Official Feature Dictionary</span>
-                    <span className="text-[11px] text-slate-400">Review Frontend Labels and technical definitions from Image 1</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">Inspect Official Feature Dictionary</span>
+                    <span className="text-[11px] text-zinc-500">Review Frontend Labels and technical definitions</span>
                   </div>
                   <button
                     onClick={() => handleSubTabSwitch('dictionary')}
-                    className="px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer shrink-0 bg-white text-slate-950 hover:bg-slate-100 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer shrink-0 bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
                   >
                     Open Dictionary &rarr;
                   </button>
@@ -1295,16 +1260,16 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
               </div>
             </div>
 
-            {/* In-Page Quick Reference Table (Image 1 Specs) */}
-            <div className="rounded-3xl border border-white/10 bg-[#060D1E]/85 p-6 shadow-xl space-y-3 text-slate-100">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            {/* In-Page Quick Reference Table */}
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 p-5 shadow-xs space-y-3 text-zinc-900 dark:text-zinc-100">
+              <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-3">
                 <div className="flex items-center gap-2">
-                  <FileSpreadsheet className="w-5 h-5 text-cyan-400" />
-                  <h4 className="text-sm font-extrabold text-white">
-                    Feature Dictionary Reference (Image 1 Specifications)
+                  <FileSpreadsheet className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                  <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    Feature Dictionary Reference
                   </h4>
                 </div>
-                <span className="text-xs font-mono text-slate-400">
+                <span className="text-xs font-mono text-zinc-500">
                   Current values linked to live sandbox
                 </span>
               </div>
@@ -1312,14 +1277,14 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b border-white/10 text-slate-400 font-mono">
-                      <th className="pb-3 px-2 font-bold">Input</th>
-                      <th className="pb-3 px-2 font-bold">Frontend Label</th>
-                      <th className="pb-3 px-2 font-bold">User-Friendly Technical Description</th>
-                      <th className="pb-3 px-2 font-bold">Current Sandbox Value</th>
+                    <tr className="border-b border-zinc-200/60 dark:border-white/5 text-zinc-500 font-mono text-[11px]">
+                      <th className="pb-2.5 px-2 font-semibold">Input</th>
+                      <th className="pb-2.5 px-2 font-semibold">Frontend Label</th>
+                      <th className="pb-2.5 px-2 font-semibold">Technical Description</th>
+                      <th className="pb-2.5 px-2 font-semibold">Current Sandbox Value</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5 text-slate-300">
+                  <tbody className="divide-y divide-zinc-200/60 dark:divide-white/5 text-zinc-700 dark:text-zinc-300">
                     {PAYSIM_FEATURE_DICTIONARY.map((feat) => {
                       const curVal = 
                         feat.input === 'step' ? `${tx.step} (Hour)` :
@@ -1329,19 +1294,19 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                         `$${tx.oldbalanceDest.toLocaleString()}`;
 
                       return (
-                        <tr key={feat.input} className="hover:bg-white/5 transition-colors">
-                          <td className="py-3 px-2 font-mono text-cyan-400 font-bold whitespace-nowrap">
+                        <tr key={feat.input} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                          <td className="py-2.5 px-2 font-mono text-zinc-900 dark:text-zinc-100 font-semibold whitespace-nowrap">
                             <span className="mr-1.5">{feat.icon}</span>
                             {feat.input}
                           </td>
-                          <td className="py-3 px-2 font-bold text-white whitespace-nowrap">
+                          <td className="py-2.5 px-2 font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
                             {feat.label}
                           </td>
-                          <td className="py-3 px-2 text-slate-400 leading-relaxed min-w-[280px]">
+                          <td className="py-2.5 px-2 text-zinc-500 leading-relaxed min-w-[280px]">
                             {feat.description}
                           </td>
-                          <td className="py-3 px-2 font-mono font-bold text-emerald-400 whitespace-nowrap">
-                            <span className="px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30">
+                          <td className="py-2.5 px-2 font-mono font-medium whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded text-[11px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                               {curVal}
                             </span>
                           </td>
@@ -1383,39 +1348,39 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
             transition={{ duration: 0.2 }}
             className="space-y-6"
           >
-            <div className="rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 p-6 shadow-xs space-y-4 text-zinc-900 dark:text-zinc-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-white/5 pb-4">
                 <div>
-                  <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                    <FileSpreadsheet className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <FileSpreadsheet className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
                     <span>PaySim Feature Dictionary & Schema Alignment (PRD §9)</span>
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5 font-medium">
-                    Strictly defined Frontend Labels and User-Friendly Technical Descriptions from Image 1 with UI Control rules from Image 2.
+                  <p className="text-xs text-zinc-500 mt-0.5 font-normal">
+                    Strictly defined Frontend Labels and User-Friendly Technical Descriptions with UI Control rules.
                   </p>
                 </div>
                 <button
                   onClick={() => handleSubTabSwitch('showdown')}
-                  className="btn-3d-primary px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer self-start sm:self-auto bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
                 >
                   <span>Test in Live Showdown</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              {/* Exact Table from Image 1 with UI Controls from Image 2 */}
+              {/* Exact Table from Schema Specifications */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="border-b-2 border-blue-200 text-blue-950 font-mono text-[11px] bg-blue-50/60">
-                      <th className="py-3 px-3 font-extrabold">Input</th>
-                      <th className="py-3 px-3 font-extrabold">Frontend Label (Image 1)</th>
-                      <th className="py-3 px-3 font-extrabold">User-Friendly Technical Description (Image 1)</th>
-                      <th className="py-3 px-3 font-extrabold">UI Control (Image 2)</th>
-                      <th className="py-3 px-3 font-extrabold">Sandbox Value</th>
+                    <tr className="border-b border-zinc-200/60 dark:border-white/5 text-zinc-500 font-mono text-[11px] bg-zinc-50 dark:bg-zinc-800/40">
+                      <th className="py-2.5 px-3 font-semibold">Input</th>
+                      <th className="py-2.5 px-3 font-semibold">Frontend Label</th>
+                      <th className="py-2.5 px-3 font-semibold">Technical Description</th>
+                      <th className="py-2.5 px-3 font-semibold">UI Control</th>
+                      <th className="py-2.5 px-3 font-semibold">Sandbox Value</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700">
+                  <tbody className="divide-y divide-zinc-200/60 dark:divide-white/5 text-zinc-700 dark:text-zinc-300">
                     {PAYSIM_FEATURE_DICTIONARY.map((row) => {
                       const curVal = 
                         row.input === 'step' ? `${tx.step} (Hour)` :
@@ -1425,24 +1390,24 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                         `$${tx.oldbalanceDest.toLocaleString()}`;
 
                       return (
-                        <tr key={row.input} className="hover:bg-blue-50/40 transition-colors">
-                          <td className="py-3.5 px-3 font-mono text-blue-700 font-extrabold whitespace-nowrap text-sm">
+                        <tr key={row.input} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                          <td className="py-3 px-3 font-mono text-zinc-900 dark:text-zinc-100 font-semibold whitespace-nowrap text-xs">
                             <span className="mr-1.5">{row.icon}</span>
                             {row.input}
                           </td>
-                          <td className="py-3.5 px-3 font-extrabold text-slate-900 whitespace-nowrap text-xs">
+                          <td className="py-3 px-3 font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap text-xs">
                             {row.label}
                           </td>
-                          <td className="py-3.5 px-3 text-slate-600 leading-relaxed text-xs max-w-md">
+                          <td className="py-3 px-3 text-zinc-500 leading-relaxed text-xs max-w-md">
                             {row.description}
                           </td>
-                          <td className="py-3.5 px-3 font-mono text-xs whitespace-nowrap">
-                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold">
+                          <td className="py-3 px-3 font-mono text-xs whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60 font-medium">
                               {row.uiControl}
                             </span>
                           </td>
-                          <td className="py-3.5 px-3 font-mono font-bold text-emerald-700 whitespace-nowrap">
-                            <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+                          <td className="py-3 px-3 font-mono font-medium whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded text-[11px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                               {curVal}
                             </span>
                           </td>
@@ -1454,27 +1419,27 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
               </div>
 
               {/* Local Quarantine & Feature Transformation Architecture */}
-              <div className="mt-6 p-5 rounded-2xl bg-gradient-to-r from-blue-50/90 via-teal-50/80 to-emerald-50/90 border border-blue-200/80 space-y-3">
-                <h4 className="text-xs font-mono uppercase text-blue-900 font-bold flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <div className="mt-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-3">
+                <h4 className="text-xs font-mono uppercase text-zinc-800 dark:text-zinc-200 font-semibold flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
                   Client-Side Preprocessing & Quarantine Architecture (PRD §9)
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-700">
-                  <div className="p-3 bg-white rounded-xl border border-blue-100 shadow-sm space-y-1">
-                    <span className="font-bold text-blue-900 block">1. Local Normalization</span>
-                    <p className="text-[11px] text-slate-500 leading-snug">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-zinc-600 dark:text-zinc-400">
+                  <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-white/5 shadow-xs space-y-1">
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">1. Local Normalization</span>
+                    <p className="text-[11px] text-zinc-500 leading-snug">
                       Numeric features (<code>amount</code>, <code>oldbalanceOrg</code>, <code>oldbalanceDest</code>) undergo Log1p and RobustScaler locally within each silo.
                     </p>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-teal-100 shadow-sm space-y-1">
-                    <span className="font-bold text-teal-900 block">2. One-Hot Vectorization</span>
-                    <p className="text-[11px] text-slate-500 leading-snug">
-                      Categorical <code>type</code> is converted into 5 one-hot columns (TRANSFER, CASH_OUT, PAYMENT, CASH_IN, DEBIT) before PyTorch tensor ingestion.
+                  <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-white/5 shadow-xs space-y-1">
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">2. One-Hot Vectorization</span>
+                    <p className="text-[11px] text-zinc-500 leading-snug">
+                      Categorical <code>type</code> is converted into 5 one-hot columns (TRANSFER, CASH_OUT, PAYMENT, CASH_IN, DEBIT) before tensor ingestion.
                     </p>
                   </div>
-                  <div className="p-3 bg-white rounded-xl border border-emerald-100 shadow-sm space-y-1">
-                    <span className="font-bold text-emerald-900 block">3. SecAgg+ Quarantine</span>
-                    <p className="text-[11px] text-slate-500 leading-snug">
+                  <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-white/5 shadow-xs space-y-1">
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">3. SecAgg+ Quarantine</span>
+                    <p className="text-[11px] text-zinc-500 leading-snug">
                       Trained weight updates are protected with Diffie-Hellman masks. Zero raw balances or transaction amounts leave institutional servers.
                     </p>
                   </div>

@@ -368,10 +368,10 @@ export const SilosAndNetworkView: React.FC<SilosAndNetworkViewProps> = ({
                         <button
                           key={key}
                           onClick={() => loadSyntheticPreset(key)}
-                          className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold cursor-pointer transition-all ${
+                          className={`px-3.5 py-2 rounded-xl text-xs font-mono font-medium cursor-pointer transition-colors ${
                             isSel 
-                              ? 'btn-3d-primary' 
-                              : 'btn-3d-glass text-slate-700'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-xs' 
+                              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-white/5'
                           }`}
                         >
                           {cfg.name.split(' ')[0]} ({cfg.defaultRows.toLocaleString()})

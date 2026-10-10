@@ -5,7 +5,7 @@ Run with: uvicorn risk_api:app --reload (or uvicorn risks_api:app --reload)
 The browser must call this backend. Keep GEMINI_API_Key in the server .env,
 never in frontend JavaScript. ML output remains authoritative; Gemini explains it.
 """
-
+import asyncio
 import io
 import json
 import os
@@ -19,15 +19,25 @@ import pandas as pd
 import requests
 import shap
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
-
-from predict_paysim import assess_transaction
-
+import sys
 
 ROOT = Path(__file__).parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+try:
+    from predict_paysim import assess_transaction
+except ImportError:
+    from backend.predict_paysim import assess_transaction
+
+try:
+    from onnx_engine import onnx_hub
+except ImportError:
+    from backend.onnx_engine import onnx_hub
 load_dotenv(ROOT / ".env")
 load_dotenv(ROOT.parent / ".env")
 
@@ -66,6 +76,65 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
 )
+
+
+class TelemetryBroadcaster:
+    """Manages WebSocket connections and broadcasts real-time inference telemetry."""
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+        self.active_streams: int = 0
+
+    async def connect(self, ws: WebSocket):
+        await ws.accept()
+        self.active_connections.append(ws)
+        try:
+            await ws.send_text(json.dumps(self.get_payload()))
+        except Exception:
+            pass
+
+    def disconnect(self, ws: WebSocket):
+        if ws in self.active_connections:
+            self.active_connections.remove(ws)
+
+    def get_payload(self) -> dict[str, Any]:
+        snap = onnx_hub.get_telemetry_snapshot()
+        snap["active_streams"] = self.active_streams
+        snap["active_connections"] = len(self.active_connections)
+        snap["timestamp"] = time.time()
+        return snap
+
+    async def broadcast(self):
+        if not self.active_connections:
+            return
+        payload_str = json.dumps(self.get_payload())
+        dead = []
+        for conn in self.active_connections:
+            try:
+                await conn.send_text(payload_str)
+            except Exception:
+                dead.append(conn)
+        for d in dead:
+            if d in self.active_connections:
+                self.active_connections.remove(d)
+
+    def schedule_broadcast(self):
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(self.broadcast())
+        except RuntimeError:
+            pass
+
+
+telemetry_hub = TelemetryBroadcaster()
+
+
+@app.on_event("startup")
+async def startup_telemetry_ticker():
+    async def ticker():
+        while True:
+            await asyncio.sleep(1.5)
+            await telemetry_hub.broadcast()
+    asyncio.create_task(ticker())
 
 
 class AssessRequest(BaseModel):
@@ -318,14 +387,7 @@ def _batch_assess_banks(records: list[dict[str, Any]]) -> dict[str, Any]:
         features[f"type_{cat}"] = (types == cat).astype(int)
         
     encoded = features.reindex(columns=cols, fill_value=0.0).fillna(0.0)
-    raw_probs = model.predict_proba(encoded)[:, 1]
-    
-    if bundle.get("calibrator") is not None:
-        clipped = np.clip(raw_probs, 1e-6, 1.0 - 1e-6)
-        logits = np.log(clipped / (1.0 - clipped)).reshape(-1, 1)
-        probs = bundle["calibrator"].predict_proba(logits)[:, 1]
-    else:
-        probs = raw_probs
+    probs, onnx_stats = onnx_hub.predict_proba_batch("banks", encoded)
         
     scores = np.round(probs * 100.0, 2)
     is_flagged = probs >= threshold
@@ -378,7 +440,9 @@ def _batch_assess_banks(records: list[dict[str, Any]]) -> dict[str, Any]:
             "mean_risk_score": round(float(np.mean(scores)), 2),
             "p95_risk_score": round(float(np.percentile(scores, 95)), 2) if n > 0 else 0.0,
             "decision_threshold": round(threshold, 4),
-            "processing_time_ms": round(elapsed_ms, 2)
+            "processing_time_ms": round(elapsed_ms, 2),
+            "inference_engine": onnx_stats.get("engine", "ONNX_FP16"),
+            "throughput_rps": onnx_stats.get("throughput_rps", 0.0),
         },
         "records": results
     }
@@ -432,14 +496,7 @@ def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
             feat_df.loc[idx, col] = 1.0
             
     encoded = feat_df.fillna(0.0)
-    raw_probs = model.predict_proba(encoded)[:, 1]
-    
-    if bundle.get("calibrator") is not None:
-        clipped = np.clip(raw_probs, 1e-6, 1.0 - 1e-6)
-        logits = np.log(clipped / (1.0 - clipped)).reshape(-1, 1)
-        probs = bundle["calibrator"].predict_proba(logits)[:, 1]
-    else:
-        probs = raw_probs
+    probs, onnx_stats = onnx_hub.predict_proba_batch("creditfraud", encoded)
         
     scores = np.round(probs * 100.0, 2)
     is_flagged = probs >= threshold
@@ -492,7 +549,9 @@ def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
             "mean_risk_score": round(float(np.mean(scores)), 2),
             "p95_risk_score": round(float(np.percentile(scores, 95)), 2) if n > 0 else 0.0,
             "decision_threshold": round(threshold, 4),
-            "processing_time_ms": round(elapsed_ms, 2)
+            "processing_time_ms": round(elapsed_ms, 2),
+            "inference_engine": onnx_stats.get("engine", "ONNX_FP16"),
+            "throughput_rps": onnx_stats.get("throughput_rps", 0.0),
         },
         "records": results
     }
@@ -541,14 +600,7 @@ def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
         features[f"state_{st}"] = (states == st).astype(np.uint8)
         
     encoded = features.reindex(columns=cols, fill_value=0).fillna(0)
-    raw_probs = model.predict_proba(encoded)[:, 1]
-    
-    if bundle.get("calibrator") is not None:
-        clipped = np.clip(raw_probs, 1e-6, 1.0 - 1e-6)
-        logits = np.log(clipped / (1.0 - clipped)).reshape(-1, 1)
-        probs = bundle["calibrator"].predict_proba(logits)[:, 1]
-    else:
-        probs = raw_probs
+    probs, onnx_stats = onnx_hub.predict_proba_batch("insurance", encoded)
         
     scores = np.round(probs * 100.0, 2)
     is_flagged = probs >= threshold
@@ -601,7 +653,9 @@ def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
             "mean_risk_score": round(float(np.mean(scores)), 2),
             "p95_risk_score": round(float(np.percentile(scores, 95)), 2) if n > 0 else 0.0,
             "decision_threshold": round(threshold, 4),
-            "processing_time_ms": round(elapsed_ms, 2)
+            "processing_time_ms": round(elapsed_ms, 2),
+            "inference_engine": onnx_stats.get("engine", "ONNX_FP16"),
+            "throughput_rps": onnx_stats.get("throughput_rps", 0.0),
         },
         "records": results
     }
@@ -610,12 +664,16 @@ def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
 def run_batch_ml(domain: str, records: list[dict[str, Any]]) -> dict[str, Any]:
     d = domain.lower()
     if d in ("banks", "paysim"):
-        return _batch_assess_banks(records)
-    if d in ("creditfraud", "lenders"):
-        return _batch_assess_creditfraud(records)
-    if d in ("insurance", "insurers"):
-        return _batch_assess_insurance(records)
-    raise ValueError(f"Unknown domain: {domain}. Must be one of: banks, lenders, insurers")
+        result = _batch_assess_banks(records)
+    elif d in ("creditfraud", "lenders"):
+        result = _batch_assess_creditfraud(records)
+    elif d in ("insurance", "insurers"):
+        result = _batch_assess_insurance(records)
+    else:
+        raise ValueError(f"Unknown domain: {domain}. Must be one of: banks, lenders, insurers")
+    
+    telemetry_hub.schedule_broadcast()
+    return result
 
 
 def local_reasoning(domain, ml_json):
@@ -810,6 +868,7 @@ def health():
         "status": "ok",
         "models": {name: {"available": path.is_file(), "artifact": str(path.relative_to(ARTIFACTS_DIR.parent))}
                    for name, path in MODEL_PATHS.items()},
+        "onnx_engine": onnx_hub.get_telemetry_snapshot(),
         "gemini_configured": bool(os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_Key")),
     }
 
@@ -822,6 +881,8 @@ def root():
         "health": "/health",
         "interactive_api_docs": "/docs",
         "assessment_endpoint": "POST /api/assess",
+        "streaming_endpoint": "POST /api/assess/stream",
+        "telemetry_websocket": "/ws/telemetry",
         "message": "Use /docs to submit a risk assessment; the root URL does not accept prediction inputs.",
     }
 
@@ -843,6 +904,138 @@ def assess(request: AssessRequest):
     return {"domain": request.domain, "ml_risk_json": ml_json, "ai_reasoning": reasoning}
 
 
+class StreamAssessRequest(BaseModel):
+    domain: Literal["banks", "lenders", "insurers", "creditfraud", "insurance"]
+    user_input: dict[str, Any] = Field(..., description="Transaction or application payload")
+
+
+def stream_gemini_tokens_sync(domain: str, ml_json: dict[str, Any]):
+    """Generator yielding SSE formatted strings for real-time token streaming."""
+    # 1. Yield initial authoritative ML evaluation metadata
+    yield f"data: {json.dumps({'type': 'meta', 'domain': domain, 'ml_risk_json': ml_json})}\n\n"
+
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_Key")
+    explanation_json = dict(ml_json)
+    for identifier in ["transaction_id", "claim_id"]:
+        explanation_json.pop(identifier, None)
+    if isinstance(explanation_json.get("model"), dict):
+        explanation_json["model"] = {
+            key: value for key, value in explanation_json["model"].items()
+            if key != "artifact"
+        }
+
+    prompt = (
+        "You are the authoritative explanation layer for the TrustFed / ENIGMA Financial Risk Screening Platform. "
+        "Your role is to interpret the model's authoritative assessment for compliance officers, fraud analysts, and risk teams.\n\n"
+        "Guidelines:\n"
+        "1. Write a clear, concise, structured response using exactly these markdown labeled sections:\n"
+        "   - **Assessment Summary**: State the exact fraud probability (as a percentage), calibrated risk score, and classification relative to the decision cutoff threshold. Clearly say whether this is flagged for Human Review or Routine Approval.\n"
+        "   - **Key Feature Evidence (SHAP Drivers)**: Explain the top SHAP features and their exact impact direction. For Banks (PaySim), explain how transaction type (TRANSFER/CASH_OUT vs routine retail), account drainage ratio (amount relative to sender balance), and destination account balance ($0 mule/burner account vs established counterparty) drove the score.\n"
+        "   - **Network Context & Silo Parity**: Briefly explain why an isolated bank silo might miss this pattern (e.g. lack of cross-silo destination visibility), whereas the collaborative federated model caught it.\n"
+        "   - **Anomaly Signal**: Explain the anomaly score as an indicator of behavioral unusualness relative to historical baseline distributions (not a fraud probability).\n"
+        "   - **Recommended Verification Checks**: Provide concrete domain checks (e.g., verifying multi-factor authentication, confirming recipient account tenure, reviewing velocity limits for Banks; policy/incident records for Insurers).\n"
+        "   - **Governance & Limitations**: State that this assessment is decision support based on synthetic benchmark data under SecAgg+ and Differential Privacy, requiring human oversight without automated adverse action.\n\n"
+        "2. Strictly use the provided assessment values (never invent numbers, thresholds, or facts).\n"
+        "3. Keep the tone professional, objective, and regulatory-grade.\n\n"
+        f"Domain: {domain}\n"
+        f"Authoritative ML Assessment JSON:\n{json.dumps(explanation_json, ensure_ascii=False)}"
+    )
+
+    streamed_successfully = False
+    model_used = "gemini-2.5-flash"
+
+    if api_key:
+        for model_name in gemini_model_order(api_key):
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:streamGenerateContent?alt=sse"
+            headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
+            payload = {
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "temperature": 0.2,
+                    "maxOutputTokens": 1200,
+                    "thinkingConfig": {"thinkingBudget": 0}
+                }
+            }
+            try:
+                r = requests.post(url, headers=headers, json=payload, stream=True, timeout=12)
+                if r.status_code == 400 and "thinkingConfig" in r.text:
+                    payload["generationConfig"].pop("thinkingConfig", None)
+                    r = requests.post(url, headers=headers, json=payload, stream=True, timeout=12)
+
+                if r.status_code == 200:
+                    model_used = model_name
+                    got_any_token = False
+                    for line in r.iter_lines(decode_unicode=True):
+                        if not line:
+                            continue
+                        if line.startswith("data: "):
+                            raw_json = line[6:].strip()
+                            if raw_json:
+                                try:
+                                    chunk = json.loads(raw_json)
+                                    candidates = chunk.get("candidates", [])
+                                    if candidates:
+                                        parts = candidates[0].get("content", {}).get("parts", [])
+                                        for part in parts:
+                                            text_chunk = part.get("text", "")
+                                            if text_chunk:
+                                                got_any_token = True
+                                                yield f"data: {json.dumps({'type': 'token', 'token': text_chunk})}\n\n"
+                                except Exception:
+                                    pass
+                    if got_any_token:
+                        streamed_successfully = True
+                        break
+            except Exception:
+                continue
+
+    # Fallback: progressive simulated token stream of deterministic reasoning
+    if not streamed_successfully:
+        model_used = "deterministic-local"
+        fallback = local_reasoning(domain, ml_json)
+        full_text = fallback.get("text", "")
+        words = full_text.split(" ")
+        for i in range(0, len(words), 3):
+            chunk = " ".join(words[i:i+3]) + (" " if i+3 < len(words) else "")
+            yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
+            time.sleep(0.015)
+
+    # Final event
+    yield f"data: {json.dumps({'type': 'done', 'done': True, 'source': 'gemini' if streamed_successfully else 'local_fallback', 'model': model_used})}\n\n"
+
+
+@app.post("/api/assess/stream")
+def assess_stream(request: StreamAssessRequest):
+    """Real-time SSE token streaming endpoint for Gemini 2.5 Flash explanations with live typewriter effect."""
+    try:
+        ml_json = run_ml(request.domain, request.user_input)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except NotImplementedError as exc:
+        raise HTTPException(status_code=501, detail=str(exc)) from exc
+    except (ValueError, TypeError, KeyError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    def event_stream():
+        telemetry_hub.active_streams += 1
+        try:
+            for event in stream_gemini_tokens_sync(request.domain, ml_json):
+                yield event
+        finally:
+            telemetry_hub.active_streams = max(0, telemetry_hub.active_streams - 1)
+            telemetry_hub.schedule_broadcast()
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
+
+
 class BatchAssessRequest(BaseModel):
     domain: Literal["banks", "lenders", "insurers", "creditfraud", "insurance"]
     records: list[dict[str, Any]] = Field(..., description="List of transactions/applications/claims to screen")
@@ -850,7 +1043,7 @@ class BatchAssessRequest(BaseModel):
 
 @app.post("/api/assess/batch")
 def assess_batch(request: BatchAssessRequest):
-    """Vectorized high-throughput batch screening endpoint."""
+    """Vectorized high-throughput batch screening endpoint powered by ONNX FP16."""
     try:
         return run_batch_ml(request.domain, request.records)
     except FileNotFoundError as exc:
@@ -916,4 +1109,26 @@ def download_sample_file(filename: str):
     if not file_path.is_file():
         raise HTTPException(status_code=404, detail="Requested file not found")
     return FileResponse(file_path, filename=filename, media_type="text/csv")
+
+
+@app.websocket("/ws/telemetry")
+async def websocket_telemetry_endpoint(websocket: WebSocket):
+    """High-frequency WebSocket telemetry hub pushing live P50/P95, throughput & SecAgg stats."""
+    await telemetry_hub.connect(websocket)
+    try:
+        while True:
+            msg = await websocket.receive_text()
+            if msg in ("ping", "refresh"):
+                await websocket.send_text(json.dumps(telemetry_hub.get_payload()))
+    except WebSocketDisconnect:
+        telemetry_hub.disconnect(websocket)
+    except Exception:
+        telemetry_hub.disconnect(websocket)
+
+
+@app.get("/api/telemetry")
+def get_telemetry_snapshot():
+    """Retrieve instantaneous telemetry snapshot over HTTP."""
+    return telemetry_hub.get_payload()
+
 

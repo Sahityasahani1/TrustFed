@@ -301,27 +301,27 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Subtab Navigation Pill */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="space-y-5">
+      {/* Subtab Navigation */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-blue-600" />
+          <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 font-sans tracking-tight">
+            <CreditCard className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             <span>Credit Fraud &amp; Loan Default Risk Studio</span>
-            <span className="text-[10px] font-mono font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full border border-blue-300">
-              artifacts/creditfraud
+            <span className="text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700/60">
+              XGBoost 500-Tree
             </span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5 font-medium">
-            307,511 Home Credit loan records • 500-Tree XGBoost GBDT • Platt-calibrated threshold 0.1557
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-sans">
+            307,511 Home Credit loan records • Platt-calibrated decision cutoff 0.1557 • Zero PII transmission.
           </p>
         </div>
 
         <TabsNav
           tabs={[
             { id: 'showdown', label: '1. Applicant Inputs & Showdown', icon: <CreditCard className="w-3.5 h-3.5" />, badge: 'Live Inference' },
-            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: '20-Loan Demo' },
-            { id: 'metrics', label: '3. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'ROC-AUC 0.768' },
+            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: 'Vectorized' },
+            { id: 'metrics', label: '3. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -339,61 +339,53 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
             className="space-y-6"
           >
             {/* Quick Scenario Preset Selector */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-3xl border-2 border-blue-200/90 bg-gradient-to-r from-blue-50/95 via-indigo-50/90 to-teal-50/95 shadow-xl shadow-blue-500/10">
-              <div>
-                <span className="text-xs font-mono uppercase text-blue-900 font-black tracking-wider block">
-                  Interactive Applicant Presets:
-                </span>
-                <span className="text-xs text-slate-600 font-medium">
-                  Load benchmark credit profiles from 307k real loan applicants
-                </span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 text-xs font-mono shadow-xs">
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                Applicant Presets:
+              </span>
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <button
                   onClick={() => loadPreset('high_risk')}
-                  className="btn-3d-danger px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-rose-500/20"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20"
                 >
-                  <span>⚡ High Leverage Loan (Risk Cutoff Exceeded)</span>
+                  ⚡ High Leverage Loan (Risk Exceeded)
                 </button>
                 <button
                   onClick={() => loadPreset('prime_safe')}
-                  className="btn-3d-success px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
                 >
-                  <span>✓ Prime Borrower (High Bureau Score)</span>
+                  ✓ Prime Borrower (High Bureau Score)
                 </button>
                 <button
                   onClick={() => loadPreset('low_doc')}
-                  className="btn-3d-primary px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-blue-500/20"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60 hover:bg-zinc-200"
                 >
-                  <span>✓ Revolving Retail Loan</span>
+                  ✓ Revolving Retail Loan
                 </button>
               </div>
             </div>
 
             {/* Main Interactive Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               {/* Left Column: Loan Input Sandbox */}
-              <div className="lg:col-span-6 rounded-3xl border-2 border-blue-200/90 bg-white/95 p-6 space-y-5 shadow-2xl shadow-blue-500/10">
-                <div className="flex items-center justify-between border-b border-blue-100 pb-3">
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <CreditCard className="w-4 h-4 text-blue-600" />
+              <div className="lg:col-span-6 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 p-5 space-y-4 shadow-xs text-zinc-900 dark:text-zinc-100">
+                <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2.5">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
                     <span>Loan Applicant Parameters (7 Key Drivers)</span>
                   </h3>
-                  <span className="text-[11px] font-mono text-blue-800 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200 font-bold">
-                    XGBoost 500-Tree Features
+                  <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700/60">
+                    Live Inputs
                   </span>
                 </div>
 
                 {/* 1. Annual Total Income */}
-                <div className="p-3.5 rounded-2xl border border-blue-100 bg-slate-50/70 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm">💼</span>
-                      <label className="text-xs font-bold text-slate-900">
-                        Annual Total Income <code className="text-[11px] font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">AMT_INCOME_TOTAL</code>
-                      </label>
-                    </div>
-                    <span className="font-mono text-blue-700 font-bold text-sm">
+                    <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                      Annual Total Income <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">AMT_INCOME_TOTAL</code>
+                    </label>
+                    <span className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold text-xs tabular-nums">
                       ${appData.amt_income_total.toLocaleString()}
                     </span>
                   </div>
@@ -404,20 +396,17 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                     step="5000"
                     value={appData.amt_income_total}
                     onChange={(e) => setAppData(prev => ({ ...prev, amt_income_total: Number(e.target.value) }))}
-                    className="w-full accent-blue-600 cursor-pointer"
+                    className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                   />
                 </div>
 
                 {/* 2. Credit Amount Requested */}
-                <div className="p-3.5 rounded-2xl border border-blue-100 bg-slate-50/70 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm">🏦</span>
-                      <label className="text-xs font-bold text-slate-900">
-                        Credit / Principal Amount <code className="text-[11px] font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">AMT_CREDIT</code>
-                      </label>
-                    </div>
-                    <span className="font-mono text-indigo-700 font-bold text-sm">
+                    <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                      Credit Principal Amount <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">AMT_CREDIT</code>
+                    </label>
+                    <span className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold text-xs tabular-nums">
                       ${appData.amt_credit.toLocaleString()}
                     </span>
                   </div>
@@ -428,20 +417,20 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                     step="10000"
                     value={appData.amt_credit}
                     onChange={(e) => setAppData(prev => ({ ...prev, amt_credit: Number(e.target.value) }))}
-                    className="w-full accent-indigo-600 cursor-pointer"
+                    className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                   />
-                  <div className="text-[11px] text-slate-500 flex justify-between">
-                    <span>Debt-to-Income Leverage: <strong>{debtToIncome}x</strong></span>
-                    <span>Annuity-to-Income: <strong>{annuityIncomeRatio}%</strong></span>
+                  <div className="text-[11px] text-zinc-500 flex justify-between font-mono">
+                    <span>DTI Leverage: <strong className="text-zinc-800 dark:text-zinc-200">{debtToIncome}x</strong></span>
+                    <span>Annuity-to-Income: <strong className="text-zinc-800 dark:text-zinc-200">{annuityIncomeRatio}%</strong></span>
                   </div>
                 </div>
 
                 {/* 3. External Credit Bureau Score 2 & 3 */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3 rounded-2xl border border-blue-100 bg-slate-50/70 space-y-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <label className="font-bold text-slate-900">Bureau Score 2</label>
-                      <span className="font-mono font-bold text-blue-700">{appData.ext_source_2.toFixed(2)}</span>
+                      <label className="font-semibold text-zinc-800 dark:text-zinc-200">Bureau Score 2</label>
+                      <span className="font-mono font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">{appData.ext_source_2.toFixed(2)}</span>
                     </div>
                     <input
                       type="range"
@@ -450,15 +439,15 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                       step="0.01"
                       value={appData.ext_source_2}
                       onChange={(e) => setAppData(prev => ({ ...prev, ext_source_2: Number(e.target.value) }))}
-                      className="w-full accent-blue-600 cursor-pointer"
+                      className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                     />
-                    <span className="text-[10px] text-slate-400 font-mono">EXT_SOURCE_2 (Normalized 0..1)</span>
+                    <span className="text-[10px] text-zinc-400 font-mono">EXT_SOURCE_2</span>
                   </div>
 
-                  <div className="p-3 rounded-2xl border border-blue-100 bg-slate-50/70 space-y-1.5">
+                  <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <label className="font-bold text-slate-900">Bureau Score 3</label>
-                      <span className="font-mono font-bold text-cyan-700">{appData.ext_source_3.toFixed(2)}</span>
+                      <label className="font-semibold text-zinc-800 dark:text-zinc-200">Bureau Score 3</label>
+                      <span className="font-mono font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">{appData.ext_source_3.toFixed(2)}</span>
                     </div>
                     <input
                       type="range"
@@ -467,16 +456,16 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                       step="0.01"
                       value={appData.ext_source_3}
                       onChange={(e) => setAppData(prev => ({ ...prev, ext_source_3: Number(e.target.value) }))}
-                      className="w-full accent-cyan-600 cursor-pointer"
+                      className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                     />
-                    <span className="text-[10px] text-slate-400 font-mono">EXT_SOURCE_3 (#1 SHAP Driver)</span>
+                    <span className="text-[10px] text-zinc-400 font-mono">EXT_SOURCE_3 (#1 Driver)</span>
                   </div>
                 </div>
 
                 {/* 4. Loan Contract Type */}
-                <div className="p-3 rounded-2xl border border-blue-100 bg-slate-50/70 space-y-2">
-                  <label className="text-xs font-bold text-slate-900 block">
-                    Loan Contract Category <code className="text-[11px] font-mono text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">NAME_CONTRACT_TYPE</code>
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
+                  <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">
+                    Loan Contract Category <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">NAME_CONTRACT_TYPE</code>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {(['Cash loans', 'Revolving loans'] as const).map(type => (
@@ -484,10 +473,10 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         key={type}
                         type="button"
                         onClick={() => setAppData(prev => ({ ...prev, contract_type: type }))}
-                        className={`p-2 rounded-xl text-xs font-bold cursor-pointer transition-all border ${
+                        className={`py-1.5 px-3 rounded-lg text-xs font-medium cursor-pointer transition-colors border ${
                           appData.contract_type === type
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                            ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-semibold border-transparent shadow-xs'
+                            : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700/60 hover:text-zinc-900'
                         }`}
                       >
                         {type}
@@ -496,51 +485,51 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                   </div>
                 </div>
 
-                {/* 5. 3D Primary Calculate Button */}
-                <div className="pt-2 space-y-3">
+                {/* 5. Primary Calculate Button */}
+                <div className="pt-1 space-y-2.5">
                   <button
                     type="button"
                     onClick={() => handleCalculateAndSend()}
                     disabled={isCalculating}
-                    className={`w-full py-4 px-5 rounded-2xl font-black text-sm tracking-wide flex items-center justify-center gap-3 transition-all cursor-pointer shadow-xl select-none relative overflow-hidden ${
+                    className={`w-full py-2.5 px-4 rounded-xl font-medium text-xs tracking-wide flex items-center justify-center gap-2 transition-colors cursor-pointer select-none ${
                       isCalculating
-                        ? 'bg-slate-800 text-slate-200 cursor-wait shadow-slate-900/30'
+                        ? 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-wait'
                         : isDirty
-                        ? 'btn-3d-primary text-white shadow-blue-600/30 hover:scale-[1.01] active:scale-[0.99]'
-                        : 'btn-3d-success text-white shadow-emerald-600/25 hover:scale-[1.01] active:scale-[0.99]'
+                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-xs'
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs'
                     }`}
                   >
                     {isCalculating ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
-                        <span className="font-mono text-xs sm:text-sm">Evaluating 266-Feature XGBoost Model...</span>
+                        <div className="w-4 h-4 border-2 border-zinc-400 border-t-zinc-900 dark:border-t-white rounded-full animate-spin shrink-0" />
+                        <span className="font-mono">Evaluating XGBoost Model...</span>
                       </>
                     ) : isDirty ? (
                       <>
-                        <Cpu className="w-5 h-5 text-cyan-200 shrink-0" />
-                        <span className="font-extrabold text-xs sm:text-sm uppercase">Calculate Credit Risk &amp; Send to Model</span>
-                        <span className="ml-auto text-[10px] font-mono font-bold bg-white/20 border border-white/30 px-2 py-0.5 rounded-full uppercase text-white shadow-inner">
-                          Ready
+                        <Cpu className="w-4 h-4 shrink-0" />
+                        <span>Calculate Credit Risk &amp; Send to Model</span>
+                        <span className="ml-auto text-[10px] font-mono font-medium bg-white/20 px-1.5 py-0.2 rounded">
+                          Modified
                         </span>
                       </>
                     ) : (
                       <>
-                        <CheckCircle2 className="w-5 h-5 text-emerald-200 shrink-0" />
-                        <span className="font-extrabold text-xs sm:text-sm">✓ Evaluated by Model (Click to Re-calculate)</span>
-                        <span className="ml-auto text-[10px] font-mono font-bold bg-white/25 px-2 py-0.5 rounded-full text-white">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>✓ Evaluated by Model (Click to Re-calculate)</span>
+                        <span className="ml-auto text-[10px] font-mono font-medium bg-emerald-700 px-1.5 py-0.2 rounded">
                           Synced
                         </span>
                       </>
                     )}
                   </button>
 
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-blue-50/80 via-teal-50/60 to-emerald-50/80 border border-blue-200/80 flex items-center justify-between text-[11px] text-slate-700 shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>SecAgg+ Encrypted Mask:</strong> Evaluated across multi-bank consortium with zero record leakage.</span>
+                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400 font-mono">
+                    <div className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span>Consortium Masking: Zero Plain-Text Data Leaked</span>
                     </div>
-                    <span className="font-mono text-[10px] text-blue-800 bg-white px-2 py-0.5 rounded-full border border-blue-200 font-bold shrink-0">
-                      DP ε = 2.45
+                    <span className="text-[10px] text-zinc-500">
+                      DP ε=2.45
                     </span>
                   </div>
                 </div>
@@ -551,17 +540,17 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="pt-3 border-t-2 border-dashed border-blue-200 space-y-3"
+                      className="pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-700/60 space-y-3"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-emerald-600" />
-                          <h4 className="text-xs font-mono uppercase font-black text-slate-900 tracking-wider">
-                            Proceed with Further Features
+                        <div className="flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
+                          <h4 className="text-xs font-mono uppercase font-semibold text-zinc-700 dark:text-zinc-300 tracking-wider">
+                            Further Forensic Diagnostics
                           </h4>
                         </div>
-                        <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
-                          Model Outputs Active
+                        <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          Outputs Active
                         </span>
                       </div>
 
@@ -569,17 +558,17 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'gemini' ? null : 'gemini')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'gemini'
-                              ? 'bg-gradient-to-r from-blue-700 to-indigo-600 text-white border-blue-600 shadow-md'
-                              : 'bg-white hover:bg-blue-50/60 border-blue-200 text-slate-800 shadow-xs'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <Bot className="w-4 h-4" />
+                            <Bot className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">1. Gemini AI</span>
-                              <span className="text-[10px] text-slate-500">Explanation Layer</span>
+                              <span className="text-xs font-medium block leading-tight">1. Gemini AI</span>
+                              <span className="text-[10px] opacity-70">Explanation</span>
                             </div>
                           </div>
                           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'gemini' ? 'rotate-180' : ''}`} />
@@ -588,17 +577,17 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'shap' ? null : 'shap')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'shap'
-                              ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white border-teal-600 shadow-md'
-                              : 'bg-white hover:bg-teal-50/60 border-blue-200 text-slate-800 shadow-xs'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <BarChart3 className="w-4 h-4" />
+                            <BarChart3 className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">2. SHAP Drivers</span>
-                              <span className="text-[10px] text-slate-500">XGBoost Attribution</span>
+                              <span className="text-xs font-medium block leading-tight">2. SHAP Drivers</span>
+                              <span className="text-[10px] opacity-70">Attribution</span>
                             </div>
                           </div>
                           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'shap' ? 'rotate-180' : ''}`} />
@@ -607,17 +596,17 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'audit' ? null : 'audit')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'audit'
-                              ? 'bg-gradient-to-r from-emerald-600 to-cyan-600 text-white border-emerald-600 shadow-md'
-                              : 'bg-white hover:bg-emerald-50/60 border-emerald-200 text-slate-800 shadow-xs'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <ShieldCheck className="w-4 h-4" />
+                            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">3. NIST Audit</span>
-                              <span className="text-[10px] text-slate-500">SP 1270 Quorum</span>
+                              <span className="text-xs font-medium block leading-tight">3. NIST Audit</span>
+                              <span className="text-[10px] opacity-70">SP 1270</span>
                             </div>
                           </div>
                           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'audit' ? 'rotate-180' : ''}`} />
@@ -658,19 +647,19 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-slate-900 text-slate-100 shadow-xl border border-slate-800 space-y-3"
+                          className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-white/10 space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                          <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2">
                             <div>
-                              <span className="text-xs font-mono font-bold text-cyan-400 uppercase flex items-center gap-1.5">
-                                <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                              <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                                <Activity className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                                 XGBoost SHAP Feature Attribution (artifacts/creditfraud)
                               </span>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
+                              <p className="text-[11px] text-zinc-500 mt-0.5">
                                 Mathematical log-odds feature contributions for evaluated applicant
                               </p>
                             </div>
-                            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/50">
+                            <span className="font-mono text-xs font-medium px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
                               266 Features Analyzed
                             </span>
                           </div>
@@ -685,20 +674,20 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                             ]).map((factor, idx) => {
                               const isPositive = factor.impact_log_odds > 0;
                               return (
-                                <div key={idx} className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                                <div key={idx} className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5 space-y-1.5">
                                   <div className="flex items-center justify-between text-xs">
-                                    <span className="font-bold font-mono text-slate-200"><code>{factor.feature}</code></span>
-                                    <span className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
+                                    <span className="font-semibold font-mono text-zinc-800 dark:text-zinc-200"><code>{factor.feature}</code></span>
+                                    <span className={`font-mono font-medium text-xs px-1.5 py-0.2 rounded ${
                                       isPositive 
-                                        ? 'bg-rose-950/80 text-rose-300 border border-rose-800/60' 
-                                        : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
+                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' 
+                                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                     }`}>
                                       {isPositive ? `+${factor.impact_log_odds.toFixed(3)}` : factor.impact_log_odds.toFixed(3)} log-odds
                                     </span>
                                   </div>
-                                  <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden flex">
+                                  <div className="w-full bg-zinc-200 dark:bg-zinc-700 h-1.5 rounded-full overflow-hidden flex">
                                     <div 
-                                      className={`h-full transition-all duration-500 rounded-full ${isPositive ? 'bg-gradient-to-r from-amber-500 to-rose-500' : 'bg-gradient-to-r from-emerald-500 to-teal-400'}`}
+                                      className={`h-full transition-all duration-500 rounded-full ${isPositive ? 'bg-rose-500' : 'bg-emerald-500'}`}
                                       style={{ width: `${Math.min(100, Math.abs(factor.impact_log_odds) * 180)}%` }}
                                     />
                                   </div>
@@ -714,35 +703,35 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-white border-2 border-emerald-300/80 shadow-xl space-y-3"
+                          className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-white/10 space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
+                          <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2">
                             <div>
-                              <span className="text-xs font-mono font-bold text-emerald-900 uppercase flex items-center gap-1.5">
-                                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                              <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                                <ShieldCheck className="w-4 h-4 text-emerald-500" />
                                 NIST SP 1270 Credit Risk Certificate
                               </span>
-                              <p className="text-[11px] text-slate-500">
+                              <p className="text-[11px] text-zinc-500">
                                 Audited against Fair Lending &amp; EU AI Act high-risk credit screening compliance
                               </p>
                             </div>
                             <button
                               type="button"
                               onClick={handleCopyCert}
-                              className="btn-3d-success px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                              className="px-2 py-1 rounded-md text-[11px] font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 flex items-center gap-1 cursor-pointer transition-colors"
                             >
                               {copiedCert ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                               <span>{copiedCert ? 'Copied JSON!' : 'Copy Proof'}</span>
                             </button>
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                            <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                              <span className="text-slate-500 block text-[10px]">Certificate ID:</span>
-                              <span className="font-bold text-slate-800">NIST-SP1270-CF-307K</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Certificate ID:</span>
+                              <span className="font-semibold text-zinc-900 dark:text-zinc-100">NIST-SP1270-CF-307K</span>
                             </div>
-                            <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                              <span className="text-slate-500 block text-[10px]">Model Type:</span>
-                              <span className="font-bold text-emerald-700">XGBoost 500 Trees</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Model Type:</span>
+                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">XGBoost 500 Trees</span>
                             </div>
                           </div>
                         </motion.div>
@@ -754,38 +743,38 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
 
               {/* Right Column: Live Model Showdown */}
               <div className="lg:col-span-6 space-y-4">
-                <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-200 flex items-center justify-between">
+                <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 flex items-center justify-between shadow-xs">
                   <div>
-                    <span className="text-xs font-mono font-bold text-blue-900 uppercase">Live Credit Model Showdown</span>
-                    <p className="text-[11px] text-slate-600">Evaluating 307k-sample Home Credit Risk Model</p>
+                    <span className="text-xs font-mono font-semibold text-zinc-900 dark:text-zinc-100 uppercase">Live Credit Model Showdown</span>
+                    <p className="text-[11px] text-zinc-500">Evaluating 307k-sample Home Credit Risk Model</p>
                   </div>
-                  <span className="text-xs font-mono text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300 font-bold">
+                  <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20 font-semibold">
                     ROC-AUC 0.7687
                   </span>
                 </div>
 
                 {/* Model Evaluation Sync Banner */}
                 {isDirty ? (
-                  <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 flex items-center justify-between text-xs text-amber-950 animate-pulse shadow-sm">
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs text-amber-700 dark:text-amber-300 shadow-xs">
                     <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Risk &amp; Run Underwriting Model&quot; to update inference.</span>
+                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Credit Risk&quot; to update inference.</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleCalculateAndSend()}
-                      className="px-2.5 py-1 bg-amber-600 text-white rounded-lg font-bold text-[11px] shrink-0 hover:bg-amber-700 cursor-pointer shadow-xs"
+                      className="px-2 py-0.5 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium text-[11px] shrink-0 cursor-pointer transition-colors"
                     >
                       Calculate Now &rarr;
                     </button>
                   </div>
                 ) : (
-                  <div className="p-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between text-xs text-emerald-950">
+                  <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-300">
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
                       <span>Model scores are active &amp; synchronized with loan application parameters.</span>
                     </div>
-                    <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold border border-emerald-200">
+                    <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded font-medium border border-emerald-500/20">
                       Active
                     </span>
                   </div>
@@ -805,18 +794,18 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                   totalPopulation={307511}
                 />
 
-                <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-md space-y-2">
-                  <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+                <div className="p-4 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 shadow-xs space-y-2">
+                  <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                     Underwriting Signals from artifacts/creditfraud:
                   </span>
                   <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-slate-500 block text-[10px]">Decision Cutoff:</span>
-                      <span className="font-bold text-blue-900">15.57% calibrated</span>
+                    <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                      <span className="text-zinc-500 block text-[10px]">Decision Cutoff:</span>
+                      <span className="font-semibold text-zinc-900 dark:text-zinc-100">15.57% calibrated</span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-slate-500 block text-[10px]">Benchmark PR-AUC:</span>
-                      <span className="font-bold text-emerald-700">0.2588 (+118% lift)</span>
+                    <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                      <span className="text-zinc-500 block text-[10px]">Benchmark PR-AUC:</span>
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">0.2588 (+118% lift)</span>
                     </div>
                   </div>
                 </div>
@@ -850,101 +839,101 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-6 rounded-3xl border-2 border-blue-200 bg-white shadow-xl space-y-6"
+            className="p-6 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 shadow-xs space-y-6 text-zinc-900 dark:text-zinc-100"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-blue-100 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-white/5 pb-4">
               <div>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <FileSpreadsheet className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
                   <span>Credit Fraud Risk Model Specification (artifacts/creditfraud)</span>
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-zinc-500 mt-1">
                   Evaluated on 307,511 Home Credit loan files • 80/20 Stratified train/test split with disjoint calibration
                 </p>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 shrink-0">
+              <span className="px-2.5 py-0.5 rounded text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60 shrink-0">
                 XGBoost 500-Tree GBDT
               </span>
             </div>
 
             {/* Core Metrics Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-              <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">Total Application Cohort:</span>
-                <span className="text-lg font-bold text-blue-900">307,511</span>
-                <span className="text-[10px] text-slate-400 block mt-0.5">Test Rows: 61,503</span>
+              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                <span className="text-zinc-500 block text-[10px] uppercase font-semibold">Total Application Cohort:</span>
+                <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">307,511</span>
+                <span className="text-[10px] text-zinc-400 block mt-0.5">Test Rows: 61,503</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">ROC-AUC Score:</span>
-                <span className="text-lg font-bold text-emerald-700">0.7687</span>
-                <span className="text-[10px] text-emerald-600 block mt-0.5">Strong Separation</span>
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <span className="text-emerald-700 dark:text-emerald-400 block text-[10px] uppercase font-semibold">ROC-AUC Score:</span>
+                <span className="text-lg font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">0.7687</span>
+                <span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 block mt-0.5">Strong Separation</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">PR-AUC Score:</span>
-                <span className="text-lg font-bold text-teal-700">0.2588</span>
-                <span className="text-[10px] text-teal-600 block mt-0.5">+118% over baseline</span>
+              <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                <span className="text-cyan-700 dark:text-cyan-400 block text-[10px] uppercase font-semibold">PR-AUC Score:</span>
+                <span className="text-lg font-semibold text-cyan-600 dark:text-cyan-400 tabular-nums">0.2588</span>
+                <span className="text-[10px] text-cyan-600/80 dark:text-cyan-400/80 block mt-0.5">+118% over baseline</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">Optimal Decision Cutoff:</span>
-                <span className="text-lg font-bold text-indigo-700">0.1557</span>
-                <span className="text-[10px] text-indigo-600 block mt-0.5">Platt-Calibrated</span>
+              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                <span className="text-zinc-500 block text-[10px] uppercase font-semibold">Optimal Decision Cutoff:</span>
+                <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">0.1557</span>
+                <span className="text-[10px] text-zinc-400 block mt-0.5">Platt-Calibrated</span>
               </div>
             </div>
 
             {/* Secondary Test Set Performance & Hyperparameters */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-3">
+                <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                   Classification Diagnostics (Test Split @ 0.1557 Cutoff)
                 </span>
                 <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">PRECISION:</span>
-                    <span className="font-bold text-slate-800">25.50%</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">PRECISION:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">25.50%</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">RECALL:</span>
-                    <span className="font-bold text-slate-800">43.10%</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">RECALL:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">43.10%</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">F1-SCORE:</span>
-                    <span className="font-bold text-slate-800">0.3205</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">F1-SCORE:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.3205</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">BRIER SCORE:</span>
-                    <span className="font-bold text-slate-800">0.0671</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">BRIER SCORE:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.0671</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">LOG LOSS:</span>
-                    <span className="font-bold text-slate-800">0.2427</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">LOG LOSS:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.2427</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">TRUE POSITIVES:</span>
-                    <span className="font-bold text-emerald-700">2,140</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">TRUE POSITIVES:</span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">2,140</span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-3">
+                <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                   Production Hyperparameters (Best Candidate #12 of 14)
                 </span>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">N_ESTIMATORS:</span>
-                    <span className="font-bold text-indigo-700">500 trees</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">N_ESTIMATORS:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">500 trees</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">MAX_DEPTH:</span>
-                    <span className="font-bold text-indigo-700">6 levels</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">MAX_DEPTH:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">6 levels</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">LEARNING_RATE:</span>
-                    <span className="font-bold text-indigo-700">0.03</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">LEARNING_RATE:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.03</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">MIN_CHILD_WEIGHT:</span>
-                    <span className="font-bold text-indigo-700">12</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">MIN_CHILD_WEIGHT:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">12</span>
                   </div>
                 </div>
               </div>
@@ -952,12 +941,12 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
 
             {/* Top SHAP Feature Importance Table */}
             <div className="space-y-3">
-              <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+              <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                 Top SHAP Global Feature Importance (artifacts/creditfraud/shap_importance.csv)
               </span>
-              <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+              <div className="border border-zinc-200/80 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow-xs">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-50 border-b border-slate-200 font-mono text-slate-500 uppercase text-[10px]">
+                  <thead className="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200/60 dark:border-white/5 font-mono text-zinc-500 uppercase text-[10px]">
                     <tr>
                       <th className="p-3">Rank</th>
                       <th className="p-3">Feature Name</th>
@@ -965,7 +954,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                       <th className="p-3">Importance Bar</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono">
+                  <tbody className="divide-y divide-zinc-200/60 dark:divide-white/5 font-mono text-zinc-700 dark:text-zinc-300">
                     {[
                       { rank: '#1', feature: 'EXT_SOURCE_3', val: 0.3523, pct: 100 },
                       { rank: '#2', feature: 'EXT_SOURCE_2', val: 0.3395, pct: 96 },
@@ -976,13 +965,13 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                       { rank: '#7', feature: 'OWN_CAR_AGE', val: 0.0873, pct: 25 },
                       { rank: '#8', feature: 'DAYS_EMPLOYED', val: 0.0810, pct: 23 },
                     ].map((row) => (
-                      <tr key={row.rank} className="hover:bg-slate-50/80">
-                        <td className="p-3 font-bold text-blue-700">{row.rank}</td>
-                        <td className="p-3 font-bold text-slate-800">{row.feature}</td>
-                        <td className="p-3 font-bold text-slate-600">{row.val.toFixed(4)}</td>
+                      <tr key={row.rank} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                        <td className="p-3 font-semibold text-zinc-900 dark:text-zinc-100">{row.rank}</td>
+                        <td className="p-3 font-medium text-zinc-900 dark:text-zinc-100">{row.feature}</td>
+                        <td className="p-3 text-zinc-500">{row.val.toFixed(4)}</td>
                         <td className="p-3 w-48">
-                          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-600 rounded-full" style={{ width: `${row.pct}%` }} />
+                          <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                            <div className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full" style={{ width: `${row.pct}%` }} />
                           </div>
                         </td>
                       </tr>

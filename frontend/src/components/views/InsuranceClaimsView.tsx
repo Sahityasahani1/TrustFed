@@ -291,27 +291,27 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Subtab Navigation Pill */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="space-y-5">
+      {/* Subtab Navigation */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-            <Umbrella className="w-5 h-5 text-teal-600" />
+          <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 font-sans tracking-tight">
+            <Umbrella className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             <span>Insurance Claims Fraud &amp; SIU Audit Studio</span>
-            <span className="text-[10px] font-mono font-bold bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full border border-teal-300">
-              artifacts/insurance
+            <span className="text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700/60">
+              54-Feature GBDT
             </span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5 font-medium">
-            1,000,000 policy cohort • Policy-grouped 80/20 train/test split • Calibrated cutoff threshold 0.1798
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-sans">
+            1,000,000 policy cohort • Policy-grouped 80/20 train/test split • Calibrated cutoff threshold 0.1798.
           </p>
         </div>
 
         <TabsNav
           tabs={[
             { id: 'showdown', label: '1. Claim Inputs & Showdown', icon: <Umbrella className="w-3.5 h-3.5" />, badge: 'Live Inference' },
-            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: '20-Claim Demo' },
-            { id: 'metrics', label: '3. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" />, badge: 'ROC-AUC 0.793' },
+            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: 'Vectorized' },
+            { id: 'metrics', label: '3. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -329,55 +329,50 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
             className="space-y-6"
           >
             {/* Quick Scenario Preset Selector */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-3xl border-2 border-teal-200/90 bg-gradient-to-r from-teal-50/95 via-cyan-50/90 to-emerald-50/95 shadow-xl shadow-teal-500/10">
-              <div>
-                <span className="text-xs font-mono uppercase text-teal-900 font-black tracking-wider block">
-                  Interactive Claim Presets:
-                </span>
-                <span className="text-xs text-slate-600 font-medium">
-                  Load benchmark claims from 1M real policyholder events
-                </span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 text-xs font-mono shadow-xs">
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                Claim Presets:
+              </span>
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <button
                   onClick={() => loadPreset('high_risk')}
-                  className="btn-3d-danger px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-rose-500/20"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20"
                 >
-                  <span>⚡ Renters Spike (0.1yr Tenure + Low Deductible)</span>
+                  ⚡ Renters Spike (0.1yr Tenure + Low Deductible)
                 </button>
                 <button
                   onClick={() => loadPreset('prime_safe')}
-                  className="btn-3d-success px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
                 >
-                  <span>✓ Established Auto Policy (8.5yr Tenure)</span>
+                  ✓ Established Auto (8.5yr Tenure)
                 </button>
                 <button
                   onClick={() => loadPreset('renters_spike')}
-                  className="btn-3d-primary px-3.5 py-1.5 rounded-full text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-md shadow-blue-500/20"
+                  className="px-2.5 py-1 rounded-md text-xs font-mono font-medium cursor-pointer transition-colors bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60 hover:bg-zinc-200"
                 >
-                  <span>✓ Routine Homeowners Claim</span>
+                  ✓ Routine Homeowners Claim
                 </button>
               </div>
             </div>
 
             {/* Main Interactive Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
               {/* Left Column: Claim Input Sandbox */}
-              <div className="lg:col-span-6 rounded-3xl border-2 border-teal-200/90 bg-white/95 p-6 space-y-5 shadow-2xl shadow-teal-500/10">
-                <div className="flex items-center justify-between border-b border-teal-100 pb-3">
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <Umbrella className="w-4 h-4 text-teal-600" />
+              <div className="lg:col-span-6 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 p-5 space-y-4 shadow-xs text-zinc-900 dark:text-zinc-100">
+                <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2.5">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                    <Umbrella className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
                     <span>Insurance Claim Parameters (54 Features)</span>
                   </h3>
-                  <span className="text-[11px] font-mono text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200 font-bold">
+                  <span className="text-[10px] font-mono text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700/60">
                     Group-Disjoint Model
                   </span>
                 </div>
 
                 {/* 1. Claim Type */}
-                <div className="p-3.5 rounded-2xl border border-teal-100 bg-slate-50/70 space-y-2">
-                  <label className="text-xs font-bold text-slate-900 block">
-                    Claim Type Category <code className="text-[11px] font-mono text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded">claim_type</code>
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
+                  <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">
+                    Claim Type Category <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">claim_type</code>
                   </label>
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
                     {(['home', 'auto', 'renters', 'business', 'property'] as const).map(type => (
@@ -385,10 +380,10 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                         key={type}
                         type="button"
                         onClick={() => setClaimData(prev => ({ ...prev, claim_type: type }))}
-                        className={`p-2 rounded-xl text-xs font-bold cursor-pointer transition-all border uppercase ${
+                        className={`p-1.5 rounded-lg text-xs font-medium cursor-pointer transition-colors border uppercase ${
                           claimData.claim_type === type
-                            ? 'bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-500/20'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                            ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 font-semibold border-transparent shadow-xs'
+                            : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700/60 hover:text-zinc-900'
                         }`}
                       >
                         {type}
@@ -398,12 +393,12 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                 </div>
 
                 {/* 2. Claim Amount ($) */}
-                <div className="p-3.5 rounded-2xl border border-teal-100 bg-slate-50/70 space-y-2">
+                <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-900">
-                      Total Claim Amount <code className="text-[11px] font-mono text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded">claim_amount</code>
+                    <label className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                      Total Claim Amount <code className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 bg-zinc-200/60 dark:bg-zinc-700/60 px-1 py-0.2 rounded">claim_amount</code>
                     </label>
-                    <span className="font-mono text-teal-700 font-bold text-sm">
+                    <span className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold text-xs tabular-nums">
                       ${claimData.claim_amount.toLocaleString()}
                     </span>
                   </div>
@@ -414,16 +409,16 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                     step="500"
                     value={claimData.claim_amount}
                     onChange={(e) => setClaimData(prev => ({ ...prev, claim_amount: Number(e.target.value) }))}
-                    className="w-full accent-teal-600 cursor-pointer"
+                    className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                   />
                 </div>
 
                 {/* 3. Deductible & Claim-to-Deductible Ratio */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="p-3 rounded-2xl border border-teal-100 bg-slate-50/70 space-y-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <label className="font-bold text-slate-900">Policy Deductible</label>
-                      <span className="font-mono font-bold text-teal-700">${claimData.deductible.toLocaleString()}</span>
+                      <label className="font-semibold text-zinc-800 dark:text-zinc-200">Policy Deductible</label>
+                      <span className="font-mono font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">${claimData.deductible.toLocaleString()}</span>
                     </div>
                     <input
                       type="range"
@@ -432,15 +427,15 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                       step="250"
                       value={claimData.deductible}
                       onChange={(e) => setClaimData(prev => ({ ...prev, deductible: Number(e.target.value) }))}
-                      className="w-full accent-teal-600 cursor-pointer"
+                      className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                     />
-                    <span className="text-[10px] text-slate-400 font-mono">Ratio: {claimToDeductibleRatio}x deductible</span>
+                    <span className="text-[10px] text-zinc-500 font-mono">Ratio: {claimToDeductibleRatio}x deductible</span>
                   </div>
 
-                  <div className="p-3 rounded-2xl border border-teal-100 bg-slate-50/70 space-y-1.5">
+                  <div className="p-3 rounded-xl border border-zinc-200/60 dark:border-white/5 bg-zinc-50 dark:bg-zinc-800/40 space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <label className="font-bold text-slate-900">Policyholder Tenure</label>
-                      <span className="font-mono font-bold text-emerald-700">{claimData.policyholder_tenure_years} yrs</span>
+                      <label className="font-semibold text-zinc-800 dark:text-zinc-200">Policyholder Tenure</label>
+                      <span className="font-mono font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">{claimData.policyholder_tenure_years} yrs</span>
                     </div>
                     <input
                       type="range"
@@ -449,57 +444,57 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                       step="0.1"
                       value={claimData.policyholder_tenure_years}
                       onChange={(e) => setClaimData(prev => ({ ...prev, policyholder_tenure_years: Number(e.target.value) }))}
-                      className="w-full accent-emerald-600 cursor-pointer"
+                      className="w-full accent-zinc-900 dark:accent-zinc-100 cursor-pointer h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
                     />
-                    <span className="text-[10px] text-slate-400 font-mono">#1 SHAP Feature (mean |SHAP| 0.705)</span>
+                    <span className="text-[10px] text-zinc-500 font-mono">#1 SHAP Feature (mean |SHAP| 0.705)</span>
                   </div>
                 </div>
 
-                {/* 4. 3D Primary Calculate Button */}
-                <div className="pt-2 space-y-3">
+                {/* 4. Primary Calculate Button */}
+                <div className="pt-1 space-y-2.5">
                   <button
                     type="button"
                     onClick={() => handleCalculateAndSend()}
                     disabled={isCalculating}
-                    className={`w-full py-4 px-5 rounded-2xl font-black text-sm tracking-wide flex items-center justify-center gap-3 transition-all cursor-pointer shadow-xl select-none relative overflow-hidden ${
+                    className={`w-full py-2.5 px-4 rounded-xl font-medium text-xs tracking-wide flex items-center justify-center gap-2 transition-colors cursor-pointer select-none ${
                       isCalculating
-                        ? 'bg-slate-800 text-slate-200 cursor-wait shadow-slate-900/30'
+                        ? 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-wait'
                         : isDirty
-                        ? 'btn-3d-primary text-white shadow-teal-600/30 hover:scale-[1.01] active:scale-[0.99]'
-                        : 'btn-3d-success text-white shadow-emerald-600/25 hover:scale-[1.01] active:scale-[0.99]'
+                        ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-xs'
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs'
                     }`}
                   >
                     {isCalculating ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
-                        <span className="font-mono text-xs sm:text-sm">Evaluating 54-Feature Insurance Model...</span>
+                        <div className="w-4 h-4 border-2 border-zinc-400 border-t-zinc-900 dark:border-t-white rounded-full animate-spin shrink-0" />
+                        <span className="font-mono">Evaluating 54-Feature Insurance Model...</span>
                       </>
                     ) : isDirty ? (
                       <>
-                        <Cpu className="w-5 h-5 text-cyan-200 shrink-0" />
-                        <span className="font-extrabold text-xs sm:text-sm uppercase">Calculate Claim Risk &amp; Send to Model</span>
-                        <span className="ml-auto text-[10px] font-mono font-bold bg-white/20 border border-white/30 px-2 py-0.5 rounded-full uppercase text-white shadow-inner">
-                          Ready
+                        <Cpu className="w-4 h-4 shrink-0" />
+                        <span>Calculate Claim Risk &amp; Send to Model</span>
+                        <span className="ml-auto text-[10px] font-mono font-medium bg-white/20 px-1.5 py-0.2 rounded">
+                          Modified
                         </span>
                       </>
                     ) : (
                       <>
-                        <CheckCircle2 className="w-5 h-5 text-emerald-200 shrink-0" />
-                        <span className="font-extrabold text-xs sm:text-sm">✓ Evaluated by Model (Click to Re-calculate)</span>
-                        <span className="ml-auto text-[10px] font-mono font-bold bg-white/25 px-2 py-0.5 rounded-full text-white">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
+                        <span>✓ Evaluated by Model (Click to Re-calculate)</span>
+                        <span className="ml-auto text-[10px] font-mono font-medium bg-emerald-700 px-1.5 py-0.2 rounded">
                           Synced
                         </span>
                       </>
                     )}
                   </button>
 
-                  <div className="p-3 rounded-2xl bg-gradient-to-r from-teal-50/80 via-cyan-50/60 to-emerald-50/80 border border-teal-200/80 flex items-center justify-between text-[11px] text-slate-700 shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span><strong>SecAgg+ Encrypted Mask:</strong> Cross-carrier claim screening with zero PII shared.</span>
+                  <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400 font-mono">
+                    <div className="flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span>Consortium Masking: Zero Carrier PII Shared</span>
                     </div>
-                    <span className="font-mono text-[10px] text-teal-800 bg-white px-2 py-0.5 rounded-full border border-teal-200 font-bold shrink-0">
-                      DP ε = 2.45
+                    <span className="text-[10px] text-zinc-500">
+                      DP ε=2.45
                     </span>
                   </div>
                 </div>
@@ -510,17 +505,17 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="pt-3 border-t-2 border-dashed border-teal-200 space-y-3"
+                      className="pt-3 border-t border-dashed border-zinc-200 dark:border-zinc-700/60 space-y-3"
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-emerald-600" />
-                          <h4 className="text-xs font-mono uppercase font-black text-slate-900 tracking-wider">
-                            Proceed with Further Features
+                        <div className="flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
+                          <h4 className="text-xs font-mono uppercase font-semibold text-zinc-700 dark:text-zinc-300 tracking-wider">
+                            Further Forensic Diagnostics
                           </h4>
                         </div>
-                        <span className="text-[10px] font-mono text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
-                          Model Outputs Active
+                        <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                          Outputs Active
                         </span>
                       </div>
 
@@ -528,17 +523,17 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'gemini' ? null : 'gemini')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'gemini'
-                              ? 'bg-gradient-to-r from-teal-700 to-indigo-600 text-white border-teal-600 shadow-md'
-                              : 'bg-white hover:bg-teal-50/60 border-teal-200 text-slate-800 shadow-xs'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <Bot className="w-4 h-4" />
+                            <Bot className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">1. Gemini AI</span>
-                              <span className="text-[10px] text-slate-500">SIU Explanation</span>
+                              <span className="text-xs font-medium block leading-tight">1. Gemini AI</span>
+                              <span className="text-[10px] opacity-70">SIU Brief</span>
                             </div>
                           </div>
                           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'gemini' ? 'rotate-180' : ''}`} />
@@ -547,17 +542,17 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'shap' ? null : 'shap')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'shap'
-                              ? 'bg-gradient-to-r from-cyan-600 to-emerald-600 text-white border-cyan-600 shadow-md'
-                              : 'bg-white hover:bg-cyan-50/60 border-teal-200 text-slate-800 shadow-xs'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <BarChart3 className="w-4 h-4" />
+                            <BarChart3 className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">2. SHAP Drivers</span>
-                              <span className="text-[10px] text-slate-500">Tenure &amp; Amount</span>
+                              <span className="text-xs font-medium block leading-tight">2. SHAP Drivers</span>
+                              <span className="text-[10px] opacity-70">Attribution</span>
                             </div>
                           </div>
                           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'shap' ? 'rotate-180' : ''}`} />
@@ -566,17 +561,17 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setActiveFurtherFeature(activeFurtherFeature === 'audit' ? null : 'audit')}
-                          className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all flex items-center justify-between ${
+                          className={`p-2 rounded-lg border text-left cursor-pointer transition-colors flex items-center justify-between ${
                             activeFurtherFeature === 'audit'
-                              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-600 shadow-md'
-                              : 'bg-white hover:bg-emerald-50/60 border-emerald-200 text-slate-800 shadow-xs'
+                              ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-white font-semibold'
+                              : 'bg-zinc-50 dark:bg-zinc-800/60 border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <ShieldCheck className="w-4 h-4" />
+                            <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-bold block leading-tight">3. NIST Audit</span>
-                              <span className="text-[10px] text-slate-500">SP 1270 Quorum</span>
+                              <span className="text-xs font-medium block leading-tight">3. NIST Audit</span>
+                              <span className="text-[10px] opacity-70">SP 1270</span>
                             </div>
                           </div>
                           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeFurtherFeature === 'audit' ? 'rotate-180' : ''}`} />
@@ -617,19 +612,19 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-slate-900 text-slate-100 shadow-xl border border-slate-800 space-y-3"
+                          className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 text-zinc-900 dark:text-zinc-100 border border-zinc-200/80 dark:border-white/10 space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                          <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2">
                             <div>
-                              <span className="text-xs font-mono font-bold text-cyan-400 uppercase flex items-center gap-1.5">
-                                <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                              <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                                <Activity className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
                                 TreeExplainer SHAP Feature Attribution (artifacts/insurance)
                               </span>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
+                              <p className="text-[11px] text-zinc-500 mt-0.5">
                                 Mathematical feature contributions for evaluated claim ({evaluatedClaim.claim_type}, ${evaluatedClaim.claim_amount.toLocaleString()})
                               </p>
                             </div>
-                            <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/50">
+                            <span className="font-mono text-xs font-medium px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
                               54 Features Analyzed
                             </span>
                           </div>
@@ -644,20 +639,20 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                             ]).map((factor, idx) => {
                               const isPositive = factor.impact_log_odds > 0;
                               return (
-                                <div key={idx} className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60 space-y-1.5">
+                                <div key={idx} className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5 space-y-1.5">
                                   <div className="flex items-center justify-between text-xs">
-                                    <span className="font-bold font-mono text-slate-200"><code>{factor.feature}</code></span>
-                                    <span className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
+                                    <span className="font-semibold font-mono text-zinc-800 dark:text-zinc-200"><code>{factor.feature}</code></span>
+                                    <span className={`font-mono font-medium text-xs px-1.5 py-0.2 rounded ${
                                       isPositive 
-                                        ? 'bg-rose-950/80 text-rose-300 border border-rose-800/60' 
-                                        : 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60'
+                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' 
+                                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                     }`}>
                                       {isPositive ? `+${factor.impact_log_odds.toFixed(3)}` : factor.impact_log_odds.toFixed(3)} log-odds
                                     </span>
                                   </div>
-                                  <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden flex">
+                                  <div className="w-full bg-zinc-200 dark:bg-zinc-700 h-1.5 rounded-full overflow-hidden flex">
                                     <div 
-                                      className={`h-full transition-all duration-500 rounded-full ${isPositive ? 'bg-gradient-to-r from-amber-500 to-rose-500' : 'bg-gradient-to-r from-emerald-500 to-teal-400'}`}
+                                      className={`h-full transition-all duration-500 rounded-full ${isPositive ? 'bg-rose-500' : 'bg-emerald-500'}`}
                                       style={{ width: `${Math.min(100, Math.abs(factor.impact_log_odds) * 70)}%` }}
                                     />
                                   </div>
@@ -673,35 +668,35 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                         <motion.div
                           initial={{ opacity: 0, y: 6 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-2xl bg-white border-2 border-emerald-300/80 shadow-xl space-y-3"
+                          className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/80 dark:border-white/10 space-y-3"
                         >
-                          <div className="flex items-center justify-between border-b border-emerald-100 pb-2">
+                          <div className="flex items-center justify-between border-b border-zinc-200/60 dark:border-white/5 pb-2">
                             <div>
-                              <span className="text-xs font-mono font-bold text-emerald-900 uppercase flex items-center gap-1.5">
-                                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                              <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
+                                <ShieldCheck className="w-4 h-4 text-emerald-500" />
                                 NIST SP 1270 Insurance Audit Certificate
                               </span>
-                              <p className="text-[11px] text-slate-500">
+                              <p className="text-[11px] text-zinc-500">
                                 Audited against NAIC Model Law on Insurance Fraud &amp; EU AI Act Article 14
                               </p>
                             </div>
                             <button
                               type="button"
                               onClick={handleCopyCert}
-                              className="btn-3d-success px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                              className="px-2 py-1 rounded-md text-[11px] font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 flex items-center gap-1 cursor-pointer transition-colors"
                             >
                               {copiedCert ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                               <span>{copiedCert ? 'Copied JSON!' : 'Copy Proof'}</span>
                             </button>
                           </div>
                           <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                            <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                              <span className="text-slate-500 block text-[10px]">Certificate ID:</span>
-                              <span className="font-bold text-slate-800">NIST-SP1270-INS-1M</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Certificate ID:</span>
+                              <span className="font-semibold text-zinc-900 dark:text-zinc-100">NIST-SP1270-INS-1M</span>
                             </div>
-                            <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">
-                              <span className="text-slate-500 block text-[10px]">Model Type:</span>
-                              <span className="font-bold text-emerald-700">Group-Disjoint 54-Feature GBDT</span>
+                            <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                              <span className="text-zinc-500 block text-[10px]">Model Type:</span>
+                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">Group-Disjoint 54-Feature GBDT</span>
                             </div>
                           </div>
                         </motion.div>
@@ -713,38 +708,38 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
 
               {/* Right Column: Live Model Showdown */}
               <div className="lg:col-span-6 space-y-4">
-                <div className="p-4 rounded-2xl bg-teal-50/80 border border-teal-200 flex items-center justify-between">
+                <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 flex items-center justify-between shadow-xs">
                   <div>
-                    <span className="text-xs font-mono font-bold text-teal-900 uppercase">Live Claims Model Showdown</span>
-                    <p className="text-[11px] text-slate-600">Evaluating 1,000,000-policy Insurance Risk Model</p>
+                    <span className="text-xs font-mono font-semibold text-zinc-900 dark:text-zinc-100 uppercase">Live Claims Model Showdown</span>
+                    <p className="text-[11px] text-zinc-500">Evaluating 1,000,000-policy Insurance Risk Model</p>
                   </div>
-                  <span className="text-xs font-mono text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-300 font-bold">
+                  <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20 font-semibold">
                     ROC-AUC 0.7933
                   </span>
                 </div>
 
                 {/* Model Evaluation Sync Banner */}
                 {isDirty ? (
-                  <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 flex items-center justify-between text-xs text-amber-950 animate-pulse shadow-sm">
+                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-xs text-amber-700 dark:text-amber-300 shadow-xs">
                     <div className="flex items-center gap-2">
-                      <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Risk &amp; Run Underwriting Model&quot; to update inference.</span>
+                      <ShieldAlert className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span><strong>Parameters Modified:</strong> Click &quot;Calculate Claim Risk&quot; to update inference.</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleCalculateAndSend()}
-                      className="px-2.5 py-1 bg-amber-600 text-white rounded-lg font-bold text-[11px] shrink-0 hover:bg-amber-700 cursor-pointer shadow-xs"
+                      className="px-2 py-0.5 bg-amber-600 hover:bg-amber-700 text-white rounded font-medium text-[11px] shrink-0 cursor-pointer transition-colors"
                     >
                       Calculate Now &rarr;
                     </button>
                   </div>
                 ) : (
-                  <div className="p-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-center justify-between text-xs text-emerald-950">
+                  <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-300">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                       <span>Model scores are active &amp; synchronized with insurance claim parameters.</span>
                     </div>
-                    <span className="font-mono text-[10px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold border border-emerald-200">
+                    <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded font-medium border border-emerald-500/20">
                       Active
                     </span>
                   </div>
@@ -764,18 +759,18 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                   totalPopulation={1000000}
                 />
 
-                <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-md space-y-2">
-                  <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+                <div className="p-4 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 shadow-xs space-y-2">
+                  <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                     Claims Intelligence from artifacts/insurance:
                   </span>
                   <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-slate-500 block text-[10px]">Decision Cutoff:</span>
-                      <span className="font-bold text-teal-900">17.98% calibrated</span>
+                    <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                      <span className="text-zinc-500 block text-[10px]">Decision Cutoff:</span>
+                      <span className="font-semibold text-zinc-900 dark:text-zinc-100">17.98% calibrated</span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-                      <span className="text-slate-500 block text-[10px]">Benchmark PR-AUC:</span>
-                      <span className="font-bold text-emerald-700">0.3161 (+185% lift)</span>
+                    <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                      <span className="text-zinc-500 block text-[10px]">Benchmark PR-AUC:</span>
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">0.3161 (+185% lift)</span>
                     </div>
                   </div>
                 </div>
@@ -809,101 +804,101 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="p-6 rounded-3xl border-2 border-teal-200 bg-white shadow-xl space-y-6"
+            className="p-6 rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 shadow-xs space-y-6 text-zinc-900 dark:text-zinc-100"
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-teal-100 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200/60 dark:border-white/5 pb-4">
               <div>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <FileSpreadsheet className="w-5 h-5 text-teal-600" />
+                <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
                   <span>Insurance Claims Risk Model Specification (artifacts/insurance)</span>
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-zinc-500 mt-1">
                   Evaluated on 1,000,000 policyholder records • Policy-grouped 80/20 train/test split across 20 simulated carriers
                 </p>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-teal-50 text-teal-700 border border-teal-200 shrink-0">
+              <span className="px-2.5 py-0.5 rounded text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60 shrink-0">
                 54-Feature GBDT Model
               </span>
             </div>
 
             {/* Core Metrics Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-              <div className="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">Total Policy Cohort:</span>
-                <span className="text-lg font-bold text-teal-900">1,000,000</span>
-                <span className="text-[10px] text-slate-400 block mt-0.5">Test Rows: 200,147</span>
+              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                <span className="text-zinc-500 block text-[10px] uppercase font-semibold">Total Policy Cohort:</span>
+                <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">1,000,000</span>
+                <span className="text-[10px] text-zinc-400 block mt-0.5">Test Rows: 200,147</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">ROC-AUC Score:</span>
-                <span className="text-lg font-bold text-emerald-700">0.7933</span>
-                <span className="text-[10px] text-emerald-600 block mt-0.5">High Discriminative Power</span>
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                <span className="text-emerald-700 dark:text-emerald-400 block text-[10px] uppercase font-semibold">ROC-AUC Score:</span>
+                <span className="text-lg font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">0.7933</span>
+                <span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 block mt-0.5">High Discriminative Power</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">PR-AUC Score:</span>
-                <span className="text-lg font-bold text-blue-700">0.3161</span>
-                <span className="text-[10px] text-blue-600 block mt-0.5">+185% over base rate</span>
+              <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                <span className="text-cyan-700 dark:text-cyan-400 block text-[10px] uppercase font-semibold">PR-AUC Score:</span>
+                <span className="text-lg font-semibold text-cyan-600 dark:text-cyan-400 tabular-nums">0.3161</span>
+                <span className="text-[10px] text-cyan-600/80 dark:text-cyan-400/80 block mt-0.5">+185% over base rate</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200">
-                <span className="text-slate-500 block text-[10px] uppercase font-bold">Optimal Decision Cutoff:</span>
-                <span className="text-lg font-bold text-indigo-700">0.1798</span>
-                <span className="text-[10px] text-indigo-600 block mt-0.5">Platt-Calibrated</span>
+              <div className="p-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
+                <span className="text-zinc-500 block text-[10px] uppercase font-semibold">Optimal Decision Cutoff:</span>
+                <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums">0.1798</span>
+                <span className="text-[10px] text-zinc-400 block mt-0.5">Platt-Calibrated</span>
               </div>
             </div>
 
             {/* Secondary Test Set Performance & Hyperparameters */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-3">
+                <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                   Classification Diagnostics (Test Split @ 0.1798 Cutoff)
                 </span>
                 <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">PRECISION:</span>
-                    <span className="font-bold text-slate-800">53.46%</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">PRECISION:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">53.46%</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">RECALL:</span>
-                    <span className="font-bold text-slate-800">31.73%</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">RECALL:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">31.73%</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">F1-SCORE:</span>
-                    <span className="font-bold text-slate-800">0.3982</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">F1-SCORE:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.3982</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">BRIER SCORE:</span>
-                    <span className="font-bold text-slate-800">0.0582</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">BRIER SCORE:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.0582</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">LOG LOSS:</span>
-                    <span className="font-bold text-slate-800">0.2135</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">LOG LOSS:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.2135</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">TRUE POSITIVES:</span>
-                    <span className="font-bold text-emerald-700">4,842</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">TRUE POSITIVES:</span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">4,842</span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-3">
+                <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                   Production Hyperparameters
                 </span>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">N_ESTIMATORS:</span>
-                    <span className="font-bold text-teal-700">250 trees</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">N_ESTIMATORS:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">250 trees</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">MAX_DEPTH:</span>
-                    <span className="font-bold text-teal-700">6 levels</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">MAX_DEPTH:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">6 levels</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">LEARNING_RATE:</span>
-                    <span className="font-bold text-teal-700">0.05</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">LEARNING_RATE:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.05</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-white border border-slate-200">
-                    <span className="text-slate-400 block text-[10px]">MIN_CHILD_WEIGHT:</span>
-                    <span className="font-bold text-teal-700">5</span>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
+                    <span className="text-zinc-500 block text-[10px]">MIN_CHILD_WEIGHT:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">5</span>
                   </div>
                 </div>
               </div>
@@ -911,12 +906,12 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
 
             {/* Top SHAP Feature Importance Table */}
             <div className="space-y-3">
-              <span className="text-xs font-mono uppercase text-slate-700 font-bold block">
+              <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
                 Top SHAP Global Feature Importance (artifacts/insurance/shap_importance.csv)
               </span>
-              <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+              <div className="border border-zinc-200/80 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow-xs">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-slate-50 border-b border-slate-200 font-mono text-slate-500 uppercase text-[10px]">
+                  <thead className="bg-zinc-50 dark:bg-zinc-800/60 border-b border-zinc-200/60 dark:border-white/5 font-mono text-zinc-500 uppercase text-[10px]">
                     <tr>
                       <th className="p-3">Rank</th>
                       <th className="p-3">Feature Name</th>
@@ -924,7 +919,7 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                       <th className="p-3">Importance Bar</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono">
+                  <tbody className="divide-y divide-zinc-200/60 dark:divide-white/5 font-mono text-zinc-700 dark:text-zinc-300">
                     {[
                       { rank: '#1', feature: 'policyholder_tenure_years', val: 0.7054, pct: 100 },
                       { rank: '#2', feature: 'claim_amount', val: 0.3395, pct: 48 },
@@ -935,13 +930,13 @@ export const InsuranceClaimsView: React.FC<InsuranceClaimsViewProps> = ({
                       { rank: '#7', feature: 'claim_amount_log', val: 0.0796, pct: 11 },
                       { rank: '#8', feature: 'claim_type_property', val: 0.0410, pct: 6 },
                     ].map((row) => (
-                      <tr key={row.rank} className="hover:bg-slate-50/80">
-                        <td className="p-3 font-bold text-teal-700">{row.rank}</td>
-                        <td className="p-3 font-bold text-slate-800">{row.feature}</td>
-                        <td className="p-3 font-bold text-slate-600">{row.val.toFixed(4)}</td>
+                      <tr key={row.rank} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                        <td className="p-3 font-semibold text-zinc-900 dark:text-zinc-100">{row.rank}</td>
+                        <td className="p-3 font-medium text-zinc-900 dark:text-zinc-100">{row.feature}</td>
+                        <td className="p-3 text-zinc-500">{row.val.toFixed(4)}</td>
                         <td className="p-3 w-48">
-                          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-teal-600 rounded-full" style={{ width: `${row.pct}%` }} />
+                          <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                            <div className="h-full bg-zinc-900 dark:bg-zinc-100 rounded-full" style={{ width: `${row.pct}%` }} />
                           </div>
                         </td>
                       </tr>

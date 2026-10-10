@@ -1,0 +1,33 @@
+{
+  "domain": "banks",
+  "model_type": "RandomForestClassifier",
+  "source_artifact": "model.joblib",
+  "onnx_artifact": "model_fp16.onnx",
+  "precision": "float16",
+  "input_tensor_name": "float_input",
+  "output_tensor_names": [
+    "label",
+    "probabilities"
+  ],
+  "feature_count": 11,
+  "feature_columns": [
+    "step",
+    "amount",
+    "oldbalanceOrg",
+    "oldbalanceDest",
+    "drain_ratio",
+    "is_dest_zero",
+    "type_CASH_IN",
+    "type_CASH_OUT",
+    "type_DEBIT",
+    "type_PAYMENT",
+    "type_TRANSFER"
+  ],
+  "decision_threshold": 0.4,
+  "has_calibrator": false,
+  "has_anomaly_model": true,
+  "validation_max_diff": 0.0001234500858275922,
+  "exported_at": "2026-10-10T15:53:22.997456+00:00",
+  "onnx_version": "1.23.2",
+  "onnxruntime_version": "1.31.0"
+}
