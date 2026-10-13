@@ -15,9 +15,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Environment
+# Environment & Secrets
 .env
 .env.*
+!.env.example
 env
 
 # Python

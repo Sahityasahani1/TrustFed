@@ -10,6 +10,26 @@ const CANDIDATE_BASES = [
 ];
 
 let cachedWorkingBase = null;
+let currentApiKey = (typeof window !== "undefined" && window.localStorage?.getItem("trustfed_api_key")) || "tf_dev_operator_key_01";
+
+export function setApiKey(key) {
+  currentApiKey = key;
+  if (typeof window !== "undefined") {
+    if (key) window.localStorage.setItem("trustfed_api_key", key);
+    else window.localStorage.removeItem("trustfed_api_key");
+  }
+}
+
+export function getApiKey() {
+  return currentApiKey;
+}
+
+function getAuthHeaders(contentType = "application/json") {
+  const headers = {};
+  if (contentType) headers["Content-Type"] = contentType;
+  if (currentApiKey) headers["X-API-Key"] = currentApiKey;
+  return headers;
+}
 
 async function getWorkingBase() {
   if (cachedWorkingBase) return cachedWorkingBase;
@@ -56,7 +76,7 @@ export async function assessRisk(domain, userInput, includeAiReasoning = true) {
 
   const response = await fetch(`${base}/api/assess`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getAuthHeaders("application/json"),
     body: JSON.stringify({
       domain, // "banks" | "lenders" | "insurers"
       user_input: userInput,
@@ -88,7 +108,7 @@ export async function assessBatchRisk(domain, records) {
 
   const response = await fetch(`${base}/api/assess/batch`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getAuthHeaders("application/json"),
     body: JSON.stringify({
       domain,
       records,
@@ -122,6 +142,7 @@ export async function uploadBatchFile(domain, file) {
 
   const response = await fetch(`${base}/api/assess/upload`, {
     method: "POST",
+    headers: getAuthHeaders(null),
     body: formData,
   });
 
@@ -144,7 +165,9 @@ export async function uploadBatchFile(domain, file) {
 
 export async function fetchSampleBatch(domain) {
   const base = cachedWorkingBase || (await getWorkingBase());
-  const response = await fetch(`${base}/api/samples/${domain}`);
+  const response = await fetch(`${base}/api/samples/${domain}`, {
+    headers: getAuthHeaders(),
+  });
   if (!response.ok) {
     throw new Error(`Failed to fetch sample records for ${domain}`);
   }
@@ -167,9 +190,7 @@ export async function streamRiskAssessment(domain, userInput, callbacks = {}) {
   try {
     const response = await fetch(`${base}/api/assess/stream`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders("application/json"),
       body: JSON.stringify({
         domain,
         user_input: userInput,
@@ -230,7 +251,9 @@ export async function streamRiskAssessment(domain, userInput, callbacks = {}) {
 export async function getTelemetrySnapshot() {
   const base = cachedWorkingBase || (await getWorkingBase());
   try {
-    const res = await fetch(`${base}/api/telemetry`);
+    const res = await fetch(`${base}/api/telemetry`, {
+      headers: getAuthHeaders(null),
+    });
     if (res.ok) return await res.json();
   } catch (_) {}
   return null;
@@ -292,5 +315,89 @@ export function connectTelemetryWebSocket(onTelemetry, onError) {
     }
   };
 }
+
+export async function runSecAggRound(options = {}) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/round/run`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({
+      dropout_silo_id: options.dropout_silo_id || null,
+      dp_epsilon: options.dp_epsilon || 0.045,
+      clipping_bound: options.clipping_bound || 1.0,
+    }),
+  });
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.detail || `SecAgg round failed (${response.status})`);
+  }
+  return result;
+}
+
+export async function getFederatedState() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/state`, {
+    headers: getAuthHeaders(null),
+  });
+  return await response.json();
+}
+
+export async function getFederatedAuditTrail() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/audit-trail`, {
+    headers: getAuthHeaders(null),
+  });
+  return await response.json();
+}
+
+export async function resetFederatedState() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/reset`, {
+    method: "POST",
+    headers: getAuthHeaders(null),
+  });
+  return await response.json();
+}
+
+export async function exchangeToken(apiKey = null) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const key = apiKey || currentApiKey;
+  const response = await fetch(`${base}/api/auth/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ api_key: key }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Token exchange failed");
+  }
+  return data;
+}
+
+export async function fetchCallerIdentity() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/auth/me`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch caller identity");
+  }
+  return data;
+}
+
+export async function fetchAdminAuditLog(limit = 50) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/admin/audit-log?limit=${limit}`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch admin audit log");
+  }
+  return data;
+}
+
+
 
 

@@ -42,3 +42,27 @@ export declare function connectTelemetryWebSocket(
   onTelemetry: (data: any) => void,
   onError?: (error: any) => void
 ): () => void;
+
+export interface SecAggRoundOptions {
+  dropout_silo_id?: 'bank' | 'wallet' | 'insurer' | null;
+  dp_epsilon?: number;
+  clipping_bound?: number;
+}
+
+export declare function runSecAggRound(options?: SecAggRoundOptions): Promise<{
+  ok: boolean;
+  certificate: any;
+  state: any;
+}>;
+
+export declare function getFederatedState(): Promise<any>;
+
+export declare function getFederatedAuditTrail(): Promise<{ count: number; ledger: any[] }>;
+
+export declare function resetFederatedState(): Promise<{ ok: boolean; state: any }>;
+
+export declare function setApiKey(key: string | null): void;
+export declare function getApiKey(): string | null;
+export declare function exchangeToken(apiKey?: string | null): Promise<{ access_token: string; token_type: string; expires_in: number; role: string }>;
+export declare function fetchCallerIdentity(): Promise<{ client_id: string; role: string; auth_method: string; ip: string }>;
+export declare function fetchAdminAuditLog(limit?: number): Promise<{ count: number; events: any[] }>;

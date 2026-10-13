@@ -1,0 +1,189 @@
+[
+  {
+    "timestamp": 1791660619.7878861,
+    "utc_time": "2026-10-10T19:30:19.787888+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791660667.6130533,
+    "utc_time": "2026-10-10T19:31:07.613055+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661022.3697965,
+    "utc_time": "2026-10-10T19:37:02.369800+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661160.7643065,
+    "utc_time": "2026-10-10T19:39:20.764308+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661169.626838,
+    "utc_time": "2026-10-10T19:39:29.626840+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791661396.325362,
+    "utc_time": "2026-10-10T19:43:16.325364+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661396.9573548,
+    "utc_time": "2026-10-10T19:43:16.957357+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791661415.7904837,
+    "utc_time": "2026-10-10T19:43:35.790488+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661416.402695,
+    "utc_time": "2026-10-10T19:43:36.402697+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791661500.759709,
+    "utc_time": "2026-10-10T19:45:00.759712+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 7,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:abda1508c1fa8a92b976e5d4a45471a2fc91e7c0b986284682ba2ef476b72df6"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661544.0547247,
+    "utc_time": "2026-10-10T19:45:44.054729+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 8,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:53ea5c3b1d1fd138c4b1888aeaa5b36d9a4527e882ca2f9095472a0dee7c6a24"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661569.7544675,
+    "utc_time": "2026-10-10T19:46:09.754471+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 9,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:12c308523873e22bd51644e06aa22e6520f177595f7751c26a274c4ba22a4dda"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661589.8456259,
+    "utc_time": "2026-10-10T19:46:29.845631+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661590.8690917,
+    "utc_time": "2026-10-10T19:46:30.869095+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:84ed2d7d14c5778f03a022e9a94a26961d7da7e936b12d38959e021f05825f10"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661591.0805209,
+    "utc_time": "2026-10-10T19:46:31.080524+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  }
+]

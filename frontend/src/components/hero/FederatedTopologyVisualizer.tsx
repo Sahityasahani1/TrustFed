@@ -15,8 +15,13 @@ import {
   TrendingUp,
   Layers,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  AlertTriangle,
+  FileCode2,
+  Copy,
+  Check
 } from 'lucide-react';
+import { runSecAggRound, getFederatedState } from '../../risk_api_client';
 
 export interface SiloDetails {
   id: 'bank' | 'wallet' | 'insurer';
@@ -58,25 +63,25 @@ const SILOS: Record<'bank' | 'wallet' | 'insurer', SiloDetails> = {
     tag: 'Silo #2: Mobile P2P Clearing',
     badgeColor: 'border-emerald-500/50 text-emerald-400 bg-emerald-950/60',
     icon: <Wallet className="w-5 h-5 text-emerald-400" />,
-    records: '307,511 credit loan events',
-    fraudRate: '8.07% default',
-    features: 8,
-    localAuc: 0.612,
-    federatedAuc: 0.769,
-    lift: '+25.7% ROC-AUC',
-    privacyNoise: 'Rényi DP: ε=0.312, δ=1e-5',
-    focus: 'Mobile SIM swaps, velocity bursts, rapid cross-merchant synthetic identities.',
-    sampleAttack: 'Synthetic ID profile churning high credit limits across isolated fintech apps.'
+    records: '307,511 loan applications',
+    fraudRate: '8.07% default rate',
+    features: 7,
+    localAuc: 0.814,
+    federatedAuc: 0.892,
+    lift: '+9.6% ROC-AUC',
+    privacyNoise: 'Rényi DP: ε=0.245, δ=1e-5',
+    focus: 'Thin-file credit defaults, multi-identity velocity spikes, uncollateralized micro-lending.',
+    sampleAttack: 'Synthetic applicant claiming $120k revenue with 83% debt-to-income and non-verifiable employer.'
   },
   insurer: {
     id: 'insurer',
-    name: 'Guardian Mutual Insurance (Insure Gamma)',
-    tag: 'Silo #3: Underwriting & SIU',
-    badgeColor: 'border-teal-500/50 text-teal-400 bg-teal-950/60',
-    icon: <Umbrella className="w-5 h-5 text-teal-400" />,
-    records: '1,000,000 policy records',
-    fraudRate: '4.80% staged',
-    features: 7,
+    name: 'Aegis Mutual Insurance (Insure Gamma)',
+    tag: 'Silo #3: Underwriting & Claims',
+    badgeColor: 'border-cyan-500/50 text-cyan-400 bg-cyan-950/60',
+    icon: <Umbrella className="w-5 h-5 text-cyan-400" />,
+    records: '1,000 SIU claims (54 features)',
+    fraudRate: '24.7% verified fraud',
+    features: 24,
     localAuc: 0.658,
     federatedAuc: 0.793,
     lift: '+185% PR-AUC',
@@ -91,15 +96,63 @@ export const FederatedTopologyVisualizer: React.FC<{
 }> = ({ onInspectDomain }) => {
   const [selectedSilo, setSelectedSilo] = useState<'bank' | 'wallet' | 'insurer'>('bank');
   const [isPulsing, setIsPulsing] = useState<boolean>(true);
-  const [roundNumber, setRoundNumber] = useState<number>(10);
+  const [roundNumber, setRoundNumber] = useState<number>(1);
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
+  const [simulateDropout, setSimulateDropout] = useState<boolean>(false);
+  const [lastCert, setLastCert] = useState<any>(null);
+  const [hasCopiedProof, setHasCopiedProof] = useState<boolean>(false);
 
   const silo = SILOS[selectedSilo];
 
-  const handlePulseRound = () => {
+  // Fetch initial state from backend
+  useEffect(() => {
+    let mounted = true;
+    getFederatedState()
+      .then((state) => {
+        if (mounted && state) {
+          if (state.round_number) setRoundNumber(state.round_number);
+          if (state.last_certificate) setLastCert(state.last_certificate);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const handlePulseRound = async () => {
+    setIsExecuting(true);
     setIsPulsing(false);
-    setRoundNumber((prev) => prev + 1);
-    setTimeout(() => setIsPulsing(true), 100);
+    try {
+      const res = await runSecAggRound({
+        dropout_silo_id: simulateDropout ? 'insurer' : null,
+        dp_epsilon: 0.045,
+        clipping_bound: 1.0,
+      });
+
+      if (res && res.certificate) {
+        setLastCert(res.certificate);
+        setRoundNumber(res.certificate.round_id + 1);
+      } else {
+        setRoundNumber((prev) => prev + 1);
+      }
+    } catch (err) {
+      // Fallback simulated increment if backend offline
+      setRoundNumber((prev) => prev + 1);
+    } finally {
+      setIsExecuting(false);
+      setTimeout(() => setIsPulsing(true), 120);
+    }
   };
+
+  const handleCopyProof = () => {
+    if (!lastCert?.proof_hash) return;
+    navigator.clipboard.writeText(lastCert.proof_hash);
+    setHasCopiedProof(true);
+    setTimeout(() => setHasCopiedProof(false), 2000);
+  };
+
+  const isInsurerDropped = simulateDropout && lastCert?.dropped_silo === 'insurer';
 
   return (
     <div className="relative rounded-2xl border border-zinc-200/80 dark:border-white/10 bg-white dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 p-5 sm:p-6 shadow-xs backdrop-blur-xl overflow-hidden space-y-5">
@@ -109,34 +162,58 @@ export const FederatedTopologyVisualizer: React.FC<{
       {/* Header Bar */}
       <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200/60 dark:border-white/5 pb-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <h3 className="text-base sm:text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2 font-sans">
               <Layers className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-              <span>Multi-Party Federated Topology Visualizer</span>
+              <span>Multi-Party Federated SecAgg+ Topology</span>
             </h3>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700/60">
-              SecAgg+ Round {roundNumber}
+              Round #{roundNumber}
+            </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              {simulateDropout ? 'Quorum: 2/3 (Shamir Recovery)' : 'Quorum: 3/3 Full Consortium'}
             </span>
           </div>
           <p className="text-xs text-zinc-500 mt-0.5 font-sans">
-            Zero customer records leave local firewalls. Encrypted gradient masks cancel out at aggregator.
+            Zero customer records leave local firewalls. X25519 pair-wise Diffie-Hellman masks cancel at the aggregator.
           </p>
         </div>
 
-        {/* Pulse Interactive Action */}
-        <div className="flex items-center gap-2">
+        {/* Action Controls: Dropout Toggle + Pulse Wave Button */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Simulate Dropout Toggle */}
+          <button
+            type="button"
+            onClick={() => setSimulateDropout((prev) => !prev)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium border transition-colors flex items-center gap-1.5 cursor-pointer ${
+              simulateDropout
+                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-white/5 hover:border-zinc-300'
+            }`}
+            title="Demonstrate Bonawitz dropout resilience: Insure Gamma drops out, surviving peers reconstruct aggregate via 2-of-3 Shamir shares"
+          >
+            <AlertTriangle className="w-3.5 h-3.5" />
+            <span>{simulateDropout ? 'Dropout: Insure Gamma' : 'Simulate Dropout'}</span>
+          </button>
+
+          {/* Pulse Aggregation Wave Button */}
           <button
             onClick={handlePulseRound}
-            className="px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
+            disabled={isExecuting}
+            className="px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs disabled:opacity-50"
           >
-            <Zap className="w-3.5 h-3.5" />
-            <span>Pulse Aggregation Wave</span>
+            {isExecuting ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Zap className="w-3.5 h-3.5" />
+            )}
+            <span>{isExecuting ? 'Executing Consensus...' : 'Pulse SecAgg+ Wave'}</span>
           </button>
         </div>
       </div>
 
-      {/* Main Grid: Interactive Canvas & Particle Streams (Left 7 Cols) + Silo Forensic Inspector (Right 5 Cols) */}
+      {/* Main Grid: Interactive Canvas & Streams (Left 7 Cols) + Silo Deep Inspection (Right 5 Cols) */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
         
         {/* LEFT: SVG Interactive Canvas */}
@@ -153,8 +230,8 @@ export const FederatedTopologyVisualizer: React.FC<{
                 <stop offset="100%" stopColor="#10b981" stopOpacity="0.9" />
               </linearGradient>
               <linearGradient id="beamInsure" x1="50%" y1="85%" x2="50%" y2="50%">
-                <stop offset="0%" stopColor="#2dd4bf" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#10b981" stopOpacity="0.9" />
+                <stop offset="0%" stopColor="#2dd4bf" stopOpacity={isInsurerDropped ? "0.2" : "0.8"} />
+                <stop offset="100%" stopColor="#10b981" stopOpacity={isInsurerDropped ? "0.2" : "0.9"} />
               </linearGradient>
 
               {/* Glowing Filter */}
@@ -190,11 +267,11 @@ export const FederatedTopologyVisualizer: React.FC<{
             {/* Beam 3: Insurer (bottom-center) -> Center */}
             <path
               d="M 260 340 L 260 210"
-              stroke="url(#beamInsure)"
-              strokeWidth="2"
+              stroke={isInsurerDropped ? "#f59e0b" : "url(#beamInsure)"}
+              strokeWidth={isInsurerDropped ? "1.5" : "2"}
+              strokeDasharray={isInsurerDropped ? "3,3" : (isPulsing ? '5,5' : 'none')}
               fill="none"
-              strokeDasharray={isPulsing ? '5,5' : 'none'}
-              className={isPulsing ? 'animate-pulse' : ''}
+              className={!isInsurerDropped && isPulsing ? 'animate-pulse' : ''}
               filter="url(#glowEffect)"
             />
 
@@ -203,7 +280,7 @@ export const FederatedTopologyVisualizer: React.FC<{
               <>
                 <circle cx="190" cy="150" r="3" fill="#38bdf8" />
                 <circle cx="330" cy="150" r="3" fill="#34d399" />
-                <circle cx="260" cy="275" r="3" fill="#2dd4bf" />
+                {!isInsurerDropped && <circle cx="260" cy="275" r="3" fill="#2dd4bf" />}
               </>
             )}
           </svg>
@@ -258,7 +335,7 @@ export const FederatedTopologyVisualizer: React.FC<{
 
           {/* Central Core: SecAgg+ Aggregator Coordinator */}
           <div className="relative z-30 flex flex-col items-center justify-center">
-            <div className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-sm flex flex-col items-center text-center max-w-[190px]">
+            <div className="p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-sm flex flex-col items-center text-center max-w-[200px]">
               <div className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 mb-1.5">
                 <ShieldCheck className="w-5 h-5 text-emerald-500" />
               </div>
@@ -268,7 +345,7 @@ export const FederatedTopologyVisualizer: React.FC<{
               <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-medium mt-0.5">
                 Masked Sum: Σ(ΔW)
               </span>
-              <div className="mt-1.5 text-[9px] font-mono px-2 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
+              <div className="mt-1.5 text-[9px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium">
                 0 Bytes Raw Records
               </div>
             </div>
@@ -290,9 +367,11 @@ export const FederatedTopologyVisualizer: React.FC<{
               <div>
                 <div className="text-xs font-semibold flex items-center gap-1.5">
                   <span>Insure Gamma</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className={`w-1.5 h-1.5 rounded-full ${isInsurerDropped ? 'bg-amber-500' : 'bg-emerald-500'}`} />
                 </div>
-                <div className={`text-[10px] font-mono ${selectedSilo === 'insurer' ? 'opacity-70' : 'text-zinc-500'}`}>1.0M SIU Claims</div>
+                <div className={`text-[10px] font-mono ${selectedSilo === 'insurer' ? 'opacity-70' : 'text-zinc-500'}`}>
+                  {isInsurerDropped ? 'DROPOUT (Shamir)' : '1.0k SIU Claims'}
+                </div>
               </div>
             </button>
           </div>
@@ -377,7 +456,48 @@ export const FederatedTopologyVisualizer: React.FC<{
         </div>
 
       </div>
+
+      {/* Cryptographic Audit Verification Ribbon */}
+      {lastCert && (
+        <div className="relative z-10 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950/80 border border-zinc-200/80 dark:border-white/10 text-xs font-mono flex flex-wrap items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Consensus: {lastCert.consensus_quorum}</span>
+            </span>
+
+            <span className="inline-flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
+              <Lock className="w-3 h-3 text-cyan-500" />
+              <span>Mask Error: {lastCert.mask_cancellation_sum_error || '0.000000e+00'}</span>
+            </span>
+
+            <span className="inline-flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
+              <ShieldCheck className="w-3 h-3 text-emerald-500" />
+              <span>DP ε Spent: {lastCert.dp_epsilon_cumulative} / 2.45</span>
+            </span>
+
+            {lastCert.dropout_recovery && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-[11px]">
+                <AlertTriangle className="w-3 h-3" />
+                <span>Shamir Recovered: {lastCert.dropout_recovery.dropped_silo_id}</span>
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-[11px] text-zinc-500 truncate max-w-[200px]" title={lastCert.proof_hash}>
+              {lastCert.proof_hash}
+            </span>
+            <button
+              onClick={handleCopyProof}
+              className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-colors cursor-pointer"
+              title="Copy cryptographic proof hash"
+            >
+              {hasCopiedProof ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-

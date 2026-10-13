@@ -1,14 +1,25 @@
-# Core FastAPI & Web Server
+# Core Web Server & API Framework
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
-pydantic>=2.0.0
+pydantic>=2.10.0
+pydantic-settings>=2.0.0
 python-dotenv>=1.0.0
 requests>=2.31.0
+httpx>=0.27.0
+python-multipart>=0.0.9
 
-# Machine Learning & Explainability
+# Security & Cryptography
+pyjwt>=2.8.0
+psutil>=5.9.0
+
+# Machine Learning, ONNX & Explainability
 pandas>=2.0.0
 numpy>=1.24.0
 scikit-learn>=1.4.0
 xgboost>=2.0.0
 shap>=0.45.0
 joblib>=1.3.0
+onnxruntime>=1.18.0
+
+# Testing & Quality
+pytest>=8.0.0

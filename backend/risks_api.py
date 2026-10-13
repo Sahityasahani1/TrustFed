@@ -11,7 +11,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 
 import joblib
 import numpy as np
@@ -19,7 +19,7 @@ import pandas as pd
 import requests
 import shap
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, Response, UploadFile, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel, Field
@@ -38,11 +38,73 @@ try:
     from onnx_engine import onnx_hub
 except ImportError:
     from backend.onnx_engine import onnx_hub
-load_dotenv(ROOT / ".env")
-load_dotenv(ROOT.parent / ".env")
+
+try:
+    from secagg_engine import secagg_coordinator
+except ImportError:
+    from backend.secagg_engine import secagg_coordinator
+
+try:
+    from config import settings
+except ImportError:
+    from backend.config import settings
+
+try:
+    from auth import (
+        AuthIdentity,
+        get_current_caller,
+        require_admin,
+        require_operator,
+        require_auditor,
+        log_admin_action,
+        create_jwt_token,
+        key_registry,
+        admin_audit_log,
+    )
+except ImportError:
+    from backend.auth import (
+        AuthIdentity,
+        get_current_caller,
+        require_admin,
+        require_operator,
+        require_auditor,
+        log_admin_action,
+        create_jwt_token,
+        key_registry,
+        admin_audit_log,
+    )
+
+try:
+    from schemas import validate_input_for_domain
+except ImportError:
+    from backend.schemas import validate_input_for_domain
+
+try:
+    from rate_limiter import rate_limiter, circuit_breaker, explanation_cache
+except ImportError:
+    from backend.rate_limiter import rate_limiter, circuit_breaker, explanation_cache
+
+import logging
+import uuid
+from datetime import datetime, timezone
+
+
+try:
+    from logging_config import setup_logging, register_exception_handlers, get_process_memory_mb
+except ImportError:
+    from backend.logging_config import setup_logging, register_exception_handlers, get_process_memory_mb
 
 ARTIFACTS_DIR = (ROOT / "artifacts") if (ROOT / "artifacts").exists() else (ROOT.parent / "artifacts")
 SAMPLES_DIR = (ROOT / "samples") if (ROOT / "samples").exists() else (ROOT.parent / "backend" / "samples")
+ALLOWED_SAMPLE_FILES = {
+    "sample_banks_batch.csv",
+    "sample_insurers_batch.csv",
+    "sample_lenders_batch.csv",
+    "template_banks.csv",
+    "template_insurers.csv",
+    "template_lenders.csv",
+}
+
 MODEL_PATHS = {
     "banks": ARTIFACTS_DIR / "paysim" / "model.joblib",
     "creditfraud": ARTIFACTS_DIR / "creditfraud" / "model.joblib",
@@ -65,17 +127,58 @@ GEMINI_MODEL_PREFERENCE = [
 ]
 _GEMINI_MODELS_CACHE = None
 
-app = FastAPI(title="ENIGMA Risk Inference API", version="1.0.0")
-origins = [value.strip() for value in os.getenv(
-    "FRONTEND_ORIGINS", "http://localhost:3000,http://localhost:5173"
-).split(",") if value.strip()]
+app = FastAPI(
+    title="TrustFed Risk Inference API",
+    version="2.0.0",
+    docs_url="/docs" if not settings.is_production else None,
+    redoc_url="/redoc" if not settings.is_production else None,
+)
+
+setup_logging()
+register_exception_handlers(app)
+SERVER_START_TIME = time.time()
+
+# Request Tracing Middleware (Unique X-Request-ID on all calls)
+@app.middleware("http")
+async def request_tracing_middleware(request: Request, call_next):
+    req_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex[:16]
+    request.state.request_id = req_id
+
+    t_start = time.perf_counter()
+    response = await call_next(request)
+    duration_ms = (time.perf_counter() - t_start) * 1000.0
+
+    response.headers["X-Request-ID"] = req_id
+
+    client_ip = request.client.host if request.client else "unknown"
+    logging.getLogger("trustfed.http").info(
+        f"{request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f}ms) | ip={client_ip} | req_id={req_id}"
+    )
+
+    return response
+
+# Standard Security Headers Middleware (CWE-693, CWE-1021 Defense-in-Depth)
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    if settings.is_production:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if origins else ["*"],
+    allow_origins=settings.frontend_origins,
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_headers=["Content-Type", "Authorization", "X-API-Key"],
 )
+
 
 
 class TelemetryBroadcaster:
@@ -101,6 +204,7 @@ class TelemetryBroadcaster:
         snap["active_streams"] = self.active_streams
         snap["active_connections"] = len(self.active_connections)
         snap["timestamp"] = time.time()
+        snap["federated_state"] = secagg_coordinator.get_state()
         return snap
 
     async def broadcast(self):
@@ -130,6 +234,8 @@ telemetry_hub = TelemetryBroadcaster()
 
 @app.on_event("startup")
 async def startup_telemetry_ticker():
+    summary = settings.get_sanitized_summary()
+    print(f"[TrustFed Boot] Environment: {summary['environment']} | Gemini Configured: {summary['gemini_key_configured']} | CORS: {len(summary['frontend_origins'])} origins")
     async def ticker():
         while True:
             await asyncio.sleep(1.5)
@@ -754,9 +860,8 @@ def discover_gemini_models(api_key):
 
 
 def gemini_model_order(api_key):
-    configured = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
-    configured_fallbacks = [name.strip() for name in
-                            os.getenv("GEMINI_FALLBACK_MODELS", "").split(",") if name.strip()]
+    configured = settings.gemini_model
+    configured_fallbacks = settings.gemini_fallback_models
     available = discover_gemini_models(api_key)
     discovered_order = [name for name in GEMINI_MODEL_PREFERENCE if name in available]
     ordered = [configured, *configured_fallbacks, *discovered_order]
@@ -765,7 +870,19 @@ def gemini_model_order(api_key):
 
 
 def gemini_reasoning(domain, ml_json):
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_Key")
+    # 1. Deduplication Cache check (Fast path & $0 external API cost)
+    cached = explanation_cache.get(domain, ml_json)
+    if cached:
+        return cached
+
+    # 2. Denial-of-Wallet Circuit Breaker check
+    if not circuit_breaker.is_available():
+        fallback = local_reasoning(domain, ml_json)
+        fallback["source"] = "circuit_breaker_offline"
+        fallback["fallback_reason"] = "Gemini circuit breaker is OPEN (quota limit or cooldown active)."
+        return fallback
+
+    api_key = settings.effective_gemini_api_key
     if not api_key:
         return local_reasoning(domain, ml_json)
 
@@ -828,6 +945,11 @@ def gemini_reasoning(domain, ml_json):
                     timeout=15,
                 )
 
+            if response.status_code == 429:
+                circuit_breaker.record_failure(status_code=429, is_quota_exhausted=True)
+                failures.append({"model": model_name, "reason": "HTTP 429: Quota exhausted"})
+                break
+
             if response.status_code in (401, 403):
                 failures.append({"model": model_name, "reason": f"HTTP {response.status_code}; key/authentication rejected"})
                 break
@@ -843,17 +965,21 @@ def gemini_reasoning(domain, ml_json):
             if not text.strip():
                 raise ValueError("empty response text")
 
-            return {
+            result = {
                 "source": "gemini",
                 "model": model_name,
                 "text": text.strip(),
                 "fallback_models_tried": failures
             }
+            circuit_breaker.record_success()
+            explanation_cache.set(domain, ml_json, result)
+            return result
         except Exception as exc:
-            status = getattr(getattr(exc, "response", None), "status_code", None)
+            st = getattr(getattr(exc, "response", None), "status_code", None)
+            circuit_breaker.record_failure(status_code=st)
             failures.append({
                 "model": model_name,
-                "reason": f"HTTP {status}" if status else type(exc).__name__
+                "reason": f"HTTP {st}" if st else type(exc).__name__
             })
 
     fallback = local_reasoning(domain, ml_json)
@@ -862,37 +988,156 @@ def gemini_reasoning(domain, ml_json):
     return fallback
 
 
+
 @app.get("/health")
 def health():
+    all_models_ready = all(p.is_file() for p in MODEL_PATHS.values())
     return {
-        "status": "ok",
+        "status": "ok" if all_models_ready else "degraded",
+        "environment": settings.environment,
         "models": {name: {"available": path.is_file(), "artifact": str(path.relative_to(ARTIFACTS_DIR.parent))}
                    for name, path in MODEL_PATHS.items()},
         "onnx_engine": onnx_hub.get_telemetry_snapshot(),
-        "gemini_configured": bool(os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_Key")),
+        "gemini_configured": bool(settings.effective_gemini_api_key),
+        "circuit_breaker": {
+            "state": circuit_breaker.state,
+            "is_available": circuit_breaker.is_available(),
+        },
+        "federated": {
+            "current_round": secagg_coordinator.round_number,
+            "dp_budget_remaining": max(0.0, round(secagg_coordinator.dp_budget_total - secagg_coordinator.cumulative_dp_epsilon_spent, 4)),
+            "active_silos": len(secagg_coordinator.silos),
+        },
+        "system": {
+            "uptime_seconds": round(time.time() - SERVER_START_TIME, 1),
+            "memory_rss_mb": get_process_memory_mb(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+    }
+
+
+@app.get("/health/live")
+def health_live():
+    """Liveness probe: fast 200 OK verifying process event loop is active."""
+    return {
+        "status": "alive",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "uptime_seconds": round(time.time() - SERVER_START_TIME, 1),
+    }
+
+
+@app.get("/health/ready")
+def health_ready(response: Response):
+    """Readiness probe: validates all models are loaded and storage directory is writable."""
+    checks = {}
+    is_ready = True
+
+    # 1. Model artifacts
+    models_ready = all(p.is_file() for p in MODEL_PATHS.values())
+    checks["models_loaded"] = models_ready
+    if not models_ready:
+        is_ready = False
+
+    # 2. Storage writeability
+    storage_writable = False
+    try:
+        probe_file = ARTIFACTS_DIR / ".readiness_probe_tmp"
+        probe_file.write_text("probe", encoding="utf-8")
+        probe_file.unlink(missing_ok=True)
+        storage_writable = True
+    except Exception:
+        storage_writable = False
+        is_ready = False
+    checks["storage_writable"] = storage_writable
+
+    # 3. SecAgg coordinator
+    checks["secagg_initialized"] = secagg_coordinator is not None
+    if not checks["secagg_initialized"]:
+        is_ready = False
+
+    status_str = "ready" if is_ready else "not_ready"
+    if not is_ready:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+    return {
+        "status": status_str,
+        "environment": settings.environment,
+        "checks": checks,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
 
 @app.get("/")
 def root():
     return {
-        "service": "ENIGMA Risk Inference API",
+        "service": "TrustFed Risk Inference & Federated Intelligence API",
         "status": "running",
+        "environment": settings.environment,
         "health": "/health",
-        "interactive_api_docs": "/docs",
-        "assessment_endpoint": "POST /api/assess",
-        "streaming_endpoint": "POST /api/assess/stream",
-        "telemetry_websocket": "/ws/telemetry",
-        "message": "Use /docs to submit a risk assessment; the root URL does not accept prediction inputs.",
+        "interactive_api_docs": "/docs" if not settings.is_production else "disabled_in_production",
+        "auth_endpoints": {
+            "token_exchange": "POST /api/auth/token",
+            "caller_identity": "GET /api/auth/me",
+        },
+        "assessment_endpoints": {
+            "single": "POST /api/assess",
+            "stream": "POST /api/assess/stream",
+            "batch": "POST /api/assess/batch",
+            "upload": "POST /api/assess/upload",
+        },
+        "federated_endpoints": {
+            "state": "GET /api/federated/state",
+            "consensus_round": "POST /api/federated/round/run",
+            "audit_trail": "GET /api/federated/audit-trail",
+            "reset": "POST /api/federated/reset",
+        },
     }
 
 
+class TokenExchangeRequest(BaseModel):
+    api_key: str = Field(..., description="API key to exchange for a signed short-lived JWT token")
+
+
+@app.post("/api/auth/token")
+def exchange_token(req: TokenExchangeRequest, request: Request, response: Response):
+    """Exchanges an active API key for a signed 120-minute JWT Bearer token."""
+    rate_limiter.check(request, tier="auth", response=response)
+
+    record = key_registry.authenticate(req.api_key)
+    if not record:
+        raise HTTPException(status_code=401, detail="Invalid or inactive API key")
+    token = create_jwt_token(identity=record["name"], role=record["role"], expires_in_minutes=120)
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "expires_in_minutes": 120,
+        "identity": record["name"],
+        "role": record["role"],
+    }
+
+
+@app.get("/api/auth/me")
+def get_caller_identity(caller: AuthIdentity = Depends(get_current_caller)):
+    """Returns caller identity, role, and authentication method."""
+    return caller.to_dict()
+
+
+@app.get("/api/admin/audit-log")
+def get_admin_audit_log(caller: AuthIdentity = Depends(require_admin)):
+    """Returns administrative actions audit ledger (Admin only)."""
+    return {"count": len(admin_audit_log), "total": len(admin_audit_log), "events": admin_audit_log}
+
+
+
 @app.post("/api/assess")
-def assess(request: AssessRequest):
+def assess(request: AssessRequest, req: Request, caller: AuthIdentity = Depends(require_operator)):
+    rate_limiter.check(req, tier="default")
     try:
+        validated_input = validate_input_for_domain(request.domain, request.user_input)
+
         # Required ordering: ML inference first; the explanation API receives
         # only the structured ML result, never the raw form payload.
-        ml_json = run_ml(request.domain, request.user_input)
+        ml_json = run_ml(request.domain, validated_input)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except NotImplementedError as exc:
@@ -900,8 +1145,14 @@ def assess(request: AssessRequest):
     except (ValueError, TypeError, KeyError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
+
     reasoning = gemini_reasoning(request.domain, ml_json) if request.include_ai_reasoning else None
-    return {"domain": request.domain, "ml_risk_json": ml_json, "ai_reasoning": reasoning}
+    return {
+        "domain": request.domain,
+        "ml_risk_json": ml_json,
+        "ai_reasoning": reasoning,
+        "operator": caller.identity,
+    }
 
 
 class StreamAssessRequest(BaseModel):
@@ -914,7 +1165,19 @@ def stream_gemini_tokens_sync(domain: str, ml_json: dict[str, Any]):
     # 1. Yield initial authoritative ML evaluation metadata
     yield f"data: {json.dumps({'type': 'meta', 'domain': domain, 'ml_risk_json': ml_json})}\n\n"
 
-    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_Key")
+    # Circuit breaker check: If tripped, immediately stream deterministic local brief
+    if not circuit_breaker.is_available():
+        fallback = local_reasoning(domain, ml_json)
+        full_text = fallback.get("text", "")
+        words = full_text.split(" ")
+        for i in range(0, len(words), 3):
+            chunk = " ".join(words[i:i+3]) + (" " if i+3 < len(words) else "")
+            yield f"data: {json.dumps({'type': 'token', 'token': chunk})}\n\n"
+            time.sleep(0.01)
+        yield f"data: {json.dumps({'type': 'done', 'done': True, 'source': 'circuit_breaker_offline', 'model': 'deterministic-local'})}\n\n"
+        return
+
+    api_key = settings.effective_gemini_api_key
     explanation_json = dict(ml_json)
     for identifier in ["transaction_id", "claim_id"]:
         explanation_json.pop(identifier, None)
@@ -962,6 +1225,10 @@ def stream_gemini_tokens_sync(domain: str, ml_json: dict[str, Any]):
                     payload["generationConfig"].pop("thinkingConfig", None)
                     r = requests.post(url, headers=headers, json=payload, stream=True, timeout=12)
 
+                if r.status_code == 429:
+                    circuit_breaker.record_failure(status_code=429, is_quota_exhausted=True)
+                    break
+
                 if r.status_code == 200:
                     model_used = model_name
                     got_any_token = False
@@ -984,9 +1251,12 @@ def stream_gemini_tokens_sync(domain: str, ml_json: dict[str, Any]):
                                 except Exception:
                                     pass
                     if got_any_token:
+                        circuit_breaker.record_success()
                         streamed_successfully = True
                         break
-            except Exception:
+            except Exception as exc:
+                st = getattr(getattr(exc, "response", None), "status_code", None)
+                circuit_breaker.record_failure(status_code=st)
                 continue
 
     # Fallback: progressive simulated token stream of deterministic reasoning
@@ -1004,17 +1274,21 @@ def stream_gemini_tokens_sync(domain: str, ml_json: dict[str, Any]):
     yield f"data: {json.dumps({'type': 'done', 'done': True, 'source': 'gemini' if streamed_successfully else 'local_fallback', 'model': model_used})}\n\n"
 
 
+
 @app.post("/api/assess/stream")
-def assess_stream(request: StreamAssessRequest):
+def assess_stream(request: StreamAssessRequest, req: Request, caller: AuthIdentity = Depends(require_operator)):
     """Real-time SSE token streaming endpoint for Gemini 2.5 Flash explanations with live typewriter effect."""
+    rate_limiter.check(req, tier="ai_stream")
     try:
-        ml_json = run_ml(request.domain, request.user_input)
+        validated_input = validate_input_for_domain(request.domain, request.user_input)
+        ml_json = run_ml(request.domain, validated_input)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except NotImplementedError as exc:
         raise HTTPException(status_code=501, detail=str(exc)) from exc
     except (ValueError, TypeError, KeyError) as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
 
     def event_stream():
         telemetry_hub.active_streams += 1
@@ -1042,8 +1316,18 @@ class BatchAssessRequest(BaseModel):
 
 
 @app.post("/api/assess/batch")
-def assess_batch(request: BatchAssessRequest):
+def assess_batch(request: BatchAssessRequest, req: Request, caller: AuthIdentity = Depends(require_operator)):
     """Vectorized high-throughput batch screening endpoint powered by ONNX FP16."""
+    rate_limiter.check(req, tier="batch")
+    if not request.records:
+        raise HTTPException(status_code=400, detail="Batch records list cannot be empty.")
+
+    if len(request.records) > settings.max_batch_records:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Batch size of {len(request.records)} records exceeds maximum allowed cap of {settings.max_batch_records} records.",
+        )
+
     try:
         return run_batch_ml(request.domain, request.records)
     except FileNotFoundError as exc:
@@ -1053,30 +1337,80 @@ def assess_batch(request: BatchAssessRequest):
 
 
 @app.post("/api/assess/upload")
-async def assess_upload(file: UploadFile = File(...), domain: str = Form(...)):
-    """Upload CSV or JSON file for immediate vectorized screening."""
-    try:
-        content = await file.read()
-        filename = file.filename.lower()
-        if filename.endswith(".json"):
-            records = json.loads(content.decode("utf-8"))
-            if isinstance(records, dict) and "records" in records:
-                records = records["records"]
-            elif not isinstance(records, list):
-                records = [records]
-        elif filename.endswith(".csv"):
-            df = pd.read_csv(io.StringIO(content.decode("utf-8", errors="replace")))
-            records = df.to_dict(orient="records")
-        else:
-            raise ValueError("Unsupported file format. Please upload a valid .csv or .json file.")
+async def assess_upload(
+    req: Request,
+    file: UploadFile = File(...),
+    domain: str = Form(...),
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """Upload CSV or JSON file for immediate vectorized screening with strict size and row limits."""
+    rate_limiter.check(req, tier="batch")
+    if not file.filename:
 
-        return run_batch_ml(domain, records)
+        raise HTTPException(status_code=400, detail="Missing upload filename.")
+
+    clean_filename = Path(file.filename).name.lower()
+    if not (clean_filename.endswith(".csv") or clean_filename.endswith(".json")):
+        raise HTTPException(
+            status_code=400,
+            detail="Unsupported file format. Please upload a valid .csv or .json file.",
+        )
+
+    # 1. Stream-read chunks to enforce strict 10MB file size ceiling (CWE-400 DoS defense)
+    max_size = settings.max_upload_size_bytes
+    chunk_size = 64 * 1024  # 64 KB chunks
+    total_bytes = 0
+    buffer = io.BytesIO()
+
+    while True:
+        chunk = await file.read(chunk_size)
+        if not chunk:
+            break
+        total_bytes += len(chunk)
+        if total_bytes > max_size:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail=f"Uploaded file exceeds maximum allowed limit of {max_size // (1024 * 1024)}MB.",
+            )
+        buffer.write(chunk)
+
+    raw_bytes = buffer.getvalue()
+    if not raw_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    # 2. Parse payload safely
+    try:
+        if clean_filename.endswith(".json"):
+            parsed = json.loads(raw_bytes.decode("utf-8"))
+            if isinstance(parsed, dict) and "records" in parsed:
+                records = parsed["records"]
+            elif isinstance(parsed, list):
+                records = parsed
+            elif isinstance(parsed, dict):
+                records = [parsed]
+            else:
+                raise ValueError("JSON must contain an array or record object.")
+        else:
+            df = pd.read_csv(io.StringIO(raw_bytes.decode("utf-8", errors="replace")))
+            records = df.to_dict(orient="records")
     except Exception as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
+        raise HTTPException(status_code=422, detail=f"Failed to parse uploaded file: {str(exc)}")
+
+    # 3. Enforce record count cap
+    if not records:
+        raise HTTPException(status_code=400, detail="Uploaded file contains zero data records.")
+
+    if len(records) > settings.max_batch_records:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Batch size of {len(records)} records exceeds maximum allowed cap of {settings.max_batch_records} records.",
+        )
+
+    return run_batch_ml(domain, records)
 
 
 @app.get("/api/samples/{domain}")
-def get_sample_records(domain: str):
+def get_sample_records(domain: str, caller: AuthIdentity = Depends(require_auditor)):
     """Retrieve preloaded demo batch records for instant 1-click testing."""
     d = domain.lower()
     mapping = {
@@ -1090,8 +1424,8 @@ def get_sample_records(domain: str):
     fname = mapping.get(d)
     if not fname:
         raise HTTPException(status_code=404, detail=f"No sample available for domain '{domain}'")
-    file_path = SAMPLES_DIR / fname
-    if not file_path.is_file():
+    file_path = (SAMPLES_DIR / fname).resolve()
+    if not (file_path.is_relative_to(SAMPLES_DIR.resolve()) and file_path.is_file()):
         raise HTTPException(status_code=404, detail="Sample file not found on server")
     df = pd.read_csv(file_path)
     return {
@@ -1103,17 +1437,36 @@ def get_sample_records(domain: str):
 
 
 @app.get("/api/samples/download/{filename}")
-def download_sample_file(filename: str):
-    """Download template or sample CSV file."""
-    file_path = SAMPLES_DIR / filename
-    if not file_path.is_file():
+def download_sample_file(filename: str, caller: AuthIdentity = Depends(require_auditor)):
+    """Download template or sample CSV file with strict path traversal prevention."""
+    # 1. Reject path separators or directory traversal indicators (CWE-22)
+    if "/" in filename or "\\" in filename or ".." in filename:
+        raise HTTPException(status_code=400, detail="Invalid filename format. Directory separators are forbidden.")
+
+    # 2. Strict allowlist validation
+    clean_name = Path(filename).name
+    if clean_name not in ALLOWED_SAMPLE_FILES:
+        raise HTTPException(status_code=404, detail=f"File '{clean_name}' is not in the allowed samples directory.")
+
+    # 3. Canonical path resolution check
+    file_path = (SAMPLES_DIR / clean_name).resolve()
+    samples_resolved = SAMPLES_DIR.resolve()
+    if not (file_path.is_relative_to(samples_resolved) and file_path.is_file()):
         raise HTTPException(status_code=404, detail="Requested file not found")
-    return FileResponse(file_path, filename=filename, media_type="text/csv")
+
+    return FileResponse(file_path, filename=clean_name, media_type="text/csv")
+
 
 
 @app.websocket("/ws/telemetry")
-async def websocket_telemetry_endpoint(websocket: WebSocket):
+async def websocket_telemetry_endpoint(websocket: WebSocket, token: Optional[str] = Query(None)):
     """High-frequency WebSocket telemetry hub pushing live P50/P95, throughput & SecAgg stats."""
+    # Validate ticket or token in production mode
+    if settings.is_production:
+        if not token or not (key_registry.authenticate(token) or verify_jwt_token(token)):
+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+            return
+
     await telemetry_hub.connect(websocket)
     try:
         while True:
@@ -1127,8 +1480,83 @@ async def websocket_telemetry_endpoint(websocket: WebSocket):
 
 
 @app.get("/api/telemetry")
-def get_telemetry_snapshot():
+def get_telemetry_snapshot(caller: AuthIdentity = Depends(require_auditor)):
     """Retrieve instantaneous telemetry snapshot over HTTP."""
     return telemetry_hub.get_payload()
+
+
+class RunSecAggRoundRequest(BaseModel):
+    dropout_silo_id: Optional[Literal["bank", "wallet", "insurer"]] = None
+    dp_epsilon: float = 0.045
+    clipping_bound: float = 1.0
+
+
+@app.post("/api/federated/round/run")
+async def run_secagg_round(
+    req: RunSecAggRoundRequest = RunSecAggRoundRequest(),
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """Executes a 4-phase Bonawitz SecAgg+ consensus round across participating silos."""
+    try:
+        cert = secagg_coordinator.execute_round(
+            dropout_silo_id=req.dropout_silo_id,
+            dp_epsilon=req.dp_epsilon,
+            clipping_bound=req.clipping_bound,
+        )
+        telemetry_hub.schedule_broadcast()
+
+        log_admin_action(
+            actor=caller.identity,
+            role=caller.role,
+            action="RUN_SECAGG_ROUND",
+            details={
+                "round_id": cert["round_id"],
+                "quorum": cert["consensus_quorum"],
+                "dropout": req.dropout_silo_id,
+                "proof_hash": cert["proof_hash"],
+            },
+            client_ip=caller.client_ip,
+        )
+
+        return {
+            "ok": True,
+            "certificate": cert,
+            "state": secagg_coordinator.get_state(),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"SecAgg+ consensus execution failed: {e}")
+
+
+@app.get("/api/federated/state")
+async def get_federated_state(caller: AuthIdentity = Depends(require_auditor)):
+    """Retrieve the current multi-party federated consensus state and DP ledger."""
+    return secagg_coordinator.get_state()
+
+
+@app.get("/api/federated/audit-trail")
+async def get_federated_audit_trail(caller: AuthIdentity = Depends(require_auditor)):
+    """Retrieve historical cryptographic audit certificates."""
+    return {
+        "count": len(secagg_coordinator.historical_ledger),
+        "ledger": secagg_coordinator.historical_ledger,
+    }
+
+
+@app.post("/api/federated/reset")
+async def reset_federated_state(caller: AuthIdentity = Depends(require_admin)):
+    """Reset the federated training state to round 1 (Admin only)."""
+    secagg_coordinator.reset()
+    telemetry_hub.schedule_broadcast()
+
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="RESET_FEDERATED_STATE",
+        details={"reset_to_round": 1},
+        client_ip=caller.client_ip,
+    )
+
+    return {"ok": True, "state": secagg_coordinator.get_state()}
+
 
 

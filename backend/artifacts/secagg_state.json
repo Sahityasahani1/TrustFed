@@ -1,0 +1,141 @@
+{
+  "round_number": 7,
+  "cumulative_dp_epsilon_spent": 0.060000000000000005,
+  "global_loss": 0.1175174930626999,
+  "global_roc_auc": 0.980795388738624,
+  "global_pr_auc": 0.864367855953114,
+  "historical_ledger": [
+    {
+      "round_id": 1,
+      "timestamp": 1791661591.0266643,
+      "consensus_quorum": "3/3 silos",
+      "active_silos": [
+        "bank",
+        "wallet",
+        "insurer"
+      ],
+      "dropped_silo": null,
+      "mask_cancellation_sum_error": "5.2557529982e-16",
+      "dp_epsilon_spent_round": 0.01,
+      "dp_epsilon_cumulative": 0.01,
+      "dp_budget_remaining": 2.44,
+      "l2_clipping_bound": 1.0,
+      "global_roc_auc": 0.8348,
+      "global_pr_auc": 0.7237,
+      "global_loss": 0.3299,
+      "latency_ms": 3.84,
+      "proof_hash": "sha256:d2dfccf4c2d92d314946c49c34695741ada4486362c53b0d16444e1f3db96f74",
+      "dropout_recovery": null
+    },
+    {
+      "round_id": 2,
+      "timestamp": 1791661591.0319822,
+      "consensus_quorum": "3/3 silos",
+      "active_silos": [
+        "bank",
+        "wallet",
+        "insurer"
+      ],
+      "dropped_silo": null,
+      "mask_cancellation_sum_error": "5.3704519970e-16",
+      "dp_epsilon_spent_round": 0.01,
+      "dp_epsilon_cumulative": 0.02,
+      "dp_budget_remaining": 2.43,
+      "l2_clipping_bound": 1.0,
+      "global_roc_auc": 0.8939,
+      "global_pr_auc": 0.7787,
+      "global_loss": 0.2611,
+      "latency_ms": 2.86,
+      "proof_hash": "sha256:1614a2ff312e16f48888fdf5af29a9b8c3a3d71a9a60d57c52fbce8722faa950",
+      "dropout_recovery": null
+    },
+    {
+      "round_id": 3,
+      "timestamp": 1791661591.0375557,
+      "consensus_quorum": "3/3 silos",
+      "active_silos": [
+        "bank",
+        "wallet",
+        "insurer"
+      ],
+      "dropped_silo": null,
+      "mask_cancellation_sum_error": "2.5715299081e-15",
+      "dp_epsilon_spent_round": 0.01,
+      "dp_epsilon_cumulative": 0.03,
+      "dp_budget_remaining": 2.42,
+      "l2_clipping_bound": 1.0,
+      "global_roc_auc": 0.9316,
+      "global_pr_auc": 0.8148,
+      "global_loss": 0.209,
+      "latency_ms": 3.62,
+      "proof_hash": "sha256:bd4b001d7d006fff81882219908c82386e54c9a0c4c2fd5a289df64d5611ec6d",
+      "dropout_recovery": null
+    },
+    {
+      "round_id": 4,
+      "timestamp": 1791661591.0426738,
+      "consensus_quorum": "3/3 silos",
+      "active_silos": [
+        "bank",
+        "wallet",
+        "insurer"
+      ],
+      "dropped_silo": null,
+      "mask_cancellation_sum_error": "5.8538211812e-16",
+      "dp_epsilon_spent_round": 0.01,
+      "dp_epsilon_cumulative": 0.04,
+      "dp_budget_remaining": 2.41,
+      "l2_clipping_bound": 1.0,
+      "global_roc_auc": 0.9557,
+      "global_pr_auc": 0.8385,
+      "global_loss": 0.1697,
+      "latency_ms": 2.71,
+      "proof_hash": "sha256:cbbe12a9a9e1f517f2fc10d55195608f9c2b6645d99c90c6ba9c7b375cf02f1f",
+      "dropout_recovery": null
+    },
+    {
+      "round_id": 5,
+      "timestamp": 1791661591.048066,
+      "consensus_quorum": "3/3 silos",
+      "active_silos": [
+        "bank",
+        "wallet",
+        "insurer"
+      ],
+      "dropped_silo": null,
+      "mask_cancellation_sum_error": "9.9380828118e-16",
+      "dp_epsilon_spent_round": 0.01,
+      "dp_epsilon_cumulative": 0.05,
+      "dp_budget_remaining": 2.4,
+      "l2_clipping_bound": 1.0,
+      "global_roc_auc": 0.971,
+      "global_pr_auc": 0.8541,
+      "global_loss": 0.14,
+      "latency_ms": 3.09,
+      "proof_hash": "sha256:127cef8ae464f044fcf6460eec2a453e238c24f65b8a1a5b83dcb715fa60f85c",
+      "dropout_recovery": null
+    },
+    {
+      "round_id": 6,
+      "timestamp": 1791661591.0526128,
+      "consensus_quorum": "3/3 silos",
+      "active_silos": [
+        "bank",
+        "wallet",
+        "insurer"
+      ],
+      "dropped_silo": null,
+      "mask_cancellation_sum_error": "1.4105343393e-15",
+      "dp_epsilon_spent_round": 0.01,
+      "dp_epsilon_cumulative": 0.06,
+      "dp_budget_remaining": 2.39,
+      "l2_clipping_bound": 1.0,
+      "global_roc_auc": 0.9808,
+      "global_pr_auc": 0.8644,
+      "global_loss": 0.1175,
+      "latency_ms": 2.52,
+      "proof_hash": "sha256:7519d47435e1090c08ccc50795e0c629f85503b452b2dc5e09c484220693d29f",
+      "dropout_recovery": null
+    }
+  ]
+}
