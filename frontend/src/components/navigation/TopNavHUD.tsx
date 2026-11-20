@@ -15,7 +15,7 @@ export interface TopNavHUDProps {
   activeMainTab?: string;
   onGoToIntro: () => void;
   onGoToFeatures?: () => void;
-  onSelectDomain?: (domain: 'intro' | 'intelligence' | 'creditfraud' | 'insurance') => void;
+  onSelectDomain?: (domain: 'intro' | 'intelligence' | 'creditfraud' | 'insurance' | 'clearinghouse' | 'compliance') => void;
   isDark: boolean;
   onToggleTheme: () => void;
   onOpenCommandPalette: () => void;
@@ -37,9 +37,12 @@ export const TopNavHUD: React.FC<TopNavHUDProps> = ({
 }) => {
   const domains = [
     { id: 'intro', label: 'Overview', isIntro: true },
-    { id: 'intelligence', label: 'Banks', badge: 'PaySim' },
-    { id: 'creditfraud', label: 'Lenders', badge: 'Credit' },
+    { id: 'intelligence', label: 'Banks', badge: 'Transfers' },
+    { id: 'creditfraud', label: 'Lenders', badge: 'Loans' },
     { id: 'insurance', label: 'Insurers', badge: 'Claims' },
+    { id: 'clearinghouse', label: 'Clearinghouse', badge: '50 TPS' },
+    { id: 'compliance', label: 'Compliance', badge: 'NIST/FCRA' },
+    { id: 'enclaves', label: 'Enclaves & TEE', badge: 'AWS Nitro' },
   ];
 
   const handleDomainClick = (dId: string) => {
@@ -72,10 +75,10 @@ export const TopNavHUD: React.FC<TopNavHUDProps> = ({
           </span>
         </button>
 
-        {/* Live SecAgg Consensus Indicator */}
+        {/* Network Consensus Indicator */}
         <div className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-mono font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>SecAgg 3/3</span>
+          <span>Network 3/3 Online</span>
         </div>
       </div>
 

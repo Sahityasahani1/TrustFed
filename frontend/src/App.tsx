@@ -13,6 +13,9 @@ import { JudgeDemoBar } from './components/demo/JudgeDemoBar';
 import { IntelligenceAndGovView } from './components/views/IntelligenceAndGovView';
 import { CreditFraudView } from './components/views/CreditFraudView';
 import { InsuranceClaimsView } from './components/views/InsuranceClaimsView';
+import { ClearinghouseStreamWorkbench } from './components/views/ClearinghouseStreamWorkbench';
+import { ComplianceLedgerWorkbench } from './components/views/ComplianceLedgerWorkbench';
+import { HardwareEnclaveWorkbench } from './components/views/HardwareEnclaveWorkbench';
 
 import { Hero3DStage } from './components/hero/Hero3DStage';
 import { IntroPage } from './components/pages/IntroPage';
@@ -31,13 +34,16 @@ export function App() {
       return { page: 'intro', main: 'intelligence', sub: 'showdown' };
     }
     
-    const validMains = ['intelligence', 'creditfraud', 'insurance'];
+    const validMains = ['intelligence', 'creditfraud', 'insurance', 'clearinghouse', 'compliance', 'enclaves'];
     const main = validMains.includes(part1) ? part1 : 'intelligence';
 
     let sub = part2;
     if (!sub) {
       if (main === 'creditfraud') sub = 'cf-showdown';
       else if (main === 'insurance') sub = 'ins-showdown';
+      else if (main === 'clearinghouse') sub = 'stream';
+      else if (main === 'compliance') sub = 'overrides';
+      else if (main === 'enclaves') sub = 'enclave';
       else sub = (part1 === 'dictionary' ? 'dictionary' : 'showdown');
     }
     return { page: 'features', main, sub };
@@ -97,6 +103,9 @@ export function App() {
     if (!resolvedSubTab) {
       if (mainTabId === 'creditfraud') resolvedSubTab = 'cf-showdown';
       else if (mainTabId === 'insurance') resolvedSubTab = 'ins-showdown';
+      else if (mainTabId === 'clearinghouse') resolvedSubTab = 'stream';
+      else if (mainTabId === 'compliance') resolvedSubTab = 'overrides';
+      else if (mainTabId === 'enclaves') resolvedSubTab = 'enclave';
       else resolvedSubTab = 'showdown';
     }
 
@@ -248,6 +257,15 @@ export function App() {
                       }}
                     />
                   )}
+                  {activeMainTab === 'clearinghouse' && (
+                    <ClearinghouseStreamWorkbench />
+                  )}
+                  {activeMainTab === 'compliance' && (
+                    <ComplianceLedgerWorkbench />
+                  )}
+                  {activeMainTab === 'enclaves' && (
+                    <HardwareEnclaveWorkbench />
+                  )}
                 </main>
               </motion.div>
             )}
@@ -258,24 +276,24 @@ export function App() {
             <div className="flex flex-wrap items-center justify-center gap-2">
               <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Raw Records Transmitted: 0
+                Customer Records Shared: 0
               </span>
               <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-                SecAgg+ Masking: Active
+                Multi-Institution Encryption: Active
               </span>
               <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                Differential Privacy: ε=2.45
+                Enterprise Privacy Protection: Certified
               </span>
               <span className="px-3 py-1 rounded-md text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                NIST AI RMF Parity
+                Regulatory Compliance: Verified
               </span>
             </div>
 
             <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 font-mono">
-              TrustFed Federated Intelligence Platform • Zero Plain-Text Data Leakage • Press ⌘K for Command Bar
+              TrustFed Collaborative Defense Platform • Zero Customer Data Exposure • Press ⌘K for Command Bar
             </div>
           </footer>
 

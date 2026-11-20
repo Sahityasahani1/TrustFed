@@ -72,7 +72,7 @@ Model: ${modelName}
 Risk Score: ${riskScore}/100 (Probability: ${(fraudProbability * 100).toFixed(2)}%)
 Decision Cutoff: ${(decisionThreshold * 100).toFixed(2)}%
 Classification: ${classification}
-Statutory Alignment: NIST AI RMF, FCRA §609, EU AI Act Title III
+Statutory Alignment: Consumer Protection & Enterprise Privacy Certified
 Generated at: ${new Date().toISOString()}
 
 EXECUTIVE NARRATIVE:
@@ -105,20 +105,20 @@ ${aiReasoningText || 'Evaluated against multi-party federated model.'}
 
 ---
 
-## 2. SHAP Feature Attribution Matrix
+## 2. Primary Risk Factors & Decision Drivers
 ${shapDrivers
   .map(
     (d, i) =>
-      `${i + 1}. **${d.feature}**: ${d.impact_log_odds > 0 ? '+' : ''}${d.impact_log_odds.toFixed(4)} log-odds (${d.direction || (d.impact_log_odds > 0 ? 'increases risk' : 'decreases risk')})`
+      `${i + 1}. **${d.feature}**: Relative impact ${Math.abs(d.impact_log_odds).toFixed(2)} (${d.direction || (d.impact_log_odds > 0 ? 'increases risk' : 'decreases risk')})`
   )
   .join('\n')}
 
 ---
 
 ## 3. Statutory Compliance Alignment
-- **NIST AI RMF 1.0 (GOVERN-1.2):** Validated cross-silo differential privacy epsilon bounds (ε=2.45).
-- **US Equal Credit Opportunity Act (ECOA) / FCRA §609:** Deterministic principal risk factor disclosure.
-- **EU AI Act Title III (High-Risk AI Systems):** Auditable human oversight loop and zero plain-text record leakage.
+- **Enterprise Privacy Standards:** Certified mathematical guarantees protecting customer and account identities.
+- **Consumer Transparency & Fairness:** Clear factor breakdown for adverse action notices and explanations.
+- **Institutional Governance:** Immutable audit trails with mandatory human oversight and zero customer data sharing.
 `;
 
     const blob = new Blob([content], { type: 'text/markdown' });
@@ -184,7 +184,7 @@ ${shapDrivers
             {isStreaming ? (
               <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 flex items-center gap-1.5 animate-pulse">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-                SSE Stream (TTFT &lt; 300ms)
+                Real-time Analysis
               </span>
             ) : (
               <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60">
@@ -193,10 +193,10 @@ ${shapDrivers
             )}
           </div>
           <h3 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 font-sans">
-            Regulatory Forensic Brief &amp; Attribution
+            Executive Risk Brief &amp; Attribution
           </h3>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Calibrated on multi-party federated model ({modelName}) with differential privacy guarantees.
+            Evaluated using collaborative defense intelligence with enterprise privacy protection.
           </p>
         </div>
 
@@ -297,16 +297,16 @@ ${shapDrivers
         <div className="flex items-center justify-between pb-1 border-b border-zinc-200/60 dark:border-white/5">
           <span className="text-xs font-mono font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            2. SHAP Feature Attribution Waterfall ({shapDrivers.length} Factors)
+            2. Primary Risk Factors &amp; Impact Breakdown ({shapDrivers.length} Factors)
           </span>
           <span className="text-[11px] font-mono text-zinc-400">
-            GBDT Log-Odds Decomposition
+            Factor Impact Analysis
           </span>
         </div>
 
         {shapDrivers.length === 0 ? (
           <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 text-xs text-zinc-500 font-mono text-center">
-            No local SHAP factors returned for this evaluation.
+            No risk factors flagged for this evaluation.
           </div>
         ) : (
           <div className="space-y-2">
@@ -376,7 +376,7 @@ ${shapDrivers
               <span>NIST AI RMF 1.0</span>
             </div>
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug">
-              GOVERN-1.2 &amp; MEASURE-2.5 parity: Rényi DP (ε=2.45, δ=1e-5) guaranteed zero customer record leakage.
+              Certified enterprise protection: Zero customer or account records leave institutional custody.
             </p>
           </div>
 
@@ -386,7 +386,7 @@ ${shapDrivers
               <span>FCRA §609 / ECOA</span>
             </div>
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug">
-              Adverse action defensibility via deterministic top-4 SHAP attributions disclosed to applicants.
+              Explainable decisions: Clear primary risk factor disclosures for compliant customer communications.
             </p>
           </div>
 
@@ -396,7 +396,7 @@ ${shapDrivers
               <span>EU AI Act Title III</span>
             </div>
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-snug">
-              High-Risk AI System conformity: immutable batch logging, human-in-the-loop audit trail.
+              Enterprise governance: Immutable audit trails with continuous human oversight.
             </p>
           </div>
         </div>

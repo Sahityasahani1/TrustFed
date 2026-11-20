@@ -40,7 +40,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
   siloVerdict,
   federatedVerdict,
   defaultThreshold = 0.40,
-  prAucLiftText = '+185.3% PR-AUC Lift',
+  prAucLiftText = '+185.3% Fraud Detection Lift',
   fpReductionText = '-64.2% False Positives',
   totalPopulation = 10000,
 }) => {
@@ -116,7 +116,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
               </span>
             </div>
             <h3 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 font-sans mt-0.5">
-              Isolated Silo vs. TrustFed Federated Model
+              Isolated Institution vs. Collaborative Defense Network
             </h3>
           </div>
           <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
@@ -140,7 +140,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
           </span>
           <span className="text-zinc-300 dark:text-zinc-600">|</span>
           <span className="text-zinc-500 dark:text-zinc-400">
-            SecAgg 3/3 Active
+            Multi-Institution Protected
           </span>
         </div>
       </div>
@@ -174,7 +174,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
 
           <div className="text-[11px] text-amber-700 dark:text-amber-300/90 flex items-start gap-1.5 pt-0.5">
             <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-            <span>Blind to multi-silo hops and cross-institution mule account patterns.</span>
+            <span>Limited visibility across institutional boundaries and coordinated fraud rings.</span>
           </div>
         </div>
 
@@ -186,7 +186,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
               <span className="text-xs font-mono font-medium text-zinc-900 dark:text-zinc-100">{federatedModelName}</span>
             </div>
             <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              SecAgg Consensus
+              Collaborative Defense
             </span>
           </div>
 
@@ -206,7 +206,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
 
           <div className="text-[11px] text-emerald-700 dark:text-emerald-300 flex items-start gap-1.5 pt-0.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-            <span>Detects distributed coordinated attacks using multi-party aggregated weights.</span>
+            <span>Identifies cross-institution fraud rings and coordinated attacks in real time.</span>
           </div>
         </div>
 
@@ -224,7 +224,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
                   : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
             >
-              PR Curve (PR-AUC)
+              Precision vs Recall
             </button>
             <button
               onClick={() => setActiveCurve('roc')}
@@ -234,7 +234,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
                   : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
               }`}
             >
-              ROC Curve (ROC-AUC)
+              Detection Performance
             </button>
           </div>
 
@@ -282,7 +282,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
                   <Line
                     type="monotone"
                     dataKey="fedPrecision"
-                    name="TrustFed Precision"
+                    name="Collaborative Precision"
                     stroke="#10b981"
                     strokeWidth={2}
                     dot={false}
@@ -290,7 +290,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
                   <Line
                     type="monotone"
                     dataKey="siloPrecision"
-                    name="Silo Precision"
+                    name="Isolated Precision"
                     stroke="#71717a"
                     strokeWidth={1.5}
                     strokeDasharray="4 4"
@@ -302,7 +302,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
                   <Line
                     type="monotone"
                     dataKey="fedTpr"
-                    name="TrustFed TPR"
+                    name="Collaborative Detection"
                     stroke="#06b6d4"
                     strokeWidth={2}
                     dot={false}
@@ -310,7 +310,7 @@ export const ModelShowdownCard: React.FC<ModelShowdownCardProps> = ({
                   <Line
                     type="monotone"
                     dataKey="siloTpr"
-                    name="Silo TPR"
+                    name="Isolated Detection"
                     stroke="#71717a"
                     strokeWidth={1.5}
                     strokeDasharray="4 4"

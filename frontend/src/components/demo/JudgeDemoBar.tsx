@@ -20,20 +20,20 @@ export const JudgeDemoBar: React.FC<JudgeDemoBarProps> = ({
     {
       num: 1,
       time: 'Domain 1',
-      title: 'PaySim Banking Fraud',
-      desc: 'Account drain, mule cash-out & synthetic fraud detection with 10k transactions',
+      title: 'Banking & Wire Fraud',
+      desc: 'Account drain, mule transfers & rapid fund depletion detection',
     },
     {
       num: 2,
       time: 'Domain 2',
-      title: 'Credit Default Risk',
-      desc: '307k real loan cohort • 500-Tree XGBoost GBDT with debt-to-income analysis',
+      title: 'Lending & Credit Risk',
+      desc: 'Comprehensive loan evaluation with debt-to-income and external credit indicators',
     },
     {
       num: 3,
       time: 'Domain 3',
-      title: 'SIU Insurance Claims',
-      desc: '1M policyholder cohort • Group-disjoint 54-feature SIU audit model',
+      title: 'Insurance Fraud & Claims',
+      desc: 'High-risk claim triage, staged accident patterns, and policyholder tenure analysis',
     },
   ];
 
@@ -51,9 +51,9 @@ export const JudgeDemoBar: React.FC<JudgeDemoBarProps> = ({
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/5 backdrop-blur-md border border-white/10 text-cyan-300 shadow-sm">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                <span>PRD §15 Hackathon Pitch Walkthrough</span>
+                <span>Interactive Product Tour</span>
                 <span className="w-1 h-1 rounded-full bg-white/40" />
-                <span className="text-slate-300">3-Minute Live Script</span>
+                <span className="text-slate-300">Guided Showcase</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">
                 Institutions collaborate on intelligence, never on customer records.
@@ -83,7 +83,7 @@ export const JudgeDemoBar: React.FC<JudgeDemoBarProps> = ({
               ) : (
                 <>
                   <Play className="h-4 w-4 fill-current text-cyan-600" />
-                  <span>Start 3-Min Pitch</span>
+                  <span>Start Product Tour</span>
                   <ArrowRight className="h-4 w-4 text-cyan-500" />
                 </>
               )}

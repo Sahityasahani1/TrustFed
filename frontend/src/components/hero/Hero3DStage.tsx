@@ -38,9 +38,9 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
         <div className="text-center max-w-4xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full text-xs font-bold bg-white/20 backdrop-blur-xl border border-white/30 text-white shadow-lg shadow-black/5 animate-float-subtle">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span className="tracking-wide">PRD §15 Hackathon Pitch Walkthrough</span>
+            <span className="tracking-wide">Interactive Enterprise Showcase</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-white/90 font-medium">3-Minute Live Interactive Script</span>
+            <span className="text-white/90 font-medium">Guided Product Tour</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold font-display tracking-tight text-white leading-[1.08] drop-shadow-md">
@@ -48,7 +48,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
           </h1>
 
           <p className="text-base sm:text-lg text-white/90 font-medium max-w-2xl mx-auto leading-relaxed">
-            Collaborative federated fraud intelligence across banks, digital wallets, lenders & insurers. Zero customer record leakage with SecAgg+ Diffie-Hellman masking & Rényi DP.
+            Collaborative federated fraud intelligence across banks, digital wallets, lenders & insurers. Zero customer data exposure with multi-institution encryption and strict privacy standards.
           </p>
 
           {/* Action Pills */}
@@ -72,7 +72,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
               ) : (
                 <>
                   <Play className="h-4 w-4 fill-current text-indigo-600" />
-                  <span>Start 3-Min Pitch</span>
+                  <span>Start Product Tour</span>
                   <ArrowRight className="h-4 w-4 text-indigo-400" />
                 </>
               )}
@@ -83,7 +83,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
               className="flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold bg-white/15 hover:bg-white/25 text-white border border-white/25 backdrop-blur-xl shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.03]"
             >
               <Cpu className="w-4 h-4 text-purple-200" />
-              <span>⚡ Execute FL Round 1-10</span>
+              <span>⚡ Run Defense Simulation</span>
             </button>
           </div>
         </div>
@@ -98,17 +98,17 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
 
           <div className="absolute -top-6 right-8 md:right-16 z-30 hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-white shadow-xl shadow-indigo-900/10 text-xs font-bold text-slate-800 animate-float-reverse">
             <span className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-            <span>SecAgg+ Masking Active</span>
+            <span>Zero-Data Sharing Active</span>
           </div>
 
           <div className="absolute -bottom-4 left-1/4 z-30 hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-white shadow-xl shadow-indigo-900/10 text-xs font-bold text-slate-800 animate-float-subtle">
             <span className="w-2 h-2 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
-            <span>+22% PR-AUC Improvement</span>
+            <span>+22% Detection Accuracy Lift</span>
           </div>
 
           <div className="absolute -bottom-4 right-1/4 z-30 hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-white shadow-xl shadow-indigo-900/10 text-xs font-bold text-slate-800 animate-float-slow">
             <span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
-            <span>Rényi DP Safe: ε = 2.45</span>
+            <span>Privacy Shield Active</span>
           </div>
 
           {/* 3D Overlapping Floating Cards Deck */}
@@ -173,7 +173,7 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
                     </h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[10px] text-purple-700 font-semibold">Federated SecAgg+ v10</span>
+                      <span className="text-[10px] text-purple-700 font-semibold">Collaborative Defense Core</span>
                     </div>
                   </div>
                 </div>
@@ -199,11 +199,11 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
 
                 <div className="grid grid-cols-2 gap-2 pt-1 text-center font-mono">
                   <div className="p-2 rounded-xl bg-purple-50/80 border border-purple-100">
-                    <span className="text-[10px] text-slate-500 block">PR-AUC Score</span>
+                    <span className="text-[10px] text-slate-500 block">Accuracy Score</span>
                     <span className="text-xs font-bold text-purple-700">0.842 (+22%)</span>
                   </div>
                   <div className="p-2 rounded-xl bg-emerald-50/80 border border-emerald-100">
-                    <span className="text-[10px] text-slate-500 block">SecAgg Leakage</span>
+                    <span className="text-[10px] text-slate-500 block">Data Shared</span>
                     <span className="text-xs font-bold text-emerald-700">0.000 (0 bytes)</span>
                   </div>
                 </div>
@@ -244,18 +244,18 @@ export const Hero3DStage: React.FC<Hero3DStageProps> = ({
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Encrypted Delta:</span>
-                  <span className="font-mono font-bold text-purple-600">ΔW masked (DH)</span>
+                  <span className="font-mono font-bold text-purple-600">Encrypted Sync</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium">Rényi Budget Spent:</span>
-                  <span className="font-semibold text-slate-700">ε_spent = 0.245</span>
+                  <span className="text-slate-500 font-medium">Privacy Protection Status:</span>
+                  <span className="font-semibold text-slate-700">100% Protected</span>
                 </div>
               </div>
 
               <div className="p-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-2 text-[11px] text-slate-600">
                 <Lock className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Private Gradient:</strong> Raw transaction details remain on-premise behind client firewall.
+                  <strong>Data Privacy:</strong> Raw customer details remain strictly within the institution.
                 </span>
               </div>
             </div>

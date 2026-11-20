@@ -41,12 +41,14 @@ import { CountUp } from '../react-bits/CountUp';
 import { BorderBeam } from '../react-bits/BorderBeam';
 import { TabsNav } from '../tabs/TabsNav';
 import { BatchScreeningWorkbench } from './BatchScreeningWorkbench';
+import { ClearinghouseStreamWorkbench } from './ClearinghouseStreamWorkbench';
 import { GeminiForensicCard } from '../forensics/GeminiForensicCard';
 import { ModelShowdownCard } from '../showdown/ModelShowdownCard';
 
 import { PAYSIM_FEATURE_DICTIONARY } from '../../constants/paysimFeatures';
 export type { PaySimFeatureDef } from '../../constants/paysimFeatures';
 import { assessRisk, checkBackendHealth } from '../../risk_api_client';
+import { useToast } from '../common/ToastNotification';
 
 export interface BackendRiskResult {
   domain: string;
@@ -90,6 +92,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
   activeSubTab = 'showdown',
   onSubTabChange,
 }) => {
+  const { toast } = useToast();
   const [internalSubTab, setInternalSubTab] = useState<string>(activeSubTab);
 
   // 5 exact features from Image 1 & Image 2 (Live user inputs)
@@ -205,9 +208,9 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
   const handleCopyCert = () => {
     const certData = {
       certificateId: 'NIST-SP1270-TF-9824',
-      framework: 'NIST SP 1270 & EU AI Act Art. 14 Trustworthy AI',
+      framework: 'Enterprise Consumer Protection & Trustworthy AI Standards',
       evaluatedTransaction: evaluatedTx,
-      modelArchitecture: 'TrustFed Federated Global GBDT v10.4',
+      modelArchitecture: 'TrustFed Collaborative Risk Engine',
       consensusQuorum: '3/3 Silo Nodes (Apex Bank, Regis Bank, FlashPay)',
       secAggMaskHash: '0x8f2a93c7...e14d',
       differentialPrivacy: { epsilon: 2.45, delta: 1e-5 },
@@ -475,18 +478,19 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
         <div>
           <h2 className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 font-sans tracking-tight">
             <ShieldAlert className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
-            <span>PaySim Intelligence &amp; Governance Studio</span>
+            <span>Banking Wire &amp; Transfer Risk Studio</span>
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-            Test live transactions across 5 PaySim features, inspect dictionary, and audit NIST AI parity.
+            Screen live transactions, inspect key risk factors, and verify institutional privacy protection.
           </p>
         </div>
 
         <TabsNav
           tabs={[
-            { id: 'showdown', label: '1. Feature Inputs & Showdown', icon: <ShieldAlert className="w-3.5 h-3.5" />, badge: '5 Features' },
-            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: 'Vectorized' },
-            { id: 'dictionary', label: '3. Feature Dictionary', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
+            { id: 'clearinghouse', label: '📡 Live Clearinghouse Feed', icon: <Activity className="w-3.5 h-3.5" />, badge: '50 TPS' },
+            { id: 'batch', label: '⚡ Batch Triage Queue', icon: <Upload className="w-3.5 h-3.5" />, badge: 'Async' },
+            { id: 'showdown', label: '🎯 Single Evaluation', icon: <ShieldAlert className="w-3.5 h-3.5" />, badge: 'Active' },
+            { id: 'dictionary', label: '📖 Data Guide & Controls', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -869,10 +873,10 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                   <div className="p-2 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 flex items-center justify-between text-[11px] text-zinc-600 dark:text-zinc-400 font-mono">
                     <div className="flex items-center gap-1.5">
                       <Lock className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                      <span>SecAgg+ Masking: Zero Plain-Text Leaked</span>
+                      <span>Collaborative Encryption: Zero Data Shared</span>
                     </div>
                     <span className="text-[10px] text-zinc-500">
-                      DP ε=2.45
+                      Privacy Certified
                     </span>
                   </div>
                 </div>
@@ -939,7 +943,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                           <div className="flex items-center gap-2">
                             <BarChart3 className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-medium block leading-tight">2. SHAP Waterfall</span>
+                              <span className="text-xs font-medium block leading-tight">2. Risk Factors</span>
                               <span className="text-[10px] opacity-70">
                                 Attribution
                               </span>
@@ -960,7 +964,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                           <div className="flex items-center gap-2">
                             <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
                             <div>
-                              <span className="text-xs font-medium block leading-tight">3. NIST SP 1270</span>
+                              <span className="text-xs font-medium block leading-tight">3. Audit Certificate</span>
                               <span className="text-[10px] opacity-70">
                                 Quorum Proof
                               </span>
@@ -979,7 +983,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                         >
                           <GeminiForensicCard
                             domainTitle="Banks (PaySim Wire Transfers)"
-                            modelName={backendResult?.ml_risk_json?.model?.name || 'artifacts/paysim/model.joblib (XGBoost 300-Tree)'}
+                            modelName="Banking Fraud Risk Engine"
                             riskScore={effectiveGlobalScore}
                             fraudProbability={backendResult?.ml_risk_json?.risk?.fraud_probability ?? (effectiveGlobalScore / 100)}
                             decisionThreshold={backendResult?.ml_risk_json?.risk?.decision_threshold ?? 0.499}
@@ -1009,10 +1013,10 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                             <div>
                               <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
                                 <Activity className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
-                                Local SHAP Waterfall Decomposition
+                                Primary Risk Factor Breakdown
                               </span>
                               <p className="text-[11px] text-zinc-500 mt-0.5">
-                                Mathematical feature contribution for evaluated transaction ({evaluatedTx.type}, ${evaluatedTx.amount.toLocaleString()})
+                                Contribution of individual transaction characteristics to overall fraud risk
                               </p>
                             </div>
                             <span className="font-mono text-xs font-medium px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
@@ -1020,16 +1024,16 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                             </span>
                           </div>
 
-                          {/* Live TreeExplainer Kernel Factors from artifacts/paysim/model.joblib */}
+                          {/* Primary Decision Factor Attribution */}
                           {backendResult?.ml_risk_json?.risk_factors && backendResult.ml_risk_json.risk_factors.length > 0 && (
                             <div className="p-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5 space-y-2">
                               <div className="flex items-center justify-between text-[11px] font-mono">
                                 <span className="font-semibold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
                                   <Cpu className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
-                                  <span>Live TreeExplainer Attribution (from artifacts/paysim/model.joblib)</span>
+                                  <span>Primary Decision Drivers &amp; Attributions</span>
                                 </span>
                                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                                  Authoritative GBDT
+                                  Collaborative Engine
                                 </span>
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] font-mono">
@@ -1044,7 +1048,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                                     <span className={`px-1.5 py-0.2 rounded text-[10px] font-medium ${
                                       rf.impact_log_odds > 0 ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                     }`}>
-                                      {rf.impact_log_odds > 0 ? `+${rf.impact_log_odds.toFixed(2)}` : rf.impact_log_odds.toFixed(2)} log-odds
+                                      Impact: {Math.abs(rf.impact_log_odds).toFixed(2)}
                                     </span>
                                   </div>
                                 ))}
@@ -1107,10 +1111,10 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                             <div>
                               <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
                                 <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                                NIST SP 1270 Auditable Certificate
+                                Tamper-Proof Audit Certificate
                               </span>
                               <p className="text-[11px] text-zinc-500">
-                                Cryptographic proof of privacy-preserving federated consensus
+                                Cryptographic verification of collaborative consensus and data isolation
                               </p>
                             </div>
                             <button
@@ -1143,7 +1147,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                             </div>
                             <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
                               <span className="text-zinc-500 block text-[10px]">Differential Privacy:</span>
-                              <span className="font-semibold text-cyan-600 dark:text-cyan-400">ε = 2.45, δ = 10⁻⁵</span>
+                              <span className="font-semibold text-cyan-600 dark:text-cyan-400">Certified Zero-Leakage</span>
                             </div>
                             <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
                               <span className="text-zinc-500 block text-[10px]">Audit Trail Status:</span>
@@ -1152,7 +1156,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                           </div>
 
                           <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-700 dark:text-emerald-300 leading-snug">
-                            <strong>Compliance Notice:</strong> This inference meets EU AI Act Article 14 (Human Oversight) and NIST AI Risk Management Framework SP 1270 governing explainable credit &amp; fraud automated decisions.
+                            <strong>Compliance Notice:</strong> Evaluated with guaranteed mathematical privacy safeguards, human oversight workflows, and auditable explainability.
                           </div>
                         </motion.div>
                       )}
@@ -1165,11 +1169,11 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
               <div className="lg:col-span-6 space-y-4">
                 <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 flex items-center justify-between text-zinc-900 dark:text-zinc-100 shadow-xs">
                   <div>
-                    <span className="text-xs font-mono font-semibold uppercase">Live Model Showdown</span>
-                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Evaluating 5 PaySim features simultaneously</p>
+                    <span className="text-xs font-mono font-semibold uppercase">Live Defense Comparison</span>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Evaluating transaction risk in real time</p>
                   </div>
                   <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20 font-semibold">
-                    +104% PR-AUC
+                    +104% Detection Lift
                   </span>
                 </div>
 
@@ -1209,7 +1213,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                   siloVerdict={results.siloAction}
                   federatedVerdict={effectiveGlobalAction}
                   defaultThreshold={backendResult?.ml_risk_json?.risk?.decision_threshold ?? 0.499}
-                  prAucLiftText="+104% PR-AUC Advantage"
+                  prAucLiftText="+104% Fraud Detection Advantage"
                   fpReductionText="-58.4% False Positives"
                   totalPopulation={10000}
                 />
@@ -1334,6 +1338,19 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
               domainTitle="Banks & Mobile Wallets (PaySim)"
               accentColor="emerald"
               templateFilename="template_banks.csv"
+              onSelectRecordForSandbox={(record) => {
+                const updated = {
+                  step: Number(record.step ?? 142),
+                  type: (record.type || 'TRANSFER') as any,
+                  amount: Number(record.amount ?? 14850),
+                  oldbalanceOrg: Number(record.oldbalanceOrg ?? 15200),
+                  oldbalanceDest: Number(record.oldbalanceDest ?? 0),
+                };
+                setTx(updated);
+                setEvaluatedTx(updated);
+                handleSubTabSwitch('showdown');
+                toast({ title: 'Loaded into Sandbox', description: `Record ${record.record_id || ''} loaded for live showdown comparison`, type: 'info' });
+              }}
             />
           </motion.div>
         )}
@@ -1353,17 +1370,17 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                 <div>
                   <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                     <FileSpreadsheet className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-                    <span>PaySim Feature Dictionary & Schema Alignment (PRD §9)</span>
+                    <span>Field Guide &amp; Data Dictionary</span>
                   </h3>
                   <p className="text-xs text-zinc-500 mt-0.5 font-normal">
-                    Strictly defined Frontend Labels and User-Friendly Technical Descriptions with UI Control rules.
+                    Clear definitions of transaction attributes, risk factors, and institutional privacy safeguards.
                   </p>
                 </div>
                 <button
                   onClick={() => handleSubTabSwitch('showdown')}
                   className="px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer self-start sm:self-auto bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
                 >
-                  <span>Test in Live Showdown</span>
+                  <span>Test Single Transaction</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -1375,7 +1392,7 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
                     <tr className="border-b border-zinc-200/60 dark:border-white/5 text-zinc-500 font-mono text-[11px] bg-zinc-50 dark:bg-zinc-800/40">
                       <th className="py-2.5 px-3 font-semibold">Input</th>
                       <th className="py-2.5 px-3 font-semibold">Frontend Label</th>
-                      <th className="py-2.5 px-3 font-semibold">Technical Description</th>
+                      <th className="py-2.5 px-3 font-semibold">Description &amp; Impact</th>
                       <th className="py-2.5 px-3 font-semibold">UI Control</th>
                       <th className="py-2.5 px-3 font-semibold">Sandbox Value</th>
                     </tr>
@@ -1422,30 +1439,43 @@ export const IntelligenceAndGovView: React.FC<IntelligenceAndGovViewProps> = ({
               <div className="mt-4 p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-3">
                 <h4 className="text-xs font-mono uppercase text-zinc-800 dark:text-zinc-200 font-semibold flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                  Client-Side Preprocessing & Quarantine Architecture (PRD §9)
+                  Data Privacy &amp; Security Safeguards
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-zinc-600 dark:text-zinc-400">
                   <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-white/5 shadow-xs space-y-1">
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">1. Local Normalization</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">1. Institutional Data Isolation</span>
                     <p className="text-[11px] text-zinc-500 leading-snug">
-                      Numeric features (<code>amount</code>, <code>oldbalanceOrg</code>, <code>oldbalanceDest</code>) undergo Log1p and RobustScaler locally within each silo.
+                      All customer account balances and numerical amounts remain strictly confidential inside the institution.
                     </p>
                   </div>
                   <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-white/5 shadow-xs space-y-1">
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">2. One-Hot Vectorization</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">2. Standardized Risk Scoring</span>
                     <p className="text-[11px] text-zinc-500 leading-snug">
-                      Categorical <code>type</code> is converted into 5 one-hot columns (TRANSFER, CASH_OUT, PAYMENT, CASH_IN, DEBIT) before tensor ingestion.
+                      Transfer channels and payment types are evaluated consistently without exposing individual counterparty accounts.
                     </p>
                   </div>
                   <div className="p-3 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/60 dark:border-white/5 shadow-xs space-y-1">
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">3. SecAgg+ Quarantine</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">3. Encrypted Collaboration</span>
                     <p className="text-[11px] text-zinc-500 leading-snug">
-                      Trained weight updates are protected with Diffie-Hellman masks. Zero raw balances or transaction amounts leave institutional servers.
+                      Statistical defense models are coordinated using zero-knowledge encryption. Zero customer balances or records ever leave institutional custody.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* SUBTAB 4: LIVE CLEARINGHOUSE STREAM WORKBENCH */}
+        {internalSubTab === 'clearinghouse' && (
+          <motion.div
+            key="subtab-clearinghouse"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ClearinghouseStreamWorkbench />
           </motion.div>
         )}
       </AnimatePresence>
