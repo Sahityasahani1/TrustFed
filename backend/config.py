@@ -72,9 +72,9 @@ class Settings(BaseSettings):
     )
 
     # Rate Limiting Configuration
-    rate_limit_default: str = Field(default="60/minute", alias="RATE_LIMIT_DEFAULT")
-    rate_limit_ai_stream: str = Field(default="15/minute", alias="RATE_LIMIT_AI_STREAM")
-    rate_limit_batch: str = Field(default="30/minute", alias="RATE_LIMIT_BATCH")
+    rate_limit_default: str = Field(default="600/minute", alias="RATE_LIMIT_DEFAULT")
+    rate_limit_ai_stream: str = Field(default="30/minute", alias="RATE_LIMIT_AI_STREAM")
+    rate_limit_batch: str = Field(default="120/minute", alias="RATE_LIMIT_BATCH")
 
     # Maximum Request Body & Upload Caps
     max_upload_size_bytes: int = Field(
@@ -84,7 +84,29 @@ class Settings(BaseSettings):
     max_batch_records: int = Field(
         default=1000,
         alias="MAX_BATCH_RECORDS",
-        description="Maximum records allowed per batch inference request",
+        description="Maximum records allowed per synchronous batch inference request",
+    )
+
+    # Phase 2: Distributed Redis Caching & Asynchronous Task Queue
+    redis_url: str = Field(
+        default="redis://localhost:6379/0",
+        alias="REDIS_URL",
+        description="Redis connection URL for distributed caching and state",
+    )
+    job_max_records: int = Field(
+        default=10000,
+        alias="JOB_MAX_RECORDS",
+        description="Maximum records allowed per asynchronous batch screening job",
+    )
+    job_worker_concurrency: int = Field(
+        default=4,
+        alias="JOB_WORKER_CONCURRENCY",
+        description="Concurrency level for asynchronous background worker queues",
+    )
+    cache_ttl_seconds: int = Field(
+        default=86400,
+        alias="CACHE_TTL_SECONDS",
+        description="Default TTL in seconds for semantic LLM explanation cache (24 hours)",
     )
 
     @property

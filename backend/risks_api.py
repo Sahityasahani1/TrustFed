@@ -11,7 +11,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 import joblib
 import numpy as np
@@ -30,38 +30,26 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 try:
-    from predict_paysim import assess_transaction
-except ImportError:
     from backend.predict_paysim import assess_transaction
+except ImportError:
+    from predict_paysim import assess_transaction
 
 try:
-    from onnx_engine import onnx_hub
-except ImportError:
     from backend.onnx_engine import onnx_hub
+except ImportError:
+    from onnx_engine import onnx_hub
 
 try:
-    from secagg_engine import secagg_coordinator
-except ImportError:
     from backend.secagg_engine import secagg_coordinator
+except ImportError:
+    from secagg_engine import secagg_coordinator
 
 try:
-    from config import settings
-except ImportError:
     from backend.config import settings
+except ImportError:
+    from config import settings
 
 try:
-    from auth import (
-        AuthIdentity,
-        get_current_caller,
-        require_admin,
-        require_operator,
-        require_auditor,
-        log_admin_action,
-        create_jwt_token,
-        key_registry,
-        admin_audit_log,
-    )
-except ImportError:
     from backend.auth import (
         AuthIdentity,
         get_current_caller,
@@ -73,16 +61,75 @@ except ImportError:
         key_registry,
         admin_audit_log,
     )
+except ImportError:
+    from auth import (
+        AuthIdentity,
+        get_current_caller,
+        require_admin,
+        require_operator,
+        require_auditor,
+        log_admin_action,
+        create_jwt_token,
+        key_registry,
+        admin_audit_log,
+    )
 
 try:
-    from schemas import validate_input_for_domain
-except ImportError:
     from backend.schemas import validate_input_for_domain
+except ImportError:
+    from schemas import validate_input_for_domain
 
 try:
-    from rate_limiter import rate_limiter, circuit_breaker, explanation_cache
-except ImportError:
     from backend.rate_limiter import rate_limiter, circuit_breaker, explanation_cache
+except ImportError:
+    from rate_limiter import rate_limiter, circuit_breaker, explanation_cache
+
+try:
+    from backend.semantic_cache import semantic_cache
+except ImportError:
+    from semantic_cache import semantic_cache
+
+try:
+    from backend.job_queue import job_manager, JobStatus
+except ImportError:
+    from job_queue import job_manager, JobStatus
+
+try:
+    from backend.stream_engine import clearinghouse_hub
+except ImportError:
+    from stream_engine import clearinghouse_hub
+
+try:
+    from backend.compliance_engine import (
+        generate_fcra_adverse_action_notice,
+        generate_nist_sp1270_certificate,
+        verify_compliance_signature,
+    )
+    from backend.investigator_workflow import (
+        record_investigator_override,
+        list_investigator_overrides,
+        get_compliance_audit_summary,
+    )
+except ImportError:
+    from compliance_engine import (
+        generate_fcra_adverse_action_notice,
+        generate_nist_sp1270_certificate,
+        verify_compliance_signature,
+    )
+    from investigator_workflow import (
+        record_investigator_override,
+        list_investigator_overrides,
+        get_compliance_audit_summary,
+    )
+
+try:
+    from backend.enclave_attestation import enclave_service
+    from backend.rdp_accountant import rdp_accountant, PrivacyBudgetExhaustedError
+    from backend.federated_node_client import federated_coordinator
+except ImportError:
+    from enclave_attestation import enclave_service
+    from rdp_accountant import rdp_accountant, PrivacyBudgetExhaustedError
+    from federated_node_client import federated_coordinator
 
 import logging
 import uuid
@@ -291,6 +338,8 @@ def get_insurance_bundle():
     return _INS_BUNDLE, _INS_EXPLAINER
 
 
+_SHAP_MEMO: dict = {}
+
 def _insurance_assessment(payload):
     path = MODEL_PATHS["insurance"]
     if not path.is_file():
@@ -326,10 +375,14 @@ def _insurance_assessment(payload):
     encoded = encoded.reindex(columns=bundle["feature_columns"], fill_value=0)
     encoded = encoded.replace([np.inf, -np.inf], np.nan).fillna(0)
 
-    raw = float(bundle["model"].predict_proba(encoded)[0, 1])
-    if bundle.get("calibrator") is not None:
-        clipped = float(np.clip(raw, 1e-6, 1 - 1e-6))
-        raw = float(bundle["calibrator"].predict_proba([[np.log(clipped / (1 - clipped))]])[0, 1])
+    if onnx_hub.get_holder("insurance").is_onnx_active:
+        probs, _ = onnx_hub.predict_proba_batch("insurance", encoded)
+        raw = float(probs[0])
+    else:
+        raw = float(bundle["model"].predict_proba(encoded)[0, 1])
+        if bundle.get("calibrator") is not None:
+            clipped = float(np.clip(raw, 1e-6, 1 - 1e-6))
+            raw = float(bundle["calibrator"].predict_proba([[np.log(clipped / (1 - clipped))]])[0, 1])
     threshold = float(bundle.get("decision_threshold", 0.1798))
     anomaly_score = None
     if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
@@ -337,9 +390,18 @@ def _insurance_assessment(payload):
         reference = np.asarray(bundle["anomaly_reference_scores"])
         anomaly_score = float(1.0 - np.searchsorted(reference, score, side="right") / len(reference))
 
-    shap_values = explainer(encoded)
-    values = np.asarray(shap_values.values)
-    impacts = values[0, :, -1] if values.ndim == 3 else values[0]
+    feat_key = ("ins", tuple(np.round(encoded.iloc[0].values, 4)))
+    if feat_key in _SHAP_MEMO:
+        impacts = _SHAP_MEMO[feat_key]
+    else:
+        try:
+            raw_vals = explainer.shap_values(encoded, check_additivity=False)
+        except Exception:
+            raw_vals = explainer(encoded).values
+        values = np.asarray(raw_vals)
+        impacts = values[0, :, -1] if values.ndim == 3 else values[0]
+        if len(_SHAP_MEMO) < 2048:
+            _SHAP_MEMO[feat_key] = impacts
     top_indices = np.argsort(np.abs(impacts))[::-1][:5]
     names = list(bundle["feature_columns"])
     factors = [{"feature": names[int(i)], "impact_log_odds": float(impacts[i]),
@@ -403,10 +465,14 @@ def _creditfraud_assessment(payload):
         
     encoded = row.reindex(columns=bundle["feature_columns"], fill_value=0.0).fillna(0.0)
     
-    raw = float(bundle["model"].predict_proba(encoded)[0, 1])
-    if bundle.get("calibrator") is not None:
-        clipped = float(np.clip(raw, 1e-6, 1 - 1e-6))
-        raw = float(bundle["calibrator"].predict_proba([[np.log(clipped / (1 - clipped))]])[0, 1])
+    if onnx_hub.get_holder("creditfraud").is_onnx_active:
+        probs, _ = onnx_hub.predict_proba_batch("creditfraud", encoded)
+        raw = float(probs[0])
+    else:
+        raw = float(bundle["model"].predict_proba(encoded)[0, 1])
+        if bundle.get("calibrator") is not None:
+            clipped = float(np.clip(raw, 1e-6, 1 - 1e-6))
+            raw = float(bundle["calibrator"].predict_proba([[np.log(clipped / (1 - clipped))]])[0, 1])
         
     threshold = float(bundle.get("decision_threshold", 0.15566))
     anomaly_score = None
@@ -415,9 +481,18 @@ def _creditfraud_assessment(payload):
         reference = np.asarray(bundle["anomaly_reference_scores"])
         anomaly_score = float(1.0 - np.searchsorted(reference, score, side="right") / len(reference))
         
-    shap_values = explainer(encoded)
-    values = np.asarray(shap_values.values)
-    impacts = values[0, :, -1] if values.ndim == 3 else values[0]
+    feat_key = ("cf", tuple(np.round(encoded.iloc[0].values, 4)))
+    if feat_key in _SHAP_MEMO:
+        impacts = _SHAP_MEMO[feat_key]
+    else:
+        try:
+            raw_vals = explainer.shap_values(encoded, check_additivity=False)
+        except Exception:
+            raw_vals = explainer(encoded).values
+        values = np.asarray(raw_vals)
+        impacts = values[0, :, -1] if values.ndim == 3 else values[0]
+        if len(_SHAP_MEMO) < 2048:
+            _SHAP_MEMO[feat_key] = impacts
     top_indices = np.argsort(np.abs(impacts))[::-1][:5]
     names = list(bundle["feature_columns"])
     factors = [
@@ -504,11 +579,22 @@ def _batch_assess_banks(records: list[dict[str, Any]]) -> dict[str, Any]:
         ref = np.asarray(bundle["anomaly_reference_scores"])
         anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
         
-    shap_vals = explainer(encoded)
-    vals = np.asarray(shap_vals.values)
-    if vals.ndim == 3:
-        vals = vals[:, :, -1]
-    top_indices = np.argmax(np.abs(vals), axis=1)
+    if len(encoded) <= 30:
+        try:
+            raw_vals = explainer.shap_values(encoded, check_additivity=False)
+        except Exception:
+            raw_vals = explainer(encoded).values
+        vals = np.asarray(raw_vals)
+        if vals.ndim == 3:
+            vals = vals[:, :, -1]
+        top_indices = np.argmax(np.abs(vals), axis=1)
+    else:
+        f_imp = getattr(bundle.get("model"), "feature_importances_", None)
+        if f_imp is None or len(f_imp) != len(cols):
+            f_imp = np.ones(len(cols))
+        deviations = np.abs(encoded.values) * f_imp
+        top_indices = np.argmax(deviations, axis=1)
+        vals = deviations
     
     results = []
     for i, r in enumerate(records):
@@ -613,11 +699,22 @@ def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
         ref = np.asarray(bundle["anomaly_reference_scores"])
         anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
         
-    shap_vals = explainer(encoded)
-    vals = np.asarray(shap_vals.values)
-    if vals.ndim == 3:
-        vals = vals[:, :, -1]
-    top_indices = np.argmax(np.abs(vals), axis=1)
+    if len(encoded) <= 30:
+        try:
+            raw_vals = explainer.shap_values(encoded, check_additivity=False)
+        except Exception:
+            raw_vals = explainer(encoded).values
+        vals = np.asarray(raw_vals)
+        if vals.ndim == 3:
+            vals = vals[:, :, -1]
+        top_indices = np.argmax(np.abs(vals), axis=1)
+    else:
+        f_imp = getattr(bundle.get("model"), "feature_importances_", None)
+        if f_imp is None or len(f_imp) != len(cols):
+            f_imp = np.ones(len(cols))
+        deviations = np.abs(encoded.values) * f_imp
+        top_indices = np.argmax(deviations, axis=1)
+        vals = deviations
     
     results = []
     for i, r in enumerate(records):
@@ -717,11 +814,22 @@ def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
         ref = np.asarray(bundle["anomaly_reference_scores"])
         anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
         
-    shap_vals = explainer(encoded)
-    vals = np.asarray(shap_vals.values)
-    if vals.ndim == 3:
-        vals = vals[:, :, -1]
-    top_indices = np.argmax(np.abs(vals), axis=1)
+    if len(encoded) <= 30:
+        try:
+            raw_vals = explainer.shap_values(encoded, check_additivity=False)
+        except Exception:
+            raw_vals = explainer(encoded).values
+        vals = np.asarray(raw_vals)
+        if vals.ndim == 3:
+            vals = vals[:, :, -1]
+        top_indices = np.argmax(np.abs(vals), axis=1)
+    else:
+        f_imp = getattr(bundle.get("model"), "feature_importances_", None)
+        if f_imp is None or len(f_imp) != len(cols):
+            f_imp = np.ones(len(cols))
+        deviations = np.abs(encoded.values) * f_imp
+        top_indices = np.argmax(deviations, axis=1)
+        vals = deviations
     
     results = []
     for i, r in enumerate(records):
@@ -870,8 +978,8 @@ def gemini_model_order(api_key):
 
 
 def gemini_reasoning(domain, ml_json):
-    # 1. Deduplication Cache check (Fast path & $0 external API cost)
-    cached = explanation_cache.get(domain, ml_json)
+    # 1. Distributed Semantic Cache check (Tier 1 memory / Tier 2 Redis: <1ms, $0 external API cost)
+    cached = semantic_cache.get(domain, ml_json) or explanation_cache.get(domain, ml_json)
     if cached:
         return cached
 
@@ -973,6 +1081,7 @@ def gemini_reasoning(domain, ml_json):
             }
             circuit_breaker.record_success()
             explanation_cache.set(domain, ml_json, result)
+            semantic_cache.set(domain, ml_json, result)
             return result
         except Exception as exc:
             st = getattr(getattr(exc, "response", None), "status_code", None)
@@ -1336,6 +1445,89 @@ def assess_batch(request: BatchAssessRequest, req: Request, caller: AuthIdentity
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@app.post("/api/assess/batch/async", status_code=status.HTTP_202_ACCEPTED)
+def assess_batch_async(
+    request: BatchAssessRequest,
+    req: Request,
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """Asynchronous batch screening endpoint (Phase 2): enqueues task and returns job_id."""
+    rate_limiter.check(req, tier="batch")
+    if not request.records:
+        raise HTTPException(status_code=400, detail="Batch records list cannot be empty.")
+    try:
+        job = job_manager.create_job(
+            domain=request.domain,
+            records=request.records,
+            caller_identity=caller.identity,
+        )
+        return {
+            "job_id": job.job_id,
+            "domain": job.domain,
+            "status": job.status.value,
+            "total_records": job.total_records,
+            "created_at": job.created_at,
+            "poll_url": f"/api/jobs/{job.job_id}",
+            "results_url": f"/api/jobs/{job.job_id}/results",
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.get("/api/jobs/{job_id}")
+def get_job_status(job_id: str, caller: AuthIdentity = Depends(require_operator)):
+    """Polls status and live progress percentage of an asynchronous screening job."""
+    job = job_manager.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found.")
+    return job.to_dict(include_results=False)
+
+
+@app.get("/api/jobs/{job_id}/results")
+def get_job_results(
+    job_id: str,
+    offset: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    flagged_only: bool = Query(False),
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """Retrieves paginated screening results for a completed batch job."""
+    try:
+        return job_manager.get_job_results(job_id, offset=offset, limit=limit, flagged_only=flagged_only)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found.")
+
+
+@app.get("/api/jobs")
+def list_jobs(
+    domain: Optional[str] = Query(None),
+    limit: int = Query(20, ge=1, le=100),
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """Lists recent background batch screening jobs."""
+    jobs_list = job_manager.list_jobs(domain=domain, limit=limit)
+    return {
+        "jobs": jobs_list,
+        "total": len(jobs_list),
+    }
+
+
+@app.post("/api/jobs/{job_id}/cancel")
+def cancel_job(job_id: str, caller: AuthIdentity = Depends(require_operator)):
+    """Cancels an in-flight background batch screening job."""
+    job = job_manager.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found.")
+    cancelled = job_manager.cancel_job(job_id)
+    return {
+        "job_id": job_id,
+        "status": job.status.value,
+        "cancelled": cancelled,
+    }
+
+
 @app.post("/api/assess/upload")
 async def assess_upload(
     req: Request,
@@ -1485,6 +1677,38 @@ def get_telemetry_snapshot(caller: AuthIdentity = Depends(require_auditor)):
     return telemetry_hub.get_payload()
 
 
+@app.get("/api/cache/stats")
+def get_cache_stats(caller: AuthIdentity = Depends(require_auditor)):
+    """Returns two-tier semantic cache hit/miss stats, memory capacity, and Redis state (Phase 2)."""
+    return semantic_cache.get_stats()
+
+
+@app.post("/api/cache/clear")
+def clear_cache(caller: AuthIdentity = Depends(require_admin)):
+    """Flushes both Tier 1 in-memory and Tier 2 Redis semantic explanation caches (Phase 2)."""
+    semantic_cache.clear()
+    explanation_cache.clear()
+    return {"status": "cleared", "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@app.websocket("/ws/stream/clearinghouse")
+async def clearinghouse_ws_endpoint(websocket: WebSocket):
+    """Real-time transaction clearinghouse feed (Phase 2): pushes 10-50 scored transactions/sec."""
+    await clearinghouse_hub.connect(websocket)
+    try:
+        while True:
+            data_str = await websocket.receive_text()
+            try:
+                cmd = json.loads(data_str)
+                await clearinghouse_hub.handle_client_command(websocket, cmd)
+            except json.JSONDecodeError:
+                pass
+    except WebSocketDisconnect:
+        clearinghouse_hub.disconnect(websocket)
+    except Exception:
+        clearinghouse_hub.disconnect(websocket)
+
+
 class RunSecAggRoundRequest(BaseModel):
     dropout_silo_id: Optional[Literal["bank", "wallet", "insurer"]] = None
     dp_epsilon: float = 0.045
@@ -1557,6 +1781,344 @@ async def reset_federated_state(caller: AuthIdentity = Depends(require_admin)):
     )
 
     return {"ok": True, "state": secagg_coordinator.get_state()}
+
+
+# ============================================================================
+# Phase 3: Regulatory Compliance Exporters & Enterprise RBAC Governance
+# ============================================================================
+
+class FcraNoticeRequest(BaseModel):
+    domain: str
+    record_id: str
+    user_input: Dict[str, Any]
+    ml_risk_result: Optional[Dict[str, Any]] = None
+    applicant_name: Optional[str] = None
+    institution_name: Optional[str] = "TrustFed Collaborative Defense Consortium"
+    investigator_notes: Optional[str] = None
+
+
+class NistCertificateRequest(BaseModel):
+    domain: str
+    record_id: str
+    user_input: Dict[str, Any]
+    ml_risk_result: Optional[Dict[str, Any]] = None
+
+
+class CertificateVerifyRequest(BaseModel):
+    certificate: Dict[str, Any]
+
+
+class InvestigatorOverrideRequest(BaseModel):
+    domain: str
+    record_id: str
+    original_classification: str
+    override_classification: str
+    reason_code: str
+    justification_notes: str
+    metadata: Optional[Dict[str, Any]] = None
+
+
+@app.post("/api/compliance/fcra-notice")
+async def create_fcra_notice(
+    req: FcraNoticeRequest,
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Generates a legally defensible FCRA / ECOA Regulation B Adverse Action Notice (12 CFR Part 1002)."""
+    domain = req.domain.lower()
+    result = req.ml_risk_result
+    if not result:
+        result = run_ml(domain, req.user_input)
+
+    doc = generate_fcra_adverse_action_notice(
+        domain=domain,
+        record_id=req.record_id,
+        user_input=req.user_input,
+        ml_risk_result=result,
+        applicant_name=req.applicant_name,
+        institution_name=req.institution_name,
+        investigator_notes=req.investigator_notes,
+    )
+
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+        details={
+            "notice_id": doc["notice_id"],
+            "record_id": req.record_id,
+            "domain": domain,
+        },
+        client_ip=caller.client_ip,
+    )
+    return doc
+
+
+@app.post("/api/compliance/nist-certificate")
+async def create_nist_certificate(
+    req: NistCertificateRequest,
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Produces a formal NIST SP 1270 AI Explainability & Differential Privacy Certificate."""
+    domain = req.domain.lower()
+    result = req.ml_risk_result
+    if not result:
+        result = run_ml(domain, req.user_input)
+
+    cert = generate_nist_sp1270_certificate(
+        domain=domain,
+        record_id=req.record_id,
+        user_input=req.user_input,
+        ml_risk_result=result,
+        verifier_identity=f"TrustFed Root Governance Node ({caller.identity})",
+    )
+
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="ISSUE_NIST_SP1270_CERTIFICATE",
+        details={
+            "certificate_id": cert["certificate_id"],
+            "record_id": req.record_id,
+            "domain": domain,
+        },
+        client_ip=caller.client_ip,
+    )
+    return cert
+
+
+@app.post("/api/compliance/certificate/verify")
+async def verify_certificate(req: CertificateVerifyRequest):
+    """Verifies the cryptographic HMAC seal and tamper evidence of an issued compliance certificate."""
+    cert = dict(req.certificate)
+    seal_info = cert.pop("cryptographic_seal", None)
+    if not seal_info or "signature" not in seal_info:
+        return {
+            "valid": False,
+            "detail": "Certificate is missing cryptographic_seal payload or signature.",
+            "tamper_evident_check": "FAILED",
+        }
+
+    cert_bytes = json.dumps(cert, sort_keys=True).encode("utf-8")
+    is_valid = verify_compliance_signature(cert_bytes, seal_info["signature"])
+    return {
+        "valid": is_valid,
+        "certificate_id": cert.get("certificate_id"),
+        "standard": cert.get("standard"),
+        "iso_timestamp": cert.get("iso_timestamp"),
+        "verifier": cert.get("verifier"),
+        "tamper_evident_check": "PASSED" if is_valid else "FAILED",
+    }
+
+
+@app.post("/api/governance/override")
+async def submit_investigator_override(
+    req: InvestigatorOverrideRequest,
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """Senior Investigator action: records an authorized human-in-the-loop override with audit ledger stamp."""
+    override = record_investigator_override(
+        domain=req.domain,
+        record_id=req.record_id,
+        original_classification=req.original_classification,
+        override_classification=req.override_classification,
+        reason_code=req.reason_code,
+        justification_notes=req.justification_notes,
+        investigator_name=caller.identity,
+        investigator_role=caller.role,
+        client_ip=caller.client_ip,
+        metadata=req.metadata,
+    )
+    return override
+
+
+@app.get("/api/governance/overrides")
+async def get_investigator_overrides(
+    domain: Optional[str] = None,
+    limit: int = 50,
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Lists recorded investigator overrides, optionally filtered by domain."""
+    return {
+        "overrides": list_investigator_overrides(domain=domain, limit=limit),
+        "domain": domain,
+    }
+
+
+@app.get("/api/governance/compliance-report")
+async def get_compliance_report(
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Generates an institutional compliance audit packet combining overrides, DP guarantees, and SecAgg state."""
+    summary = get_compliance_audit_summary()
+    state = secagg_coordinator.get_state()
+    return {
+        "governance_summary": summary,
+        "federated_state": state,
+        "caller": caller.to_dict(),
+    }
+
+
+# ============================================================================
+# Phase 4: Production Distributed Federated Framework & Hardware Enclaves (TEE)
+# ============================================================================
+
+class EnclaveVerifyRequest(BaseModel):
+    attestation_wrapper: Dict[str, Any]
+    expected_nonce: Optional[str] = None
+
+
+class NodeRegisterRequest(BaseModel):
+    node_id: str
+    institution_name: Optional[str] = None
+    domain: Optional[str] = "banks"
+    endpoint_url: Optional[str] = None
+    local_samples: Optional[int] = 10000
+    region: Optional[str] = "us-east-1"
+    tls_fingerprint: Optional[str] = None
+
+
+class ExecuteRoundRequest(BaseModel):
+    round_id: Optional[int] = None
+    noise_multiplier: Optional[float] = 1.8
+    dimension: Optional[int] = 8
+    l2_clip_norm: Optional[float] = 1.0
+
+
+@app.get("/api/federated/enclave/attestation")
+async def get_enclave_attestation(
+    nonce: Optional[str] = None,
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Issues a cryptographically signed AWS Nitro Enclave remote attestation document with PCRs."""
+    doc = enclave_service.generate_attestation_document(nonce=nonce)
+    return doc
+
+
+@app.post("/api/federated/enclave/verify")
+async def verify_enclave_attestation(
+    req: EnclaveVerifyRequest,
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Verifies an Enclave remote attestation document against golden PCRs, signature, and nonce."""
+    result = enclave_service.verify_attestation(req.attestation_wrapper, expected_nonce=req.expected_nonce)
+    return result
+
+
+@app.get("/api/federated/privacy/accountant")
+async def get_privacy_accountant_status(
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Returns continuous Rényi Differential Privacy moments accountant state and remaining epsilon budget."""
+    return rdp_accountant.get_status()
+
+
+@app.post("/api/federated/privacy/accountant/reset")
+async def reset_privacy_accountant(
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Resets the continuous RDP privacy accountant ledger (operator/admin only)."""
+    rdp_accountant.reset_accountant()
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="RESET_RDP_ACCOUNTANT",
+        details={"status": "RESET_SUCCESS"},
+        client_ip=caller.client_ip,
+    )
+    return {"ok": True, "accountant": rdp_accountant.get_status()}
+
+
+@app.get("/api/federated/nodes")
+async def list_federated_nodes(
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Lists registered distributed institutional worker nodes with heartbeat and health telemetry."""
+    return {"nodes": federated_coordinator.list_nodes()}
+
+
+@app.post("/api/federated/nodes/register")
+async def register_federated_node(
+    req: NodeRegisterRequest,
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """Registers an institutional federated worker node behind a corporate firewall."""
+    res = federated_coordinator.register_node(req.dict())
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="REGISTER_FEDERATED_NODE",
+        details={"node_id": req.node_id, "domain": req.domain},
+        client_ip=caller.client_ip,
+    )
+    return {"ok": True, "node": res}
+
+
+@app.post("/api/federated/round/execute")
+async def execute_federated_round(
+    req: ExecuteRoundRequest,
+    caller: AuthIdentity = Depends(require_operator),
+):
+    """
+    Executes a distributed federated training round inside AWS Nitro TEE:
+    1. Collects masked gradient updates from nodes (y_i = Delta w_i + m_i).
+    2. SecAgg eliminates masks (sum m_i = 0) without coordinator learning individual weights.
+    3. Continuous Rényi DP moments accountant records privacy loss.
+    4. Cryptographically signed Enclave Attestation is issued.
+    """
+    try:
+        round_result = federated_coordinator.execute_secure_enclave_round(
+            round_id=req.round_id,
+            dimension=req.dimension or 8,
+            noise_multiplier=req.noise_multiplier or 1.8,
+            l2_clip_norm=req.l2_clip_norm or 1.0,
+        )
+
+        log_admin_action(
+            actor=caller.identity,
+            role=caller.role,
+            action="EXECUTE_TEE_FEDERATED_ROUND",
+            details={
+                "round_id": round_result["round_id"],
+                "epsilon": round_result["differential_privacy"]["round_epsilon"],
+                "active_nodes": round_result["consensus_metrics"]["participating_nodes"],
+            },
+            client_ip=caller.client_ip,
+        )
+        return round_result
+    except Exception as exc:
+        if "Privacy budget" in str(exc) or "PrivacyBudgetExhaustedError" in type(exc).__name__:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Differential Privacy Circuit Breaker: {str(exc)}",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Federated Round Execution Error: {str(exc)}",
+        )
+
+
+@app.get("/api/federated/audit-packet")
+async def get_federated_audit_packet(
+    caller: AuthIdentity = Depends(require_auditor),
+):
+    """Returns an exhaustive cryptographic audit packet combining TEE Attestation, RDP Ledger, and Node Topologies."""
+    attestation = enclave_service.generate_attestation_document()
+    accountant = rdp_accountant.get_status()
+    nodes = federated_coordinator.list_nodes()
+    return {
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "enclave_attestation": attestation,
+        "privacy_accountant": accountant,
+        "institutional_nodes": nodes,
+        "compliance_guarantees": {
+            "tee_isolation": "AWS Nitro Enclaves (Hardware AES-256)",
+            "differential_privacy": f"Rényi DP (delta={accountant['target_delta']}, max_epsilon={accountant['max_epsilon_budget']})",
+            "zero_raw_data_transmission": True,
+            "secagg_protocol": "Diffie-Hellman Zero-Sum Additive Masking (Shamir Secret Sharing ready)",
+        },
+    }
+
+
 
 
 

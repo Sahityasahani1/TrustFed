@@ -2,7 +2,10 @@
 // The API key must never be placed in this file or sent from the browser.
 // FLOW: UI -> risk_api_client.js -> risk_api.py (POST /api/assess) -> saved model -> Gemini -> risk_api_client.js -> UI
 
+const ENV_BASE = typeof import.meta !== "undefined" && import.meta.env?.VITE_API_BASE_URL;
+
 const CANDIDATE_BASES = [
+  ...(ENV_BASE ? [ENV_BASE.replace(/\/+$/, '')] : []),
   "http://localhost:8000",
   "http://127.0.0.1:8000",
   "http://localhost:8001",
@@ -397,6 +400,384 @@ export async function fetchAdminAuditLog(limit = 50) {
   }
   return data;
 }
+
+// ============================================================================
+// Phase 2: Asynchronous Batch Job & Distributed Semantic Cache APIs
+// ============================================================================
+
+export async function assessBatchRiskAsync(domain, records) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/assess/batch/async`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({ domain, records }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || `Async batch assessment failed with HTTP ${response.status}`);
+  }
+  return data;
+}
+
+export async function getJobStatus(jobId) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/jobs/${jobId}`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || `Failed to fetch status for job ${jobId}`);
+  }
+  return data;
+}
+
+export async function getJobResults(jobId, offset = 0, limit = 100, flaggedOnly = false) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const params = new URLSearchParams({
+    offset: String(offset),
+    limit: String(limit),
+    flagged_only: String(flaggedOnly),
+  });
+  const response = await fetch(`${base}/api/jobs/${jobId}/results?${params}`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || `Failed to fetch results for job ${jobId}`);
+  }
+  return data;
+}
+
+export async function listBatchJobs(domain = null, limit = 20) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const url = domain
+    ? `${base}/api/jobs?domain=${encodeURIComponent(domain)}&limit=${limit}`
+    : `${base}/api/jobs?limit=${limit}`;
+  const response = await fetch(url, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to list batch jobs");
+  }
+  return data;
+}
+
+export async function cancelBatchJob(jobId) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/jobs/${jobId}/cancel`, {
+    method: "POST",
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || `Failed to cancel job ${jobId}`);
+  }
+  return data;
+}
+
+export async function getCacheStats() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/cache/stats`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch cache stats");
+  }
+  return data;
+}
+
+export async function clearExplanationCache() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/cache/clear`, {
+    method: "POST",
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to clear explanation cache");
+  }
+  return data;
+}
+
+export function connectClearinghouseStream(onTick, onStatus, onError) {
+  let ws = null;
+  let isClosed = false;
+
+  getWorkingBase().then((base) => {
+    if (isClosed) return;
+    const wsUrl = base.replace(/^http/, "ws") + "/ws/stream/clearinghouse";
+    ws = new WebSocket(wsUrl);
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type === "transaction_tick" && onTick) {
+          onTick(msg);
+        } else if (onStatus) {
+          onStatus(msg);
+        }
+      } catch (err) {
+        if (onError) onError(err);
+      }
+    };
+
+    ws.onerror = (err) => {
+      if (onError) onError(err);
+    };
+  });
+
+  return {
+    disconnect: () => {
+      isClosed = true;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    },
+    setTps: (tps) => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "set_tps", tps }));
+      }
+    },
+    pause: () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "pause" }));
+      }
+    },
+    resume: () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "resume" }));
+      }
+    },
+    injectAnomaly: (domain) => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "inject_anomaly", domain }));
+      }
+    },
+  };
+}
+
+// ============================================================================
+// Phase 3: Regulatory Compliance Exporters & Enterprise RBAC APIs
+// ============================================================================
+
+export async function generateFcraNotice(domain, recordId, userInput, options = {}) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/compliance/fcra-notice`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({
+      domain,
+      record_id: recordId,
+      user_input: userInput,
+      ml_risk_result: options.mlRiskResult || null,
+      applicant_name: options.applicantName || null,
+      institution_name: options.institutionName || "TrustFed Collaborative Defense Consortium",
+      investigator_notes: options.investigatorNotes || null,
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to generate FCRA Adverse Action Notice");
+  }
+  return data;
+}
+
+export async function generateNistCertificate(domain, recordId, userInput, mlRiskResult = null) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/compliance/nist-certificate`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({
+      domain,
+      record_id: recordId,
+      user_input: userInput,
+      ml_risk_result: mlRiskResult,
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to issue NIST SP 1270 Certificate");
+  }
+  return data;
+}
+
+export async function verifyCertificateSignature(certificate) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/compliance/certificate/verify`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({ certificate }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Certificate verification request failed");
+  }
+  return data;
+}
+
+export async function submitInvestigatorOverride(domain, recordId, originalClassification, overrideClassification, reasonCode, justificationNotes, metadata = {}) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/governance/override`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({
+      domain,
+      record_id: recordId,
+      original_classification: originalClassification,
+      override_classification: overrideClassification,
+      reason_code: reasonCode,
+      justification_notes: justificationNotes,
+      metadata,
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to submit investigator override");
+  }
+  return data;
+}
+
+export async function listInvestigatorOverrides(domain = null, limit = 50) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const url = domain
+    ? `${base}/api/governance/overrides?domain=${encodeURIComponent(domain)}&limit=${limit}`
+    : `${base}/api/governance/overrides?limit=${limit}`;
+  const response = await fetch(url, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch investigator overrides");
+  }
+  return data;
+}
+
+export async function getComplianceReport() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/governance/compliance-report`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch governance compliance report");
+  }
+  return data;
+}
+
+// ============================================================================
+// Phase 4: Production Distributed Federated Framework & Hardware Enclaves (TEE)
+// ============================================================================
+
+export async function getEnclaveAttestation(nonce = null) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const url = nonce
+    ? `${base}/api/federated/enclave/attestation?nonce=${encodeURIComponent(nonce)}`
+    : `${base}/api/federated/enclave/attestation`;
+  const response = await fetch(url, { headers: getAuthHeaders(null) });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch hardware enclave attestation");
+  }
+  return data;
+}
+
+export async function verifyEnclaveAttestation(attestationWrapper, expectedNonce = null) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/enclave/verify`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({
+      attestation_wrapper: attestationWrapper,
+      expected_nonce: expectedNonce,
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Enclave attestation verification failed");
+  }
+  return data;
+}
+
+export async function getPrivacyAccountantStatus() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/privacy/accountant`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch privacy accountant status");
+  }
+  return data;
+}
+
+export async function resetPrivacyAccountant() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/privacy/accountant/reset`, {
+    method: "POST",
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to reset privacy accountant");
+  }
+  return data;
+}
+
+export async function listFederatedNodes() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/nodes`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to list federated nodes");
+  }
+  return data;
+}
+
+export async function registerFederatedNode(nodeData) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/nodes/register`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify(nodeData),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to register federated node");
+  }
+  return data;
+}
+
+export async function executeFederatedRound(params = {}) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/round/execute`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify(params),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to execute federated round in TEE");
+  }
+  return data;
+}
+
+export async function getFederatedAuditPacket() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/federated/audit-packet`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch federated audit packet");
+  }
+  return data;
+}
+
+
 
 
 

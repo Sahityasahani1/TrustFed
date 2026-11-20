@@ -15,8 +15,12 @@ if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
 from fastapi.testclient import TestClient
-from risks_api import app
-from rate_limiter import rate_limiter, circuit_breaker, explanation_cache
+try:
+    from backend.risks_api import app
+    from backend.rate_limiter import rate_limiter, circuit_breaker, explanation_cache
+except ImportError:
+    from risks_api import app
+    from rate_limiter import rate_limiter, circuit_breaker, explanation_cache
 
 client = TestClient(app)
 
