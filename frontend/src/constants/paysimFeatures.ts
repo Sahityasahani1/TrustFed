@@ -12,7 +12,7 @@ export const PAYSIM_FEATURE_DICTIONARY: PaySimFeatureDef[] = [
     input: 'step',
     label: 'Transaction Time-Step',
     description: "The point in the transaction timeline when this transaction occurred. It helps the model understand the transaction's position in the activity sequence.",
-    meaning: "PaySim's transaction time-step number",
+    meaning: "Transaction timeline hour index",
     uiControl: 'Positive whole number (1..744 hours)',
     icon: '⏱️',
   },

@@ -26,6 +26,16 @@ import numpy as np
 import pandas as pd
 import shap
 
+try:
+    from backend.onnx_engine import onnx_hub
+except ImportError:
+    try:
+        from onnx_engine import onnx_hub
+    except ImportError:
+        onnx_hub = None
+
+_PAYSIM_SHAP_CACHE: dict = {}
+
 
 ROOT = Path(__file__).parent
 ARTIFACT = (ROOT / "artifacts" / "paysim" / "model.joblib") if (ROOT / "artifacts" / "paysim" / "model.joblib").exists() else (ROOT.parent / "artifacts" / "paysim" / "model.joblib")
@@ -125,34 +135,59 @@ def make_features(transaction, feature_columns):
     return pd.DataFrame([[row.get(col, 0.0) for col in feature_columns]], columns=feature_columns)
 
 
+_PAYSIM_CACHE = {}
+
+
+def get_cached_bundle(artifact_path=ARTIFACT):
+    path_key = str(Path(artifact_path).resolve())
+    if path_key not in _PAYSIM_CACHE:
+        if not Path(artifact_path).is_file():
+            raise FileNotFoundError(f"Trained PaySim model not found: {artifact_path}")
+        bundle = joblib.load(artifact_path)
+        explainer = shap.TreeExplainer(bundle["model"])
+        _PAYSIM_CACHE[path_key] = (bundle, explainer)
+    return _PAYSIM_CACHE[path_key]
+
+
 def assess_transaction(payload, artifact_path=ARTIFACT):
     """Return a JSON-serializable risk assessment for one website form payload."""
-    if not Path(artifact_path).is_file():
-        raise FileNotFoundError(f"Trained PaySim model not found: {artifact_path}")
-    bundle = joblib.load(artifact_path)
+    bundle, explainer = get_cached_bundle(artifact_path)
     model = bundle["model"]
     transaction = validate_payload(payload, bundle["feature_columns"])
     features = make_features(transaction, bundle["feature_columns"])
 
-    raw_probability = float(model.predict_proba(features)[0, 1])
-    if bundle.get("calibrator") is not None:
-        clipped = float(np.clip(raw_probability, 1e-6, 1 - 1e-6))
-        logit = np.array([[np.log(clipped / (1 - clipped))]])
-        probability = float(bundle["calibrator"].predict_proba(logit)[0, 1])
+    if onnx_hub is not None and onnx_hub.get_holder("banks").is_onnx_active:
+        probs, _ = onnx_hub.predict_proba_batch("banks", features)
+        probability = float(probs[0])
     else:
-        probability = raw_probability
+        raw_probability = float(model.predict_proba(features)[0, 1])
+        if bundle.get("calibrator") is not None:
+            clipped = float(np.clip(raw_probability, 1e-6, 1 - 1e-6))
+            logit = np.array([[np.log(clipped / (1 - clipped))]])
+            probability = float(bundle["calibrator"].predict_proba(logit)[0, 1])
+        else:
+            probability = raw_probability
     threshold = float(bundle["decision_threshold"])
 
     anomaly_raw = float(bundle["anomaly_model"].decision_function(features)[0])
     reference = np.asarray(bundle["anomaly_reference_scores"])
     anomaly_score = float(1.0 - np.searchsorted(reference, anomaly_raw, side="right") / len(reference))
 
-    shap_result = shap.TreeExplainer(model)(features)
-    impacts = np.asarray(shap_result.values)
-    if impacts.ndim == 3:
-        impacts = impacts[0, :, -1]
+    feat_tuple = tuple(np.round(features.iloc[0].values, 4))
+    if feat_tuple in _PAYSIM_SHAP_CACHE:
+        impacts = _PAYSIM_SHAP_CACHE[feat_tuple]
     else:
-        impacts = impacts[0]
+        try:
+            raw_shap = explainer.shap_values(features, check_additivity=False)
+        except Exception:
+            raw_shap = explainer(features).values
+        impacts = np.asarray(raw_shap)
+        if impacts.ndim == 3:
+            impacts = impacts[0, :, -1]
+        else:
+            impacts = impacts[0]
+        if len(_PAYSIM_SHAP_CACHE) < 2048:
+            _PAYSIM_SHAP_CACHE[feat_tuple] = impacts
     names = list(bundle["feature_columns"])
     top_indices = np.argsort(np.abs(impacts))[::-1][:5]
     reasons = [{

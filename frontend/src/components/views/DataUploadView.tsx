@@ -376,10 +376,10 @@ export const DataUploadView: React.FC<DataUploadViewProps> = ({
             <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
               <h3 className="text-sm font-bold text-slate-200 mb-1 flex items-center gap-2">
                 <FileSpreadsheet className="w-4 h-4 text-cyan-400" />
-                Shared Feature Schema Alignment (PRD §9)
+                Shared Feature Schema &amp; Data Alignment
               </h3>
               <p className="text-xs text-slate-400 mb-4">
-                Each institution preprocesses its raw transaction features locally before mapping into the standard PyTorch vector:
+                Each institution safeguards its raw transaction features locally before evaluating against collaborative defense models:
               </p>
 
               <div className="overflow-x-auto">

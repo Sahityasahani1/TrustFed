@@ -30,6 +30,7 @@ import { BatchScreeningWorkbench } from './BatchScreeningWorkbench';
 import { assessRisk, checkBackendHealth } from '../../risk_api_client';
 import { GeminiForensicCard } from '../forensics/GeminiForensicCard';
 import { ModelShowdownCard } from '../showdown/ModelShowdownCard';
+import { useToast } from '../common/ToastNotification';
 
 export interface CreditFraudRiskResult {
   domain: string;
@@ -73,6 +74,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
   activeSubTab = 'showdown',
   onSubTabChange,
 }) => {
+  const { toast } = useToast();
   const [internalSubTab, setInternalSubTab] = useState<string>(activeSubTab);
 
   // Live application inputs
@@ -227,7 +229,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
       certificateId: 'NIST-SP1270-CF-307K',
       framework: 'NIST SP 1270 Explainable AI & Fair Lending',
       evaluatedApplicant: evaluatedAppData,
-      modelArchitecture: 'Federated XGBoost 500-Tree GBDT (artifacts/creditfraud)',
+      modelArchitecture: 'Federated Credit Risk Defense Engine',
       samplePopulation: '307,511 Home Credit loan files',
       differentialPrivacy: { epsilon: 2.45, delta: 1e-5 },
       timestamp: new Date().toISOString(),
@@ -309,19 +311,19 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
             <CreditCard className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
             <span>Credit Fraud &amp; Loan Default Risk Studio</span>
             <span className="text-[10px] font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-2 py-0.5 rounded border border-zinc-200 dark:border-zinc-700/60">
-              XGBoost 500-Tree
+              Enterprise Risk Engine
             </span>
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-sans">
-            307,511 Home Credit loan records • Platt-calibrated decision cutoff 0.1557 • Zero PII transmission.
+            300k+ Loan Application Portfolio • Decision Cutoff 15.6% • Zero Customer Data Sharing.
           </p>
         </div>
 
         <TabsNav
           tabs={[
-            { id: 'showdown', label: '1. Applicant Inputs & Showdown', icon: <CreditCard className="w-3.5 h-3.5" />, badge: 'Live Inference' },
-            { id: 'batch', label: '2. Batch Screening & Triage', icon: <Upload className="w-3.5 h-3.5" />, badge: 'Vectorized' },
-            { id: 'metrics', label: '3. Federated Benchmark Metrics', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
+            { id: 'batch', label: '⚡ Batch Triage Queue', icon: <Upload className="w-3.5 h-3.5" />, badge: '40' },
+            { id: 'showdown', label: '🎯 Single Evaluation', icon: <CreditCard className="w-3.5 h-3.5" />, badge: 'Active' },
+            { id: 'metrics', label: '📖 Performance & Audit Profile', icon: <FileSpreadsheet className="w-3.5 h-3.5" /> },
           ]}
           activeTab={internalSubTab}
           onChange={handleSubTabSwitch}
@@ -502,7 +504,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                     {isCalculating ? (
                       <>
                         <div className="w-4 h-4 border-2 border-zinc-400 border-t-zinc-900 dark:border-t-white rounded-full animate-spin shrink-0" />
-                        <span className="font-mono">Evaluating XGBoost Model...</span>
+                        <span className="font-mono">Evaluating Loan Application...</span>
                       </>
                     ) : isDirty ? (
                       <>
@@ -529,7 +531,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                       <span>Consortium Masking: Zero Plain-Text Data Leaked</span>
                     </div>
                     <span className="text-[10px] text-zinc-500">
-                      DP ε=2.45
+                      Privacy Certified
                     </span>
                   </div>
                 </div>
@@ -622,7 +624,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                         >
                           <GeminiForensicCard
                             domainTitle="Digital Lenders (Home Credit Default Risk)"
-                            modelName={backendResult?.ml_risk_json?.model?.name || 'artifacts/creditfraud/model.joblib (XGBoost 500-Tree)'}
+                            modelName="Lending Fraud Risk Engine"
                             riskScore={effectiveGlobalScore}
                             fraudProbability={backendResult?.ml_risk_json?.risk?.fraud_probability ?? (effectiveGlobalScore / 100)}
                             decisionThreshold={backendResult?.ml_risk_json?.risk?.decision_threshold ?? 0.1557}
@@ -653,10 +655,10 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                             <div>
                               <span className="text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 uppercase flex items-center gap-1.5">
                                 <Activity className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-400" />
-                                XGBoost SHAP Feature Attribution (artifacts/creditfraud)
+                                Primary Underwriting Risk Drivers
                               </span>
                               <p className="text-[11px] text-zinc-500 mt-0.5">
-                                Mathematical log-odds feature contributions for evaluated applicant
+                                Relative impact of applicant credit metrics on loan default probability
                               </p>
                             </div>
                             <span className="font-mono text-xs font-medium px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200">
@@ -682,7 +684,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                                         ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' 
                                         : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                                     }`}>
-                                      {isPositive ? `+${factor.impact_log_odds.toFixed(3)}` : factor.impact_log_odds.toFixed(3)} log-odds
+                                      Impact: {Math.abs(factor.impact_log_odds).toFixed(2)}
                                     </span>
                                   </div>
                                   <div className="w-full bg-zinc-200 dark:bg-zinc-700 h-1.5 rounded-full overflow-hidden flex">
@@ -731,7 +733,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                             </div>
                             <div className="p-2 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
                               <span className="text-zinc-500 block text-[10px]">Model Type:</span>
-                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">XGBoost 500 Trees</span>
+                              <span className="font-semibold text-emerald-600 dark:text-emerald-400">Enterprise Defense Engine</span>
                             </div>
                           </div>
                         </motion.div>
@@ -796,7 +798,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
 
                 <div className="p-4 rounded-xl bg-white dark:bg-zinc-900/90 border border-zinc-200/80 dark:border-white/10 shadow-xs space-y-2">
                   <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
-                    Underwriting Signals from artifacts/creditfraud:
+                    Key Underwriting Signals:
                   </span>
                   <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                     <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5">
@@ -828,6 +830,24 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
               domainTitle="Digital Lenders (Home Credit Default Risk)"
               accentColor="blue"
               templateFilename="template_lenders.csv"
+              onSelectRecordForSandbox={(record) => {
+                const contract = String(record.contract_type ?? record.NAME_CONTRACT_TYPE ?? '').toLowerCase().includes('revolving')
+                  ? ('Revolving loans' as const)
+                  : ('Cash loans' as const);
+                const updated = {
+                  amt_income_total: Number(record.amt_income_total ?? record.AMT_INCOME_TOTAL ?? 270000),
+                  amt_credit: Number(record.amt_credit ?? record.AMT_CREDIT ?? 1031053),
+                  amt_annuity: Number(record.amt_annuity ?? record.AMT_ANNUITY ?? 34204),
+                  amt_goods_price: Number(record.amt_goods_price ?? record.AMT_GOODS_PRICE ?? 900000),
+                  ext_source_2: Number(record.ext_source_2 ?? record.EXT_SOURCE_2 ?? 0.55),
+                  ext_source_3: Number(record.ext_source_3 ?? record.EXT_SOURCE_3 ?? 0.45),
+                  contract_type: contract,
+                };
+                setAppData(updated);
+                setEvaluatedAppData(updated);
+                handleSubTabSwitch('showdown');
+                toast({ title: 'Loaded into Sandbox', description: `Applicant ${record.applicant_id || record.record_id || ''} loaded for live showdown`, type: 'info' });
+              }}
             />
           </motion.div>
         )}
@@ -845,14 +865,14 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
               <div>
                 <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                   <FileSpreadsheet className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
-                  <span>Credit Fraud Risk Model Specification (artifacts/creditfraud)</span>
+                  <span>Credit Risk Performance &amp; Evaluation Profile</span>
                 </h3>
                 <p className="text-xs text-zinc-500 mt-1">
-                  Evaluated on 307,511 Home Credit loan files • 80/20 Stratified train/test split with disjoint calibration
+                  Verified across 307,511 loan applications • Calibrated against historical portfolio outcomes
                 </p>
               </div>
               <span className="px-2.5 py-0.5 rounded text-xs font-mono font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/60 shrink-0">
-                XGBoost 500-Tree GBDT
+                Collaborative Risk Engine
               </span>
             </div>
 
@@ -916,23 +936,23 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
 
               <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-200/60 dark:border-white/5 space-y-3">
                 <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
-                  Production Hyperparameters (Best Candidate #12 of 14)
+                  Model Operational Profile
                 </span>
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                   <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
-                    <span className="text-zinc-500 block text-[10px]">N_ESTIMATORS:</span>
-                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">500 trees</span>
+                    <span className="text-zinc-500 block text-[10px]">ENSEMBLE SIZE:</span>
+                    <span className="font-semibold text-zinc-900 dark:text-zinc-100">500 Estimators</span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
-                    <span className="text-zinc-500 block text-[10px]">MAX_DEPTH:</span>
+                    <span className="text-zinc-500 block text-[10px]">FEATURE DEPTH:</span>
                     <span className="font-semibold text-zinc-900 dark:text-zinc-100">6 levels</span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
-                    <span className="text-zinc-500 block text-[10px]">LEARNING_RATE:</span>
+                    <span className="text-zinc-500 block text-[10px]">LEARNING RATE:</span>
                     <span className="font-semibold text-zinc-900 dark:text-zinc-100">0.03</span>
                   </div>
                   <div className="p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-white/5">
-                    <span className="text-zinc-500 block text-[10px]">MIN_CHILD_WEIGHT:</span>
+                    <span className="text-zinc-500 block text-[10px]">MIN SAMPLE WEIGHT:</span>
                     <span className="font-semibold text-zinc-900 dark:text-zinc-100">12</span>
                   </div>
                 </div>
@@ -942,7 +962,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
             {/* Top SHAP Feature Importance Table */}
             <div className="space-y-3">
               <span className="text-xs font-mono uppercase text-zinc-700 dark:text-zinc-300 font-semibold block">
-                Top SHAP Global Feature Importance (artifacts/creditfraud/shap_importance.csv)
+                Key Portfolio Risk Indicators &amp; Decision Drivers
               </span>
               <div className="border border-zinc-200/80 dark:border-white/10 rounded-xl overflow-hidden bg-white dark:bg-zinc-900 shadow-xs">
                 <table className="w-full text-xs text-left">
@@ -950,7 +970,7 @@ export const CreditFraudView: React.FC<CreditFraudViewProps> = ({
                     <tr>
                       <th className="p-3">Rank</th>
                       <th className="p-3">Feature Name</th>
-                      <th className="p-3">Mean |SHAP| Value</th>
+                      <th className="p-3">Relative Impact Score</th>
                       <th className="p-3">Importance Bar</th>
                     </tr>
                   </thead>
