@@ -1,0 +1,43 @@
+{
+  "STREAMING_ENABLED": {
+    "enabled": true,
+    "description": "Enables high-frequency WebSocket clearinghouse streaming (10-50 TPS)",
+    "category": "infrastructure"
+  },
+  "HARDWARE_ENCLAVES_ENABLED": {
+    "enabled": true,
+    "description": "Enables AWS Nitro / Intel SGX remote attestation and TEE aggregation",
+    "category": "security"
+  },
+  "GEMINI_REASONING_ENABLED": {
+    "enabled": true,
+    "description": "Enables Google Gemini 2.5 Flash generative regulatory explanations",
+    "category": "ai"
+  },
+  "RATE_LIMITING_STRICT": {
+    "enabled": true,
+    "description": "Enforces sliding-window rate limits across all API tiers",
+    "category": "security"
+  },
+  "SEMANTIC_CACHE_ENABLED": {
+    "enabled": true,
+    "description": "Enables two-tier hybrid LRU + Redis semantic explanation caching",
+    "category": "performance"
+  },
+  "STRUCTURED_JSON_LOGGING": {
+    "enabled": true,
+    "description": "Emits structured JSON application logs with PII redaction",
+    "category": "observability"
+  },
+  "EXPAND_CONTRACT_SCHEMA_V2": {
+    "enabled": true,
+    "description": "Enables backward-compatible schema expand-and-contract migrations",
+    "category": "database"
+  },
+  "TEST_FLAG_CUSTOM": {
+    "enabled": true,
+    "description": "Custom flag: TEST_FLAG_CUSTOM",
+    "category": "custom",
+    "last_modified_by": "Dev Admin Key"
+  }
+}

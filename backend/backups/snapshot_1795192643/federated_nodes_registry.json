@@ -1,0 +1,50 @@
+{
+  "total_nodes": 4,
+  "updated_at": "2026-11-20T16:37:23Z",
+  "nodes": {
+    "node-bank-alpha": {
+      "node_id": "node-bank-alpha",
+      "institution_name": "JPMorgan Chase & Co. (Node US-East-1)",
+      "domain": "banks",
+      "endpoint_url": "https://node-alpha.banks.trustfed.internal:8443",
+      "local_samples": 125000,
+      "region": "us-east-1",
+      "status": "ONLINE",
+      "tls_fingerprint": "SHA256:7b:23:44:af:12:89:cc:99:01:45:ef:33:da:bc:90:11",
+      "last_heartbeat": "2026-11-20T16:37:23Z"
+    },
+    "node-lender-beta": {
+      "node_id": "node-lender-beta",
+      "institution_name": "SoFi Technologies (Node US-West-2)",
+      "domain": "lenders",
+      "endpoint_url": "https://node-beta.lenders.trustfed.internal:8443",
+      "local_samples": 48500,
+      "region": "us-west-2",
+      "status": "ONLINE",
+      "tls_fingerprint": "SHA256:9c:11:02:bb:88:41:dd:77:23:66:fa:44:eb:cd:12:34",
+      "last_heartbeat": "2026-11-20T16:37:23Z"
+    },
+    "node-insurer-gamma": {
+      "node_id": "node-insurer-gamma",
+      "institution_name": "State Farm Mutual (Node EU-Central-1)",
+      "domain": "insurers",
+      "endpoint_url": "https://node-gamma.insurers.trustfed.internal:8443",
+      "local_samples": 36200,
+      "region": "eu-central-1",
+      "status": "ONLINE",
+      "tls_fingerprint": "SHA256:4a:55:67:89:01:23:de:ef:ab:cd:45:67:89:01:23:45",
+      "last_heartbeat": "2026-11-20T16:37:23Z"
+    },
+    "node-fintech-delta": {
+      "node_id": "node-fintech-delta",
+      "institution_name": "Revolut Global Payments (Node EU-West-1)",
+      "domain": "banks",
+      "endpoint_url": "https://node-delta.banks.trustfed.internal:8443",
+      "local_samples": 85000,
+      "region": "eu-west-1",
+      "status": "ONLINE",
+      "tls_fingerprint": "SHA256:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00",
+      "last_heartbeat": "2026-11-20T16:37:23Z"
+    }
+  }
+}

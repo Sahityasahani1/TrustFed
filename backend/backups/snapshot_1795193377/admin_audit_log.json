@@ -1,0 +1,2127 @@
+[
+  {
+    "timestamp": 1791660619.7878861,
+    "utc_time": "2026-10-10T19:30:19.787888+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791660667.6130533,
+    "utc_time": "2026-10-10T19:31:07.613055+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661022.3697965,
+    "utc_time": "2026-10-10T19:37:02.369800+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661160.7643065,
+    "utc_time": "2026-10-10T19:39:20.764308+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661169.626838,
+    "utc_time": "2026-10-10T19:39:29.626840+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791661396.325362,
+    "utc_time": "2026-10-10T19:43:16.325364+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661396.9573548,
+    "utc_time": "2026-10-10T19:43:16.957357+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791661415.7904837,
+    "utc_time": "2026-10-10T19:43:35.790488+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661416.402695,
+    "utc_time": "2026-10-10T19:43:36.402697+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1791661500.759709,
+    "utc_time": "2026-10-10T19:45:00.759712+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 7,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:abda1508c1fa8a92b976e5d4a45471a2fc91e7c0b986284682ba2ef476b72df6"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661544.0547247,
+    "utc_time": "2026-10-10T19:45:44.054729+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 8,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:53ea5c3b1d1fd138c4b1888aeaa5b36d9a4527e882ca2f9095472a0dee7c6a24"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661569.7544675,
+    "utc_time": "2026-10-10T19:46:09.754471+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 9,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:12c308523873e22bd51644e06aa22e6520f177595f7751c26a274c4ba22a4dda"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661589.8456259,
+    "utc_time": "2026-10-10T19:46:29.845631+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661590.8690917,
+    "utc_time": "2026-10-10T19:46:30.869095+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:84ed2d7d14c5778f03a022e9a94a26961d7da7e936b12d38959e021f05825f10"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1791661591.0805209,
+    "utc_time": "2026-10-10T19:46:31.080524+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795111883.634737,
+    "utc_time": "2026-11-19T18:11:23.634739+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795111884.9160457,
+    "utc_time": "2026-11-19T18:11:24.916053+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:7060acbcf6ce354273ff89c63c7c2f7c42457478619f1bbdff30bddf0048f065"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795111885.3963072,
+    "utc_time": "2026-11-19T18:11:25.396308+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795112318.0406432,
+    "utc_time": "2026-11-19T18:18:38.040645+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112318.8922102,
+    "utc_time": "2026-11-19T18:18:38.892213+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:b1a9addef8e237f6ba0ee333ccf8a22d98cc866d53fce62130c839e7b9250d1c"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112319.0429025,
+    "utc_time": "2026-11-19T18:18:39.042905+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795112514.4647605,
+    "utc_time": "2026-11-19T18:21:54.464762+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112515.26033,
+    "utc_time": "2026-11-19T18:21:55.260333+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:40300214d5e9d62e27d2f5a88a72afc644bafd9ed8472311214a250c4f0f49ae"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112515.4447372,
+    "utc_time": "2026-11-19T18:21:55.444739+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795112734.0953205,
+    "utc_time": "2026-11-19T18:25:34.095323+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112734.877282,
+    "utc_time": "2026-11-19T18:25:34.877285+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:79cecfe8d39a50669365af61aa0423b02de392e73a0e0855b96b978892b6cd30"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112735.0229933,
+    "utc_time": "2026-11-19T18:25:35.022995+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795112966.0646133,
+    "utc_time": "2026-11-19T18:29:26.064616+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112966.866189,
+    "utc_time": "2026-11-19T18:29:26.866192+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:c3e4c11b5badf3952b3ce868375026219591ee080bc1e28a88f68e1942ac7d6b"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795112967.1016197,
+    "utc_time": "2026-11-19T18:29:27.101621+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795113440.2060592,
+    "utc_time": "2026-11-19T18:37:20.206062+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795113441.0529652,
+    "utc_time": "2026-11-19T18:37:21.052968+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:db42335c1cbabc24a643de6830c99405174165d8bf4b6ab228ede9bbd1a72419"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795113441.205271,
+    "utc_time": "2026-11-19T18:37:21.205272+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795114150.5850322,
+    "utc_time": "2026-11-19T18:49:10.585035+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114151.5891514,
+    "utc_time": "2026-11-19T18:49:11.589155+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:2b6782f6f5bcf57c50482778dc3d36edf13858817390a37a7c5bbed7f3d01bb6"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114151.8382318,
+    "utc_time": "2026-11-19T18:49:11.838234+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795114853.746898,
+    "utc_time": "2026-11-19T19:00:53.746900+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-4853-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114854.0011742,
+    "utc_time": "2026-11-19T19:00:54.001177+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-4854-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114854.0284789,
+    "utc_time": "2026-11-19T19:00:54.028480+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-4854-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114854.0542028,
+    "utc_time": "2026-11-19T19:00:54.054204+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "INVESTIGATOR_OVERRIDE_SAFE",
+    "details": {
+      "override_id": "OVR-BAN-***-***-4854--54321",
+      "record_id": "TX-FLAGGED-54321",
+      "domain": "banks",
+      "original": "fraud",
+      "override": "safe",
+      "reason_code": "OVR-01"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114870.541527,
+    "utc_time": "2026-11-19T19:01:10.541531+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114871.3808973,
+    "utc_time": "2026-11-19T19:01:11.380903+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:f4d5c7caf1277a02dfa916c066e3f52a26e8de597969e7b23cd041aff86440b2"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114871.6089804,
+    "utc_time": "2026-11-19T19:01:11.608983+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795114872.0640404,
+    "utc_time": "2026-11-19T19:01:12.064042+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-4872-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114872.1242683,
+    "utc_time": "2026-11-19T19:01:12.124270+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-4872-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114872.1456804,
+    "utc_time": "2026-11-19T19:01:12.145681+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-4872-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795114872.1708806,
+    "utc_time": "2026-11-19T19:01:12.170881+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "INVESTIGATOR_OVERRIDE_SAFE",
+    "details": {
+      "override_id": "OVR-BAN-***-***-4872--54321",
+      "record_id": "TX-FLAGGED-54321",
+      "domain": "banks",
+      "original": "fraud",
+      "override": "safe",
+      "reason_code": "OVR-01"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115401.705114,
+    "utc_time": "2026-11-19T19:10:01.705116+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115402.5225189,
+    "utc_time": "2026-11-19T19:10:02.522522+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:9d73eb4ab4a578fb50f5277e8660fe6521248bc57c47a10501c4dd8e25c1c448"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115402.758977,
+    "utc_time": "2026-11-19T19:10:02.758978+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795115403.1758199,
+    "utc_time": "2026-11-19T19:10:03.175821+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-5403-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115403.2370698,
+    "utc_time": "2026-11-19T19:10:03.237072+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-5403-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115403.2600546,
+    "utc_time": "2026-11-19T19:10:03.260055+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-5403-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115403.2846398,
+    "utc_time": "2026-11-19T19:10:03.284641+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "INVESTIGATOR_OVERRIDE_SAFE",
+    "details": {
+      "override_id": "OVR-BAN-***-***-5403--54321",
+      "record_id": "TX-FLAGGED-54321",
+      "domain": "banks",
+      "original": "fraud",
+      "override": "safe",
+      "reason_code": "OVR-01"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115698.213429,
+    "utc_time": "2026-11-19T19:14:58.213434+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 3
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115698.2698483,
+    "utc_time": "2026-11-19T19:14:58.269853+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 3
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115698.310273,
+    "utc_time": "2026-11-19T19:14:58.310281+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 3
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115699.8197367,
+    "utc_time": "2026-11-19T19:14:59.819742+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115699.904474,
+    "utc_time": "2026-11-19T19:14:59.904479+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115749.5186696,
+    "utc_time": "2026-11-19T19:15:49.518680+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115749.618766,
+    "utc_time": "2026-11-19T19:15:49.618775+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115749.676951,
+    "utc_time": "2026-11-19T19:15:49.676955+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115749.8554015,
+    "utc_time": "2026-11-19T19:15:49.855406+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115749.9796853,
+    "utc_time": "2026-11-19T19:15:49.979693+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115777.1389039,
+    "utc_time": "2026-11-19T19:16:17.138908+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115778.9504325,
+    "utc_time": "2026-11-19T19:16:18.950437+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:7a765ffa6385bc7aa5e69ee3097f5176b24698f5449311085e3c825d3c5acc62"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115779.3610644,
+    "utc_time": "2026-11-19T19:16:19.361068+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795115780.1847208,
+    "utc_time": "2026-11-19T19:16:20.184723+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-5780-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.3092022,
+    "utc_time": "2026-11-19T19:16:20.309208+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-5780-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.3598318,
+    "utc_time": "2026-11-19T19:16:20.359833+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-5780-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.4112513,
+    "utc_time": "2026-11-19T19:16:20.411255+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "INVESTIGATOR_OVERRIDE_SAFE",
+    "details": {
+      "override_id": "OVR-BAN-***-***-5780--54321",
+      "record_id": "TX-FLAGGED-54321",
+      "domain": "banks",
+      "original": "fraud",
+      "override": "safe",
+      "reason_code": "OVR-01"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.6021566,
+    "utc_time": "2026-11-19T19:16:20.602159+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.6569421,
+    "utc_time": "2026-11-19T19:16:20.656944+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.7056458,
+    "utc_time": "2026-11-19T19:16:20.705648+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.873235,
+    "utc_time": "2026-11-19T19:16:20.873238+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795115780.9576156,
+    "utc_time": "2026-11-19T19:16:20.957621+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116089.1915956,
+    "utc_time": "2026-11-19T19:21:29.191600+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116090.885597,
+    "utc_time": "2026-11-19T19:21:30.885603+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:3d7490e50b7dfecf393947c819d6bbcd5c8fc7b090c12f7b2ae4431b0edda00b"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116091.2063236,
+    "utc_time": "2026-11-19T19:21:31.206327+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795116092.0437684,
+    "utc_time": "2026-11-19T19:21:32.043771+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-6092-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.1850665,
+    "utc_time": "2026-11-19T19:21:32.185070+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-6092-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.2320042,
+    "utc_time": "2026-11-19T19:21:32.232007+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-6092-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.2859912,
+    "utc_time": "2026-11-19T19:21:32.285994+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "INVESTIGATOR_OVERRIDE_SAFE",
+    "details": {
+      "override_id": "OVR-BAN-***-***-6092--54321",
+      "record_id": "TX-FLAGGED-54321",
+      "domain": "banks",
+      "original": "fraud",
+      "override": "safe",
+      "reason_code": "OVR-01"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.4602125,
+    "utc_time": "2026-11-19T19:21:32.460215+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.501931,
+    "utc_time": "2026-11-19T19:21:32.501935+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.5578325,
+    "utc_time": "2026-11-19T19:21:32.557836+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.7056499,
+    "utc_time": "2026-11-19T19:21:32.705654+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116092.785973,
+    "utc_time": "2026-11-19T19:21:32.785977+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116309.6688952,
+    "utc_time": "2026-11-19T19:25:09.668901+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116311.4056506,
+    "utc_time": "2026-11-19T19:25:11.405655+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:4a43b673f40aed6703aa5ee53b30a1396bf8e6f4dff4b34e3c4f0f4606f51331"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116311.753568,
+    "utc_time": "2026-11-19T19:25:11.753570+00:00",
+    "actor": "admin_user",
+    "role": "admin",
+    "action": "TEST_ADMIN_ACTION",
+    "details": {
+      "api_key": "[REDACTED]",
+      "user_email": "s*************n@bank.corp",
+      "round_id": 99
+    },
+    "client_ip": "127.0.0.1"
+  },
+  {
+    "timestamp": 1795116312.6565983,
+    "utc_time": "2026-11-19T19:25:12.656600+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-6312-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116312.7911742,
+    "utc_time": "2026-11-19T19:25:12.791178+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-6312-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116312.835914,
+    "utc_time": "2026-11-19T19:25:12.835915+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-6312-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116312.8865275,
+    "utc_time": "2026-11-19T19:25:12.886530+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "INVESTIGATOR_OVERRIDE_SAFE",
+    "details": {
+      "override_id": "OVR-BAN-***-***-6312--54321",
+      "record_id": "TX-FLAGGED-54321",
+      "domain": "banks",
+      "original": "fraud",
+      "override": "safe",
+      "reason_code": "OVR-01"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116313.0692687,
+    "utc_time": "2026-11-19T19:25:13.069272+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116313.1133819,
+    "utc_time": "2026-11-19T19:25:13.113384+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116313.1638536,
+    "utc_time": "2026-11-19T19:25:13.163857+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116313.3085353,
+    "utc_time": "2026-11-19T19:25:13.308539+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795116313.393649,
+    "utc_time": "2026-11-19T19:25:13.393653+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117014.8119836,
+    "utc_time": "2026-11-19T19:36:54.811989+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117016.4875247,
+    "utc_time": "2026-11-19T19:36:56.487529+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:4ccd2cec9a5e8ebbd93086a22aa956fed535fab8c54f511292bef86ee4c4bb7f"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117018.884058,
+    "utc_time": "2026-11-19T19:36:58.884061+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-7018-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117019.010374,
+    "utc_time": "2026-11-19T19:36:59.010378+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-7019-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117019.0641422,
+    "utc_time": "2026-11-19T19:36:59.064145+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-7019-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117019.2809896,
+    "utc_time": "2026-11-19T19:36:59.280992+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117019.3231328,
+    "utc_time": "2026-11-19T19:36:59.323135+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117019.3718886,
+    "utc_time": "2026-11-19T19:36:59.371891+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117019.5385349,
+    "utc_time": "2026-11-19T19:36:59.538539+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117019.6145296,
+    "utc_time": "2026-11-19T19:36:59.614532+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117161.5465202,
+    "utc_time": "2026-11-19T19:39:21.546523+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117162.4828525,
+    "utc_time": "2026-11-19T19:39:22.482856+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:92606bbc14ac92edef38c44949e9110a44c84f1a65c32381cac20a39a0cc4a54"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.2068841,
+    "utc_time": "2026-11-19T19:39:23.206887+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-7163-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.299257,
+    "utc_time": "2026-11-19T19:39:23.299260+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-7163-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.3627925,
+    "utc_time": "2026-11-19T19:39:23.362794+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-7163-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.4910917,
+    "utc_time": "2026-11-19T19:39:23.491094+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.52108,
+    "utc_time": "2026-11-19T19:39:23.521082+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.5503042,
+    "utc_time": "2026-11-19T19:39:23.550306+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.6519873,
+    "utc_time": "2026-11-19T19:39:23.651990+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795117163.735885,
+    "utc_time": "2026-11-19T19:39:23.735887+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192149.1264534,
+    "utc_time": "2026-11-20T16:29:09.126455+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "FLAG_OVERRIDE",
+    "details": {
+      "flag_key": "TEST_FLAG_CUSTOM",
+      "enabled": true
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192149.1825066,
+    "utc_time": "2026-11-20T16:29:09.182510+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "BACKUP_CREATE",
+    "details": {
+      "backup_id": "snapshot_1795192149",
+      "files": 6
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192149.214763,
+    "utc_time": "2026-11-20T16:29:09.214765+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "BACKUP_RESTORE_DRILL",
+    "details": {
+      "status": "SUCCESS",
+      "backup_id": "snapshot_1795192149",
+      "restored_files_count": 6,
+      "restored_files": [
+        "admin_audit_log.json",
+        "feature_flags.json",
+        "federated_nodes_registry.json",
+        "investigator_overrides.json",
+        "rdp_privacy_ledger.json",
+        "secagg_state.json"
+      ],
+      "recovery_time_ms": 18.38,
+      "integrity_verified": true,
+      "rto_sla_met": true
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192149.2331152,
+    "utc_time": "2026-11-20T16:29:09.233117+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "MIGRATION_EXECUTE",
+    "details": {
+      "dry_run": true,
+      "applied": 3
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192166.8691998,
+    "utc_time": "2026-11-20T16:29:26.869202+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192167.7165904,
+    "utc_time": "2026-11-20T16:29:27.716593+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:36186c940deb9af0304dbb9655f31f8c2c301185c5f34ceb9dbeac43db21da27"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.3134022,
+    "utc_time": "2026-11-20T16:29:28.313404+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-2168-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.3997195,
+    "utc_time": "2026-11-20T16:29:28.399722+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-2168-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.427507,
+    "utc_time": "2026-11-20T16:29:28.427508+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-2168-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.5346885,
+    "utc_time": "2026-11-20T16:29:28.534690+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.5626333,
+    "utc_time": "2026-11-20T16:29:28.562635+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.5904992,
+    "utc_time": "2026-11-20T16:29:28.590500+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.6742742,
+    "utc_time": "2026-11-20T16:29:28.674277+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.7176857,
+    "utc_time": "2026-11-20T16:29:28.717688+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.7801175,
+    "utc_time": "2026-11-20T16:29:28.780119+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "FLAG_OVERRIDE",
+    "details": {
+      "flag_key": "TEST_FLAG_CUSTOM",
+      "enabled": true
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.8582711,
+    "utc_time": "2026-11-20T16:29:28.858274+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "BACKUP_CREATE",
+    "details": {
+      "backup_id": "snapshot_1795192168",
+      "files": 6
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.9230173,
+    "utc_time": "2026-11-20T16:29:28.923023+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "BACKUP_RESTORE_DRILL",
+    "details": {
+      "status": "SUCCESS",
+      "backup_id": "snapshot_1795192168",
+      "restored_files_count": 6,
+      "restored_files": [
+        "admin_audit_log.json",
+        "feature_flags.json",
+        "federated_nodes_registry.json",
+        "investigator_overrides.json",
+        "rdp_privacy_ledger.json",
+        "secagg_state.json"
+      ],
+      "recovery_time_ms": 37.48,
+      "integrity_verified": true,
+      "rto_sla_met": true
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192168.947585,
+    "utc_time": "2026-11-20T16:29:28.947587+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "MIGRATION_EXECUTE",
+    "details": {
+      "dry_run": true,
+      "applied": 3
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192640.7221014,
+    "utc_time": "2026-11-20T16:37:20.722104+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192641.8247888,
+    "utc_time": "2026-11-20T16:37:21.824792+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:8239c0e8d3dd9ec92ec9bc3f6f8801e5ca7f7042fb8209c8974838060be19ec2"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192642.5333617,
+    "utc_time": "2026-11-20T16:37:22.533364+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-2642-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192642.648382,
+    "utc_time": "2026-11-20T16:37:22.648385+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-2642-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192642.697027,
+    "utc_time": "2026-11-20T16:37:22.697029+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-2642-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192642.88823,
+    "utc_time": "2026-11-20T16:37:22.888232+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192642.9206629,
+    "utc_time": "2026-11-20T16:37:22.920665+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192642.9516292,
+    "utc_time": "2026-11-20T16:37:22.951631+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192643.0375893,
+    "utc_time": "2026-11-20T16:37:23.037593+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192643.081147,
+    "utc_time": "2026-11-20T16:37:23.081149+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192643.155592,
+    "utc_time": "2026-11-20T16:37:23.155595+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "FLAG_OVERRIDE",
+    "details": {
+      "flag_key": "TEST_FLAG_CUSTOM",
+      "enabled": true
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192643.2209027,
+    "utc_time": "2026-11-20T16:37:23.220906+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "BACKUP_CREATE",
+    "details": {
+      "backup_id": "snapshot_1795192643",
+      "files": 6
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192643.2567945,
+    "utc_time": "2026-11-20T16:37:23.256797+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "BACKUP_RESTORE_DRILL",
+    "details": {
+      "status": "SUCCESS",
+      "backup_id": "snapshot_1795192643",
+      "restored_files_count": 6,
+      "restored_files": [
+        "admin_audit_log.json",
+        "feature_flags.json",
+        "federated_nodes_registry.json",
+        "investigator_overrides.json",
+        "rdp_privacy_ledger.json",
+        "secagg_state.json"
+      ],
+      "recovery_time_ms": 21.02,
+      "integrity_verified": true,
+      "rto_sla_met": true
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795192643.2795844,
+    "utc_time": "2026-11-20T16:37:23.279586+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "MIGRATION_EXECUTE",
+    "details": {
+      "dry_run": true,
+      "applied": 3
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193372.4606683,
+    "utc_time": "2026-11-20T16:49:32.460672+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "RESET_FEDERATED_STATE",
+    "details": {
+      "reset_to_round": 1
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193374.188831,
+    "utc_time": "2026-11-20T16:49:34.188837+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "RUN_SECAGG_ROUND",
+    "details": {
+      "round_id": 1,
+      "quorum": "3/3 silos",
+      "dropout": null,
+      "proof_hash": "sha256:89c82e41a1b59ddaf8a62810a46af097aa6e710850acf6987ebba779abe7b601"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193375.2975082,
+    "utc_time": "2026-11-20T16:49:35.297512+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-BAN-***-***-3375-6DC042",
+      "record_id": "TX-PAYSIM-TEST-9001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193375.8673465,
+    "utc_time": "2026-11-20T16:49:35.867351+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "GENERATE_FCRA_ADVERSE_ACTION_NOTICE",
+    "details": {
+      "notice_id": "FCRA-ECOA-LEN-***-***-3375-62248B",
+      "record_id": "LOAN-HC-TEST-4421",
+      "domain": "lenders"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193376.0217803,
+    "utc_time": "2026-11-20T16:49:36.021782+00:00",
+    "actor": "Dev Operator Key",
+    "role": "operator",
+    "action": "ISSUE_NIST_SP1270_CERTIFICATE",
+    "details": {
+      "certificate_id": "NIST-SP1270-BAN-***-***-3376-D3B028A6",
+      "record_id": "TX-PAYSIM-NIST-001",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193376.52056,
+    "utc_time": "2026-11-20T16:49:36.520563+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 1,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193376.5758574,
+    "utc_time": "2026-11-20T16:49:36.575861+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 2,
+      "epsilon": 1.3725,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193376.6378164,
+    "utc_time": "2026-11-20T16:49:36.637819+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 3,
+      "epsilon": 1.6749,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193376.785195,
+    "utc_time": "2026-11-20T16:49:36.785198+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "REGISTER_FEDERATED_NODE",
+    "details": {
+      "node_id": "node-fintech-delta",
+      "domain": "banks"
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193376.8505268,
+    "utc_time": "2026-11-20T16:49:36.850530+00:00",
+    "actor": "dev_workbench_operator",
+    "role": "admin",
+    "action": "EXECUTE_TEE_FEDERATED_ROUND",
+    "details": {
+      "round_id": 10,
+      "epsilon": 0.9543,
+      "active_nodes": 4
+    },
+    "client_ip": "testclient"
+  },
+  {
+    "timestamp": 1795193377.004779,
+    "utc_time": "2026-11-20T16:49:37.004782+00:00",
+    "actor": "Dev Admin Key",
+    "role": "admin",
+    "action": "FLAG_OVERRIDE",
+    "details": {
+      "flag_key": "TEST_FLAG_CUSTOM",
+      "enabled": true
+    },
+    "client_ip": "testclient"
+  }
+]

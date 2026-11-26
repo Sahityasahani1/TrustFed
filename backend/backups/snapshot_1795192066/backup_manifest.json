@@ -1,0 +1,33 @@
+{
+  "backup_id": "snapshot_1795192066",
+  "timestamp": 1795192066,
+  "created_at_iso": "2026-11-20T16:27:46Z",
+  "files": {
+    "admin_audit_log.json": {
+      "checksum_sha256": "ea2f59beb3757530aad694b8ab82a195cdb1a20115a1739333caa3b649fb7ea9",
+      "size_bytes": 43274
+    },
+    "feature_flags.json": {
+      "checksum_sha256": "4309c5dc9f17cb041b00d80b0f4e784e9025d4cb907bd7b232c3d9f7a9aed4a4",
+      "size_bytes": 1234
+    },
+    "federated_nodes_registry.json": {
+      "checksum_sha256": "d12ec803acbaae9b467dd7a7ba4f479334851f0626cdb6f62f3341c877e17fa0",
+      "size_bytes": 1947
+    },
+    "investigator_overrides.json": {
+      "checksum_sha256": "95f27947ae7503138cec6e927e7879e67fa2898ed6af4ccedb770b536389d370",
+      "size_bytes": 7018
+    },
+    "rdp_privacy_ledger.json": {
+      "checksum_sha256": "5fe0fc6cafce66c34f3f9894ab48304d99db4b87ccf67d738515057c45d8a734",
+      "size_bytes": 547
+    },
+    "secagg_state.json": {
+      "checksum_sha256": "94178ddf629927ea47279450a96848997ed76e1fe4ebd98cb7fd56d57256ddde",
+      "size_bytes": 4360
+    }
+  },
+  "total_files": 6,
+  "total_bytes": 58380
+}
