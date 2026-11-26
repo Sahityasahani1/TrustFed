@@ -2,13 +2,15 @@
 TrustFed: Production Structured Logging, Request Tracing & RFC-Compliant Error Handling.
 Provides:
 1. Unique Request-ID Tracing (UUIDv4) via X-Request-ID header on all requests and responses.
-2. Structured HTTP telemetry logging (method, path, status, latency_ms, client_ip, req_id).
+2. Structured JSON and HTTP telemetry logging with automated PII redaction.
 3. Global uniform exception handlers preventing internal stack trace leaks (CWE-209).
 4. System memory and diagnostic reporting via psutil.
 """
 
+import json
 import logging
 import os
+import re
 import sys
 import time
 import uuid
@@ -26,11 +28,54 @@ except ImportError:
     psutil = None
 
 try:
-    from config import settings
-except ImportError:
     from backend.config import settings
+except ImportError:
+    from config import settings
 
 logger = logging.getLogger("trustfed.http")
+
+# Sensitive fields to scrub from logs
+SENSITIVE_KEYS = {"password", "token", "secret", "api_key", "authorization", "ssn", "card_number", "pin"}
+EMAIL_REGEX = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
+
+
+def scrub_pii(data: Any) -> Any:
+    """Recursively redacts PII and sensitive credentials from logs and audit records."""
+    if isinstance(data, dict):
+        sanitized = {}
+        for k, v in data.items():
+            if any(s in k.lower() for s in SENSITIVE_KEYS):
+                sanitized[k] = "[REDACTED]"
+            else:
+                sanitized[k] = scrub_pii(v)
+        return sanitized
+    elif isinstance(data, list):
+        return [scrub_pii(item) for item in data]
+    elif isinstance(data, str):
+        return EMAIL_REGEX.sub("[EMAIL_REDACTED]", data)
+    return data
+
+
+class StructuredJsonFormatter(logging.Formatter):
+    """Custom logging formatter that outputs one-line JSON documents."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        log_payload: Dict[str, Any] = {
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(record.created)),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "request_id": getattr(record, "request_id", "system"),
+            "route": getattr(record, "route", "-"),
+            "latency_ms": getattr(record, "latency_ms", None),
+            "status_code": getattr(record, "status_code", None),
+        }
+
+        if record.exc_info:
+            log_payload["exception"] = self.formatException(record.exc_info)
+
+        clean_payload = scrub_pii(log_payload)
+        return json.dumps(clean_payload)
 
 
 def get_process_memory_mb() -> float:
