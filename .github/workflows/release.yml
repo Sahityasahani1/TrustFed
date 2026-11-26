@@ -1,0 +1,54 @@
+name: TrustFed Production Release & Tag Automation
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Production Release Build & Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          cd frontend && npm ci
+
+      - name: Run Full Production Test Suite (56 Tests)
+        run: pytest backend/ -v
+
+      - name: Build Production Frontend Bundle
+        run: |
+          cd frontend && npm run build
+
+      - name: Execute Automated Smoke Test
+        run: python scripts/smoke_test.py
+
+      - name: Create GitHub Release Asset
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          files: |
+            RUNBOOK.md
+            TRD.md
+            docker-compose.prod.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

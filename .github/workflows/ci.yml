@@ -28,20 +28,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
-          pip install ruff
+          pip install ruff pip-audit
 
       - name: Validate Environment Schema
         run: |
           cp .env.example .env
           python -c "from backend.config import settings; print('Config Validated:', settings.get_sanitized_summary())"
 
+      - name: Dependency Security Audit (pip-audit)
+        run: |
+          pip-audit --desc || true
+
       - name: Run Ruff Linter
         run: |
           ruff check backend/ --select E,F,W --ignore E501
 
-      - name: Execute Pytest Suite (All 35 Tests)
+      - name: Execute Pytest Suite (All 56 Tests)
         run: |
-          pytest
+          pytest backend/ -v
+
+      - name: Run Automated Smoke Test
+        run: |
+          python scripts/smoke_test.py
 
   frontend-ci:
     name: Frontend TypeScript Build & Audit
