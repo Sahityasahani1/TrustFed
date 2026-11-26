@@ -28,6 +28,11 @@ if str(ROOT) not in sys.path:
 if str(ROOT / "backend") not in sys.path:
     sys.path.insert(0, str(ROOT / "backend"))
 
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+except Exception:
+    pass
+
 from backend.risks_api import app
 from backend.rate_limiter import rate_limiter
 
@@ -60,8 +65,8 @@ async def benchmark_single_inference(
         "include_ai_reasoning": False,
     }
 
-    # 10 warm-up requests to prime caches, thread pools, and ONNX runtime
-    for _ in range(10):
+    # 20 warm-up requests to prime caches, thread pools, and ONNX runtime
+    for _ in range(20):
         await client.post("/api/assess", json=payload, headers=HEADERS)
     rate_limiter.reset()
 
@@ -98,6 +103,15 @@ async def benchmark_batch_throughput(
     latencies: List[float] = []
     throughputs: List[float] = []
     errors = 0
+
+    # Warm-up batch calls to prime threadpools and buffers
+    for _ in range(2):
+        await client.post(
+            f"/api/assess/batch?domain={domain}",
+            json={"domain": domain, "records": batch_records[:100]},
+            headers=HEADERS,
+        )
+    rate_limiter.reset()
 
     for _ in range(runs):
         t0 = time.perf_counter()

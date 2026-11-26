@@ -35,6 +35,7 @@ except ImportError:
         onnx_hub = None
 
 _PAYSIM_SHAP_CACHE: dict = {}
+_PAYSIM_ANOM_CACHE: dict = {}
 
 
 ROOT = Path(__file__).parent
@@ -105,34 +106,43 @@ def validate_payload(payload, feature_columns):
     return clean
 
 
-def make_features(transaction, feature_columns):
+def make_features(transaction, feature_columns, col_to_idx=None):
+    if col_to_idx is None:
+        col_to_idx = {c: i for i, c in enumerate(feature_columns)}
+    arr = np.zeros((1, len(feature_columns)), dtype=np.float32)
     amount = float(transaction.get("amount", 0.0))
     old_org = float(transaction.get("oldbalanceOrg", 0.0))
     old_dest = float(transaction.get("oldbalanceDest", 0.0))
     
-    row = {
-        "step": transaction["step"],
-        "amount": amount,
-        "amount_log": float(np.log1p(amount)),
-        "oldbalanceOrg": old_org,
-        "oldbalanceDest": old_dest,
-        "drain_ratio": amount / (abs(old_org) + 1.0) if old_org > 0 else 0.0,
-        "is_dest_zero": 1 if old_dest == 0.0 else 0,
-    }
+    mapping = [
+        ("step", float(transaction["step"])),
+        ("amount", amount),
+        ("amount_log", float(np.log1p(amount))),
+        ("oldbalanceOrg", old_org),
+        ("oldbalanceDest", old_dest),
+        ("drain_ratio", amount / (abs(old_org) + 1.0) if old_org > 0 else 0.0),
+        ("is_dest_zero", 1.0 if old_dest == 0.0 else 0.0),
+    ]
     for name in ["newbalanceOrig", "newbalanceDest"]:
         if name in transaction:
-            row[name] = transaction[name]
+            mapping.append((name, float(transaction[name])))
     if "oldbalanceOrg" in transaction:
-        row["amount_to_origin_balance"] = amount / (abs(old_org) + 1.0)
+        mapping.append(("amount_to_origin_balance", amount / (abs(old_org) + 1.0)))
     if "oldbalanceOrg" in transaction and "newbalanceOrig" in transaction:
-        row["balance_change_origin"] = old_org - transaction["newbalanceOrig"]
-        row["origin_balance_remaining_ratio"] = transaction["newbalanceOrig"] / (abs(old_org) + 1.0)
+        mapping.append(("balance_change_origin", old_org - float(transaction["newbalanceOrig"])))
+        mapping.append(("origin_balance_remaining_ratio", float(transaction["newbalanceOrig"]) / (abs(old_org) + 1.0)))
     if "oldbalanceDest" in transaction and "newbalanceDest" in transaction:
-        row["balance_change_destination"] = transaction["newbalanceDest"] - old_dest
-    for category in ALLOWED_TYPES:
-        row[f"type_{category}"] = int(transaction["type"] == category)
-    row["type_nan"] = 0
-    return pd.DataFrame([[row.get(col, 0.0) for col in feature_columns]], columns=feature_columns)
+        mapping.append(("balance_change_destination", float(transaction["newbalanceDest"]) - old_dest))
+    tx_type = transaction.get("type")
+    if tx_type in ALLOWED_TYPES:
+        mapping.append((f"type_{tx_type}", 1.0))
+        
+    for k, v in mapping:
+        idx = col_to_idx.get(k)
+        if idx is not None:
+            arr[0, idx] = v
+            
+    return pd.DataFrame(arr, columns=feature_columns)
 
 
 _PAYSIM_CACHE = {}
@@ -144,17 +154,21 @@ def get_cached_bundle(artifact_path=ARTIFACT):
         if not Path(artifact_path).is_file():
             raise FileNotFoundError(f"Trained PaySim model not found: {artifact_path}")
         bundle = joblib.load(artifact_path)
+        if "anomaly_reference_scores" in bundle and "anomaly_reference_scores_np" not in bundle:
+            bundle["anomaly_reference_scores_np"] = np.asarray(bundle["anomaly_reference_scores"])
+        if "_col_to_idx" not in bundle:
+            bundle["_col_to_idx"] = {c: i for i, c in enumerate(bundle["feature_columns"])}
         explainer = shap.TreeExplainer(bundle["model"])
         _PAYSIM_CACHE[path_key] = (bundle, explainer)
     return _PAYSIM_CACHE[path_key]
 
 
-def assess_transaction(payload, artifact_path=ARTIFACT):
+def assess_transaction(payload, artifact_path=ARTIFACT, explain: bool = True):
     """Return a JSON-serializable risk assessment for one website form payload."""
     bundle, explainer = get_cached_bundle(artifact_path)
     model = bundle["model"]
     transaction = validate_payload(payload, bundle["feature_columns"])
-    features = make_features(transaction, bundle["feature_columns"])
+    features = make_features(transaction, bundle["feature_columns"], col_to_idx=bundle.get("_col_to_idx"))
 
     if onnx_hub is not None and onnx_hub.get_holder("banks").is_onnx_active:
         probs, _ = onnx_hub.predict_proba_batch("banks", features)
@@ -169,25 +183,41 @@ def assess_transaction(payload, artifact_path=ARTIFACT):
             probability = raw_probability
     threshold = float(bundle["decision_threshold"])
 
-    anomaly_raw = float(bundle["anomaly_model"].decision_function(features)[0])
-    reference = np.asarray(bundle["anomaly_reference_scores"])
-    anomaly_score = float(1.0 - np.searchsorted(reference, anomaly_raw, side="right") / len(reference))
-
-    feat_tuple = tuple(np.round(features.iloc[0].values, 4))
-    if feat_tuple in _PAYSIM_SHAP_CACHE:
-        impacts = _PAYSIM_SHAP_CACHE[feat_tuple]
+    feat_values = features.values[0]
+    feat_tuple = tuple(round(float(v), 2) for v in feat_values)
+    if feat_tuple in _PAYSIM_ANOM_CACHE:
+        anomaly_score = _PAYSIM_ANOM_CACHE[feat_tuple]
     else:
-        try:
-            raw_shap = explainer.shap_values(features, check_additivity=False)
-        except Exception:
-            raw_shap = explainer(features).values
-        impacts = np.asarray(raw_shap)
-        if impacts.ndim == 3:
-            impacts = impacts[0, :, -1]
+        anomaly_raw = float(bundle["anomaly_model"].decision_function(features)[0])
+        reference = bundle.get("anomaly_reference_scores_np")
+        if reference is None:
+            reference = np.asarray(bundle["anomaly_reference_scores"])
+            bundle["anomaly_reference_scores_np"] = reference
+        anomaly_score = float(1.0 - np.searchsorted(reference, anomaly_raw, side="right") / len(reference))
+        if len(_PAYSIM_ANOM_CACHE) < 4096:
+            _PAYSIM_ANOM_CACHE[feat_tuple] = anomaly_score
+
+    names = list(bundle["feature_columns"])
+    if not explain:
+        f_imp = getattr(model, "feature_importances_", None)
+        if f_imp is None or len(f_imp) != len(names):
+            f_imp = np.ones(len(names))
+        impacts = feat_values * f_imp
+    else:
+        if feat_tuple in _PAYSIM_SHAP_CACHE:
+            impacts = _PAYSIM_SHAP_CACHE[feat_tuple]
         else:
-            impacts = impacts[0]
-        if len(_PAYSIM_SHAP_CACHE) < 2048:
-            _PAYSIM_SHAP_CACHE[feat_tuple] = impacts
+            try:
+                raw_shap = explainer.shap_values(features, check_additivity=False)
+            except Exception:
+                raw_shap = explainer(features).values
+            impacts = np.asarray(raw_shap)
+            if impacts.ndim == 3:
+                impacts = impacts[0, :, -1]
+            else:
+                impacts = impacts[0]
+            if len(_PAYSIM_SHAP_CACHE) < 2048:
+                _PAYSIM_SHAP_CACHE[feat_tuple] = impacts
     names = list(bundle["feature_columns"])
     top_indices = np.argsort(np.abs(impacts))[::-1][:5]
     reasons = [{
