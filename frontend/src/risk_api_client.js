@@ -777,6 +777,58 @@ export async function getFederatedAuditPacket() {
   return data;
 }
 
+export async function getPlatformStatus() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/status`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch platform status");
+  }
+  return data;
+}
+
+export async function getFeatureFlags() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/flags`, {
+    headers: getAuthHeaders(null),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to fetch feature flags");
+  }
+  return data;
+}
+
+export async function createStateBackup() {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/admin/backup/create`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to create state backup");
+  }
+  return data;
+}
+
+export async function executeRestoreDrill(backupId) {
+  const base = cachedWorkingBase || (await getWorkingBase());
+  const response = await fetch(`${base}/api/admin/backup/restore-drill`, {
+    method: "POST",
+    headers: getAuthHeaders("application/json"),
+    body: JSON.stringify({ backup_id: backupId }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to execute restore drill");
+  }
+  return data;
+}
+
+
 
 
 

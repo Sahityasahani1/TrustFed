@@ -76,10 +76,14 @@ export const TopNavHUD: React.FC<TopNavHUDProps> = ({
         </button>
 
         {/* Network Consensus Indicator */}
-        <div className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-mono font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60">
+        <button
+          onClick={() => onSelectDomain && onSelectDomain('status' as any)}
+          className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-mono font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/60 hover:border-emerald-500/40 hover:text-emerald-500 transition cursor-pointer"
+          title="View Live Platform Status & SLAs (99.98% Uptime)"
+        >
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Network 3/3 Online</span>
-        </div>
+          <span>3/3 Online (99.98%)</span>
+        </button>
       </div>
 
       {/* 2. CENTER: LINEAR-STYLE SEGMENTED DOMAIN SELECTOR */}

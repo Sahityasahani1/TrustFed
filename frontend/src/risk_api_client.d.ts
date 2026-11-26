@@ -416,3 +416,39 @@ export declare function getFederatedAuditPacket(): Promise<{
   compliance_guarantees: any;
 }>;
 
+export declare function getPlatformStatus(): Promise<{
+  platform: string;
+  system_status: string;
+  uptime_seconds: number;
+  overall_uptime_percent: number;
+  timestamp_iso: string;
+  active_incidents_count: number;
+  components: Record<string, {
+    name: string;
+    status: string;
+    latency_p95_ms?: number;
+    sla?: string;
+  }>;
+}>;
+
+export declare function getFeatureFlags(): Promise<{
+  flags: Record<string, {
+    enabled: boolean;
+    description: string;
+    category: string;
+  }>;
+}>;
+
+export declare function createStateBackup(): Promise<{
+  status: string;
+  manifest: any;
+}>;
+
+export declare function executeRestoreDrill(backupId: string): Promise<{
+  status: string;
+  backup_id: string;
+  recovery_time_ms: number;
+  rto_sla_met: boolean;
+}>;
+
+

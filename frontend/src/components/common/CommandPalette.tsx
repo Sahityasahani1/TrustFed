@@ -18,6 +18,8 @@ import {
   Scale,
   Award,
   Cpu,
+  Activity,
+  Lock,
   X
 } from 'lucide-react';
 
@@ -90,6 +92,30 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           icon: <Cpu className="w-4 h-4 text-cyan-400" />,
           action: () => { onSelectTab('enclaves', 'enclave'); onClose(); },
           badge: '🛡️ AWS Nitro',
+        },
+        {
+          id: 'system-status',
+          title: 'Live System Status & SLAs',
+          desc: 'Real-time uptime metrics (99.98%), component health, and active feature flags',
+          icon: <Activity className="w-4 h-4 text-emerald-400" />,
+          action: () => { onSelectTab('status'); onClose(); },
+          badge: '🟢 99.98% Uptime',
+        },
+        {
+          id: 'privacy-policy',
+          title: 'Privacy Policy & Zero Data Pooling Guarantees',
+          desc: 'GDPR, FCRA § 615(a), and mathematical Rényi Differential Privacy boundaries',
+          icon: <Lock className="w-4 h-4 text-cyan-400" />,
+          action: () => { onSelectTab('privacy'); onClose(); },
+          badge: '📜 Legal',
+        },
+        {
+          id: 'terms-of-service',
+          title: 'Institutional Terms of Service Agreement',
+          desc: 'Master agreement for member banks, lenders, and insurance carriers',
+          icon: <Scale className="w-4 h-4 text-indigo-400" />,
+          action: () => { onSelectTab('terms'); onClose(); },
+          badge: '🏛️ Agreement',
         },
         {
           id: 'pay-single',

@@ -16,6 +16,9 @@ import { InsuranceClaimsView } from './components/views/InsuranceClaimsView';
 import { ClearinghouseStreamWorkbench } from './components/views/ClearinghouseStreamWorkbench';
 import { ComplianceLedgerWorkbench } from './components/views/ComplianceLedgerWorkbench';
 import { HardwareEnclaveWorkbench } from './components/views/HardwareEnclaveWorkbench';
+import { StatusPageView } from './components/views/StatusPageView';
+import { PrivacyPolicyView } from './components/views/PrivacyPolicyView';
+import { TermsOfServiceView } from './components/views/TermsOfServiceView';
 
 import { Hero3DStage } from './components/hero/Hero3DStage';
 import { IntroPage } from './components/pages/IntroPage';
@@ -34,7 +37,7 @@ export function App() {
       return { page: 'intro', main: 'intelligence', sub: 'showdown' };
     }
     
-    const validMains = ['intelligence', 'creditfraud', 'insurance', 'clearinghouse', 'compliance', 'enclaves'];
+    const validMains = ['intelligence', 'creditfraud', 'insurance', 'clearinghouse', 'compliance', 'enclaves', 'status', 'privacy', 'terms'];
     const main = validMains.includes(part1) ? part1 : 'intelligence';
 
     let sub = part2;
@@ -44,6 +47,7 @@ export function App() {
       else if (main === 'clearinghouse') sub = 'stream';
       else if (main === 'compliance') sub = 'overrides';
       else if (main === 'enclaves') sub = 'enclave';
+      else if (main === 'status' || main === 'privacy' || main === 'terms') sub = 'default';
       else sub = (part1 === 'dictionary' ? 'dictionary' : 'showdown');
     }
     return { page: 'features', main, sub };
@@ -266,6 +270,15 @@ export function App() {
                   {activeMainTab === 'enclaves' && (
                     <HardwareEnclaveWorkbench />
                   )}
+                  {activeMainTab === 'status' && (
+                    <StatusPageView />
+                  )}
+                  {activeMainTab === 'privacy' && (
+                    <PrivacyPolicyView />
+                  )}
+                  {activeMainTab === 'terms' && (
+                    <TermsOfServiceView />
+                  )}
                 </main>
               </motion.div>
             )}
@@ -290,6 +303,30 @@ export function App() {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                 Regulatory Compliance: Verified
               </span>
+            </div>
+
+            <div className="flex items-center justify-center gap-4 text-xs font-mono text-zinc-500 dark:text-zinc-400">
+              <button 
+                onClick={() => handleSelectTab('status')} 
+                className="hover:text-emerald-400 transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                System Status (99.98%)
+              </button>
+              <span>•</span>
+              <button 
+                onClick={() => handleSelectTab('privacy')} 
+                className="hover:text-cyan-400 transition cursor-pointer"
+              >
+                Privacy Policy
+              </button>
+              <span>•</span>
+              <button 
+                onClick={() => handleSelectTab('terms')} 
+                className="hover:text-indigo-400 transition cursor-pointer"
+              >
+                Terms of Service
+              </button>
             </div>
 
             <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 font-mono">
