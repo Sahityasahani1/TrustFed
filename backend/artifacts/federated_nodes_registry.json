@@ -1,6 +1,6 @@
 {
   "total_nodes": 4,
-  "updated_at": "2026-11-19T19:39:23Z",
+  "updated_at": "2026-11-26T17:14:34Z",
   "nodes": {
     "node-bank-alpha": {
       "node_id": "node-bank-alpha",
@@ -11,7 +11,7 @@
       "region": "us-east-1",
       "status": "ONLINE",
       "tls_fingerprint": "SHA256:7b:23:44:af:12:89:cc:99:01:45:ef:33:da:bc:90:11",
-      "last_heartbeat": "2026-11-19T19:39:23Z"
+      "last_heartbeat": "2026-11-26T17:14:34Z"
     },
     "node-lender-beta": {
       "node_id": "node-lender-beta",
@@ -22,7 +22,7 @@
       "region": "us-west-2",
       "status": "ONLINE",
       "tls_fingerprint": "SHA256:9c:11:02:bb:88:41:dd:77:23:66:fa:44:eb:cd:12:34",
-      "last_heartbeat": "2026-11-19T19:39:23Z"
+      "last_heartbeat": "2026-11-26T17:14:34Z"
     },
     "node-insurer-gamma": {
       "node_id": "node-insurer-gamma",
@@ -33,7 +33,7 @@
       "region": "eu-central-1",
       "status": "ONLINE",
       "tls_fingerprint": "SHA256:4a:55:67:89:01:23:de:ef:ab:cd:45:67:89:01:23:45",
-      "last_heartbeat": "2026-11-19T19:39:23Z"
+      "last_heartbeat": "2026-11-26T17:14:34Z"
     },
     "node-fintech-delta": {
       "node_id": "node-fintech-delta",
@@ -44,7 +44,7 @@
       "region": "eu-west-1",
       "status": "ONLINE",
       "tls_fingerprint": "SHA256:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00",
-      "last_heartbeat": "2026-11-19T19:39:23Z"
+      "last_heartbeat": "2026-11-26T17:14:34Z"
     }
   }
 }

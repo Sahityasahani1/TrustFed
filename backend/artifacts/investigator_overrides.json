@@ -1,5 +1,149 @@
 [
   {
+    "override_id": "OVR-BAN-1795713273--54321",
+    "record_id": "TX-FLAGGED-54321",
+    "domain": "banks",
+    "timestamp": 1795713273.7763178,
+    "iso_timestamp": "2026-11-26T17:14:33.776304+00:00",
+    "investigator": {
+      "name": "Dev Operator Key",
+      "role": "operator",
+      "client_ip": "testclient"
+    },
+    "decision": {
+      "original_classification": "fraud",
+      "override_classification": "safe",
+      "is_false_positive_flag": true
+    },
+    "regulatory_justification": {
+      "reason_code": "OVR-01",
+      "reason_title": "Out-of-Band Customer Verification",
+      "reason_description": "Direct voice/OTP out-of-band contact confirmed customer authorized the transfer.",
+      "notes": "Contacted client via registered phone with MFA; verified legitimate high-value supplier payment."
+    },
+    "metadata": {}
+  },
+  {
+    "override_id": "OVR-BAN-1795235862--54321",
+    "record_id": "TX-FLAGGED-54321",
+    "domain": "banks",
+    "timestamp": 1795235862.3688326,
+    "iso_timestamp": "2026-11-21T04:37:42.368820+00:00",
+    "investigator": {
+      "name": "Dev Operator Key",
+      "role": "operator",
+      "client_ip": "testclient"
+    },
+    "decision": {
+      "original_classification": "fraud",
+      "override_classification": "safe",
+      "is_false_positive_flag": true
+    },
+    "regulatory_justification": {
+      "reason_code": "OVR-01",
+      "reason_title": "Out-of-Band Customer Verification",
+      "reason_description": "Direct voice/OTP out-of-band contact confirmed customer authorized the transfer.",
+      "notes": "Contacted client via registered phone with MFA; verified legitimate high-value supplier payment."
+    },
+    "metadata": {}
+  },
+  {
+    "override_id": "OVR-BAN-1795195027--54321",
+    "record_id": "TX-FLAGGED-54321",
+    "domain": "banks",
+    "timestamp": 1795195027.98986,
+    "iso_timestamp": "2026-11-20T17:17:07.989839+00:00",
+    "investigator": {
+      "name": "Dev Operator Key",
+      "role": "operator",
+      "client_ip": "testclient"
+    },
+    "decision": {
+      "original_classification": "fraud",
+      "override_classification": "safe",
+      "is_false_positive_flag": true
+    },
+    "regulatory_justification": {
+      "reason_code": "OVR-01",
+      "reason_title": "Out-of-Band Customer Verification",
+      "reason_description": "Direct voice/OTP out-of-band contact confirmed customer authorized the transfer.",
+      "notes": "Contacted client via registered phone with MFA; verified legitimate high-value supplier payment."
+    },
+    "metadata": {}
+  },
+  {
+    "override_id": "OVR-BAN-1795193376--54321",
+    "record_id": "TX-FLAGGED-54321",
+    "domain": "banks",
+    "timestamp": 1795193376.2074356,
+    "iso_timestamp": "2026-11-20T16:49:36.207417+00:00",
+    "investigator": {
+      "name": "Dev Operator Key",
+      "role": "operator",
+      "client_ip": "testclient"
+    },
+    "decision": {
+      "original_classification": "fraud",
+      "override_classification": "safe",
+      "is_false_positive_flag": true
+    },
+    "regulatory_justification": {
+      "reason_code": "OVR-01",
+      "reason_title": "Out-of-Band Customer Verification",
+      "reason_description": "Direct voice/OTP out-of-band contact confirmed customer authorized the transfer.",
+      "notes": "Contacted client via registered phone with MFA; verified legitimate high-value supplier payment."
+    },
+    "metadata": {}
+  },
+  {
+    "override_id": "OVR-BAN-1795192642--54321",
+    "record_id": "TX-FLAGGED-54321",
+    "domain": "banks",
+    "timestamp": 1795192642.750142,
+    "iso_timestamp": "2026-11-20T16:37:22.750129+00:00",
+    "investigator": {
+      "name": "Dev Operator Key",
+      "role": "operator",
+      "client_ip": "testclient"
+    },
+    "decision": {
+      "original_classification": "fraud",
+      "override_classification": "safe",
+      "is_false_positive_flag": true
+    },
+    "regulatory_justification": {
+      "reason_code": "OVR-01",
+      "reason_title": "Out-of-Band Customer Verification",
+      "reason_description": "Direct voice/OTP out-of-band contact confirmed customer authorized the transfer.",
+      "notes": "Contacted client via registered phone with MFA; verified legitimate high-value supplier payment."
+    },
+    "metadata": {}
+  },
+  {
+    "override_id": "OVR-BAN-1795192168--54321",
+    "record_id": "TX-FLAGGED-54321",
+    "domain": "banks",
+    "timestamp": 1795192168.455499,
+    "iso_timestamp": "2026-11-20T16:29:28.455489+00:00",
+    "investigator": {
+      "name": "Dev Operator Key",
+      "role": "operator",
+      "client_ip": "testclient"
+    },
+    "decision": {
+      "original_classification": "fraud",
+      "override_classification": "safe",
+      "is_false_positive_flag": true
+    },
+    "regulatory_justification": {
+      "reason_code": "OVR-01",
+      "reason_title": "Out-of-Band Customer Verification",
+      "reason_description": "Direct voice/OTP out-of-band contact confirmed customer authorized the transfer.",
+      "notes": "Contacted client via registered phone with MFA; verified legitimate high-value supplier payment."
+    },
+    "metadata": {}
+  },
+  {
     "override_id": "OVR-BAN-1795117163--54321",
     "record_id": "TX-FLAGGED-54321",
     "domain": "banks",

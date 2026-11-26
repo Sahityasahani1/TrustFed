@@ -131,6 +131,25 @@ except ImportError:
     from rdp_accountant import rdp_accountant, PrivacyBudgetExhaustedError
     from federated_node_client import federated_coordinator
 
+try:
+    from backend.feature_flags import feature_flags
+    from backend.webhook_signer import webhook_signer
+    from backend.backup_manager import backup_manager
+    from backend.migrations.migration_runner import migration_runner
+    from backend.alert_manager import alert_manager
+    from backend.status_endpoint import get_system_status
+    from backend.db_pool import db_pool
+except ImportError:
+    from feature_flags import feature_flags
+    from webhook_signer import webhook_signer
+    from backup_manager import backup_manager
+    from migrations.migration_runner import migration_runner
+    from alert_manager import alert_manager
+    from status_endpoint import get_system_status
+    from db_pool import db_pool
+
+from fastapi.middleware.gzip import GZipMiddleware
+
 import logging
 import uuid
 from datetime import datetime, timezone
@@ -185,9 +204,9 @@ setup_logging()
 register_exception_handlers(app)
 SERVER_START_TIME = time.time()
 
-# Request Tracing Middleware (Unique X-Request-ID on all calls)
+# Unified High-Performance Tracing & Security Headers Middleware (Single Pass)
 @app.middleware("http")
-async def request_tracing_middleware(request: Request, call_next):
+async def unified_gateway_middleware(request: Request, call_next):
     req_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex[:16]
     request.state.request_id = req_id
 
@@ -196,25 +215,31 @@ async def request_tracing_middleware(request: Request, call_next):
     duration_ms = (time.perf_counter() - t_start) * 1000.0
 
     response.headers["X-Request-ID"] = req_id
-
-    client_ip = request.client.host if request.client else "unknown"
-    logging.getLogger("trustfed.http").info(
-        f"{request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f}ms) | ip={client_ip} | req_id={req_id}"
-    )
-
-    return response
-
-# Standard Security Headers Middleware (CWE-693, CWE-1021 Defense-in-Depth)
-@app.middleware("http")
-async def add_security_headers(request: Request, call_next):
-    response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' ws: wss: http: https:;"
+    )
     if settings.is_production:
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+
+    client_ip = request.client.host if request.client else "unknown"
+    logging.getLogger("trustfed.http").info(
+        f"{request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f}ms) | ip={client_ip} | req_id={req_id}"
+    )
+    try:
+        alert_manager.record_request(response.status_code, duration_ms)
+    except Exception:
+        pass
+
     return response
 
 
@@ -320,6 +345,10 @@ def get_paysim_bundle():
         if not path.is_file():
             raise FileNotFoundError(f"PaySim model missing: {path}")
         _PAYSIM_BUNDLE = joblib.load(path)
+        if "anomaly_reference_scores" in _PAYSIM_BUNDLE and "anomaly_reference_scores_np" not in _PAYSIM_BUNDLE:
+            _PAYSIM_BUNDLE["anomaly_reference_scores_np"] = np.asarray(_PAYSIM_BUNDLE["anomaly_reference_scores"])
+        if "_col_to_idx" not in _PAYSIM_BUNDLE:
+            _PAYSIM_BUNDLE["_col_to_idx"] = {c: i for i, c in enumerate(_PAYSIM_BUNDLE["feature_columns"])}
         _PAYSIM_EXPLAINER = shap.TreeExplainer(_PAYSIM_BUNDLE["model"])
     return _PAYSIM_BUNDLE, _PAYSIM_EXPLAINER
 
@@ -334,20 +363,26 @@ def get_insurance_bundle():
         if not path.is_file():
             raise FileNotFoundError(f"Insurance model missing: {path}")
         _INS_BUNDLE = joblib.load(path)
+        if "anomaly_reference_scores" in _INS_BUNDLE and "anomaly_reference_scores_np" not in _INS_BUNDLE:
+            _INS_BUNDLE["anomaly_reference_scores_np"] = np.asarray(_INS_BUNDLE["anomaly_reference_scores"])
+        if "_col_to_idx" not in _INS_BUNDLE:
+            _INS_BUNDLE["_col_to_idx"] = {c: i for i, c in enumerate(_INS_BUNDLE["feature_columns"])}
         _INS_EXPLAINER = shap.TreeExplainer(_INS_BUNDLE["model"])
     return _INS_BUNDLE, _INS_EXPLAINER
 
 
 _SHAP_MEMO: dict = {}
+_INS_ANOM_CACHE: dict = {}
+_CF_ANOM_CACHE: dict = {}
 
-def _insurance_assessment(payload):
+def _insurance_assessment(payload, explain: bool = True):
     path = MODEL_PATHS["insurance"]
     if not path.is_file():
         raise FileNotFoundError("Insurance model missing; expected artifacts/insurance/model.joblib")
     
     # Defaults provided for testing if not all 8 fields are passed
-    claim_type = str(payload.get("claim_type", "home")).strip()
-    state = str(payload.get("state", "ID")).strip()
+    claim_type = str(payload.get("claim_type", "home")).strip().lower()
+    state = str(payload.get("state", "ID")).strip().upper()
     tenure = float(payload.get("policyholder_tenure_years", 0.2))
     previous = float(payload.get("previous_claims_count", 0))
     amount = float(payload.get("claim_amount", 23607.73))
@@ -357,23 +392,27 @@ def _insurance_assessment(payload):
     filed = pd.to_datetime(payload.get("claim_filed_date", "2022-09-03"), errors="coerce")
     filing_delay = int((filed - incident).days) if pd.notna(filed) and pd.notna(incident) else int(payload.get("filing_delay_days", 6))
 
-    features = pd.DataFrame([{
-        "claim_type": claim_type,
-        "state": state,
-        "policyholder_tenure_years": tenure,
-        "previous_claims_count": previous,
-        "claim_amount": amount,
-        "deductible": deductible,
-        "filing_delay_days": filing_delay,
-        "claim_to_deductible_ratio": amount / (deductible + 1.0),
-        "claim_amount_log": float(np.log1p(amount)),
-    }])
-    
     bundle, explainer = get_insurance_bundle()
-    categories = list(features.select_dtypes(include=["object"]).columns)
-    encoded = pd.get_dummies(features, columns=categories, dummy_na=True, dtype=np.uint8)
-    encoded = encoded.reindex(columns=bundle["feature_columns"], fill_value=0)
-    encoded = encoded.replace([np.inf, -np.inf], np.nan).fillna(0)
+    cols = bundle["feature_columns"]
+    col_to_idx = bundle["_col_to_idx"]
+    arr = np.zeros((1, len(cols)), dtype=np.float32)
+
+    for cname, cval in (
+        ("policyholder_tenure_years", tenure),
+        ("previous_claims_count", previous),
+        ("claim_amount", amount),
+        ("deductible", deductible),
+        ("filing_delay_days", float(filing_delay)),
+        ("claim_to_deductible_ratio", amount / (deductible + 1.0)),
+        ("claim_amount_log", float(np.log1p(amount))),
+        (f"claim_type_{claim_type}", 1.0),
+        (f"state_{state}", 1.0),
+    ):
+        idx = col_to_idx.get(cname)
+        if idx is not None:
+            arr[0, idx] = cval
+
+    encoded = pd.DataFrame(arr, columns=cols)
 
     if onnx_hub.get_holder("insurance").is_onnx_active:
         probs, _ = onnx_hub.predict_proba_batch("insurance", encoded)
@@ -386,22 +425,38 @@ def _insurance_assessment(payload):
     threshold = float(bundle.get("decision_threshold", 0.1798))
     anomaly_score = None
     if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
-        score = float(bundle["anomaly_model"].decision_function(encoded)[0])
-        reference = np.asarray(bundle["anomaly_reference_scores"])
-        anomaly_score = float(1.0 - np.searchsorted(reference, score, side="right") / len(reference))
+        feat_key = tuple(round(float(v), 2) for v in encoded.iloc[0].values)
+        if feat_key in _INS_ANOM_CACHE:
+            anomaly_score = _INS_ANOM_CACHE[feat_key]
+        else:
+            score = float(bundle["anomaly_model"].decision_function(encoded)[0])
+            ref = bundle.get("anomaly_reference_scores_np")
+            if ref is None:
+                ref = np.asarray(bundle["anomaly_reference_scores"])
+                bundle["anomaly_reference_scores_np"] = ref
+            anomaly_score = float(1.0 - np.searchsorted(ref, score, side="right") / len(ref))
+            if len(_INS_ANOM_CACHE) < 4096:
+                _INS_ANOM_CACHE[feat_key] = anomaly_score
 
-    feat_key = ("ins", tuple(np.round(encoded.iloc[0].values, 4)))
-    if feat_key in _SHAP_MEMO:
-        impacts = _SHAP_MEMO[feat_key]
+    names = list(bundle["feature_columns"])
+    if not explain:
+        f_imp = getattr(bundle.get("model"), "feature_importances_", None)
+        if f_imp is None or len(f_imp) != len(names):
+            f_imp = np.ones(len(names))
+        impacts = np.asarray(encoded.iloc[0].values) * f_imp
     else:
-        try:
-            raw_vals = explainer.shap_values(encoded, check_additivity=False)
-        except Exception:
-            raw_vals = explainer(encoded).values
-        values = np.asarray(raw_vals)
-        impacts = values[0, :, -1] if values.ndim == 3 else values[0]
-        if len(_SHAP_MEMO) < 2048:
-            _SHAP_MEMO[feat_key] = impacts
+        feat_key = ("ins", tuple(round(float(v), 2) for v in encoded.iloc[0].values))
+        if feat_key in _SHAP_MEMO:
+            impacts = _SHAP_MEMO[feat_key]
+        else:
+            try:
+                raw_vals = explainer.shap_values(encoded, check_additivity=False)
+            except Exception:
+                raw_vals = explainer(encoded).values
+            values = np.asarray(raw_vals)
+            impacts = values[0, :, -1] if values.ndim == 3 else values[0]
+            if len(_SHAP_MEMO) < 2048:
+                _SHAP_MEMO[feat_key] = impacts
     top_indices = np.argsort(np.abs(impacts))[::-1][:5]
     names = list(bundle["feature_columns"])
     factors = [{"feature": names[int(i)], "impact_log_odds": float(impacts[i]),
@@ -429,11 +484,15 @@ def get_creditfraud_bundle():
         if not path.is_file():
             raise FileNotFoundError(f"CreditFraud model missing: {path}")
         _CF_BUNDLE = joblib.load(path)
+        if "anomaly_reference_scores" in _CF_BUNDLE and "anomaly_reference_scores_np" not in _CF_BUNDLE:
+            _CF_BUNDLE["anomaly_reference_scores_np"] = np.asarray(_CF_BUNDLE["anomaly_reference_scores"])
+        if "_col_to_idx" not in _CF_BUNDLE:
+            _CF_BUNDLE["_col_to_idx"] = {c: i for i, c in enumerate(_CF_BUNDLE["feature_columns"])}
         _CF_EXPLAINER = shap.TreeExplainer(_CF_BUNDLE["model"])
     return _CF_BUNDLE, _CF_EXPLAINER
 
 
-def _creditfraud_assessment(payload):
+def _creditfraud_assessment(payload, explain: bool = True):
     bundle, explainer = get_creditfraud_bundle()
     
     income = float(payload.get("amt_income_total", payload.get("AMT_INCOME_TOTAL", 270000.0)))
@@ -446,24 +505,30 @@ def _creditfraud_assessment(payload):
     days_employed = float(payload.get("days_employed", payload.get("DAYS_EMPLOYED", -2500)))
     contract_type = str(payload.get("contract_type", payload.get("NAME_CONTRACT_TYPE", "Cash loans"))).strip()
     gender = str(payload.get("code_gender", payload.get("CODE_GENDER", "M"))).strip().upper()
-    
-    row = pd.DataFrame([{col: 0.0 for col in bundle["feature_columns"]}])
-    row["AMT_INCOME_TOTAL"] = income
-    row["AMT_CREDIT"] = credit
-    row["AMT_ANNUITY"] = annuity
-    row["AMT_GOODS_PRICE"] = goods_price
-    row["EXT_SOURCE_2"] = ext_source_2
-    row["EXT_SOURCE_3"] = ext_source_3
-    row["DAYS_BIRTH"] = days_birth
-    row["DAYS_EMPLOYED"] = days_employed
-    row["CREDIT_TERM"] = annuity / (credit + 1.0)
-    row["ANNUITY_INCOME_RATIO"] = annuity / (income + 1.0)
-    if f"NAME_CONTRACT_TYPE_{contract_type}" in row.columns:
-        row[f"NAME_CONTRACT_TYPE_{contract_type}"] = 1.0
-    if f"CODE_GENDER_{gender}" in row.columns:
-        row[f"CODE_GENDER_{gender}"] = 1.0
-        
-    encoded = row.reindex(columns=bundle["feature_columns"], fill_value=0.0).fillna(0.0)
+
+    cols = bundle["feature_columns"]
+    col_to_idx = bundle["_col_to_idx"]
+    arr = np.zeros((1, len(cols)), dtype=np.float32)
+
+    for cname, cval in (
+        ("AMT_INCOME_TOTAL", income),
+        ("AMT_CREDIT", credit),
+        ("AMT_ANNUITY", annuity),
+        ("AMT_GOODS_PRICE", goods_price),
+        ("EXT_SOURCE_2", ext_source_2),
+        ("EXT_SOURCE_3", ext_source_3),
+        ("DAYS_BIRTH", days_birth),
+        ("DAYS_EMPLOYED", days_employed),
+        ("CREDIT_TERM", annuity / (credit + 1.0)),
+        ("ANNUITY_INCOME_RATIO", annuity / (income + 1.0)),
+        (f"NAME_CONTRACT_TYPE_{contract_type}", 1.0),
+        (f"CODE_GENDER_{gender}", 1.0),
+    ):
+        idx = col_to_idx.get(cname)
+        if idx is not None:
+            arr[0, idx] = cval
+
+    encoded = pd.DataFrame(arr, columns=cols)
     
     if onnx_hub.get_holder("creditfraud").is_onnx_active:
         probs, _ = onnx_hub.predict_proba_batch("creditfraud", encoded)
@@ -477,22 +542,38 @@ def _creditfraud_assessment(payload):
     threshold = float(bundle.get("decision_threshold", 0.15566))
     anomaly_score = None
     if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
-        score = float(bundle["anomaly_model"].decision_function(encoded)[0])
-        reference = np.asarray(bundle["anomaly_reference_scores"])
-        anomaly_score = float(1.0 - np.searchsorted(reference, score, side="right") / len(reference))
+        feat_key = tuple(round(float(v), 2) for v in encoded.iloc[0].values)
+        if feat_key in _CF_ANOM_CACHE:
+            anomaly_score = _CF_ANOM_CACHE[feat_key]
+        else:
+            score = float(bundle["anomaly_model"].decision_function(encoded)[0])
+            ref = bundle.get("anomaly_reference_scores_np")
+            if ref is None:
+                ref = np.asarray(bundle["anomaly_reference_scores"])
+                bundle["anomaly_reference_scores_np"] = ref
+            anomaly_score = float(1.0 - np.searchsorted(ref, score, side="right") / len(ref))
+            if len(_CF_ANOM_CACHE) < 4096:
+                _CF_ANOM_CACHE[feat_key] = anomaly_score
         
-    feat_key = ("cf", tuple(np.round(encoded.iloc[0].values, 4)))
-    if feat_key in _SHAP_MEMO:
-        impacts = _SHAP_MEMO[feat_key]
+    names = list(bundle["feature_columns"])
+    if not explain:
+        f_imp = getattr(bundle.get("model"), "feature_importances_", None)
+        if f_imp is None or len(f_imp) != len(names):
+            f_imp = np.ones(len(names))
+        impacts = np.asarray(encoded.iloc[0].values) * f_imp
     else:
-        try:
-            raw_vals = explainer.shap_values(encoded, check_additivity=False)
-        except Exception:
-            raw_vals = explainer(encoded).values
-        values = np.asarray(raw_vals)
-        impacts = values[0, :, -1] if values.ndim == 3 else values[0]
-        if len(_SHAP_MEMO) < 2048:
-            _SHAP_MEMO[feat_key] = impacts
+        feat_key = ("cf", tuple(round(float(v), 2) for v in encoded.iloc[0].values))
+        if feat_key in _SHAP_MEMO:
+            impacts = _SHAP_MEMO[feat_key]
+        else:
+            try:
+                raw_vals = explainer.shap_values(encoded, check_additivity=False)
+            except Exception:
+                raw_vals = explainer(encoded).values
+            values = np.asarray(raw_vals)
+            impacts = values[0, :, -1] if values.ndim == 3 else values[0]
+            if len(_SHAP_MEMO) < 2048:
+                _SHAP_MEMO[feat_key] = impacts
     top_indices = np.argsort(np.abs(impacts))[::-1][:5]
     names = list(bundle["feature_columns"])
     factors = [
@@ -519,16 +600,16 @@ def _creditfraud_assessment(payload):
     }
 
 
-def run_ml(domain, user_input):
+def run_ml(domain, user_input, explain: bool = True):
     d = domain.lower()
     if d in ("banks", "paysim"):
         if not MODEL_PATHS["banks"].is_file():
             raise FileNotFoundError("PaySim model is missing: artifacts/paysim/model.joblib")
-        return assess_transaction(user_input)
+        return assess_transaction(user_input, explain=explain)
     if d in ("creditfraud", "lenders"):
-        return _creditfraud_assessment(user_input)
+        return _creditfraud_assessment(user_input, explain=explain)
     if d in ("insurance", "insurers"):
-        return _insurance_assessment(user_input)
+        return _insurance_assessment(user_input, explain=explain)
     raise ValueError(f"Unknown domain: {domain}. Must be one of: banks, creditfraud, insurance")
 
 
@@ -576,7 +657,10 @@ def _batch_assess_banks(records: list[dict[str, Any]]) -> dict[str, Any]:
     anomaly_scores = [None] * len(records)
     if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
         raw_anom = bundle["anomaly_model"].decision_function(encoded)
-        ref = np.asarray(bundle["anomaly_reference_scores"])
+        ref = bundle.get("anomaly_reference_scores_np")
+        if ref is None:
+            ref = np.asarray(bundle["anomaly_reference_scores"])
+            bundle["anomaly_reference_scores_np"] = ref
         anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
         
     if len(encoded) <= 30:
@@ -596,6 +680,9 @@ def _batch_assess_banks(records: list[dict[str, Any]]) -> dict[str, Any]:
         top_indices = np.argmax(deviations, axis=1)
         vals = deviations
     
+    types_list = types.tolist()
+    amounts_list = amounts.tolist()
+    drain_list = drain_ratios.tolist() if hasattr(drain_ratios, "tolist") else list(drain_ratios)
     results = []
     for i, r in enumerate(records):
         rec_id = str(r.get("transaction_id", f"TX-B-{i+1:04d}"))
@@ -614,7 +701,7 @@ def _batch_assess_banks(records: list[dict[str, Any]]) -> dict[str, Any]:
                 "impact_log_odds": round(top_imp, 3),
                 "direction": "increases_risk" if top_imp > 0 else "decreases_risk"
             },
-            "summary": f"{types.iloc[i]} ${amounts.iloc[i]:,.2f} (Drain: {drain_ratios[i]:.0%})",
+            "summary": f"{types_list[i]} ${amounts_list[i]:,.2f} (Drain: {drain_list[i]:.0%})",
             "raw_record": r
         })
         
@@ -678,14 +765,14 @@ def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
     feat_df["CREDIT_TERM"] = annuity / (credit + 1.0)
     feat_df["ANNUITY_INCOME_RATIO"] = annuity / (income + 1.0)
     
-    for idx, ctype in enumerate(contract_types):
+    for ctype in contract_types.unique():
         col = f"NAME_CONTRACT_TYPE_{ctype}"
         if col in feat_df.columns:
-            feat_df.loc[idx, col] = 1.0
-    for idx, g in enumerate(genders):
+            feat_df[col] = (contract_types == ctype).astype(float)
+    for g in genders.unique():
         col = f"CODE_GENDER_{g}"
         if col in feat_df.columns:
-            feat_df.loc[idx, col] = 1.0
+            feat_df[col] = (genders == g).astype(float)
             
     encoded = feat_df.fillna(0.0)
     probs, onnx_stats = onnx_hub.predict_proba_batch("creditfraud", encoded)
@@ -696,7 +783,10 @@ def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
     anomaly_scores = [None] * len(records)
     if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
         raw_anom = bundle["anomaly_model"].decision_function(encoded)
-        ref = np.asarray(bundle["anomaly_reference_scores"])
+        ref = bundle.get("anomaly_reference_scores_np")
+        if ref is None:
+            ref = np.asarray(bundle["anomaly_reference_scores"])
+            bundle["anomaly_reference_scores_np"] = ref
         anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
         
     if len(encoded) <= 30:
@@ -716,6 +806,9 @@ def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
         top_indices = np.argmax(deviations, axis=1)
         vals = deviations
     
+    credit_list = credit.tolist()
+    income_list = income.tolist()
+    ext2_list = ext2.tolist()
     results = []
     for i, r in enumerate(records):
         rec_id = str(r.get("applicant_id", f"APP-LN-{i+1:04d}"))
@@ -734,7 +827,7 @@ def _batch_assess_creditfraud(records: list[dict[str, Any]]) -> dict[str, Any]:
                 "impact_log_odds": round(top_imp, 3),
                 "direction": "increases_risk" if top_imp > 0 else "decreases_risk"
             },
-            "summary": f"${credit.iloc[i]:,.0f} Credit | Income ${income.iloc[i]:,.0f} | Ext2: {ext2.iloc[i]:.2f}",
+            "summary": f"${credit_list[i]:,.0f} Credit | Income ${income_list[i]:,.0f} | Ext2: {ext2_list[i]:.2f}",
             "raw_record": r
         })
         
@@ -811,7 +904,10 @@ def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
     anomaly_scores = [None] * len(records)
     if bundle.get("anomaly_model") is not None and bundle.get("anomaly_reference_scores") is not None:
         raw_anom = bundle["anomaly_model"].decision_function(encoded)
-        ref = np.asarray(bundle["anomaly_reference_scores"])
+        ref = bundle.get("anomaly_reference_scores_np")
+        if ref is None:
+            ref = np.asarray(bundle["anomaly_reference_scores"])
+            bundle["anomaly_reference_scores_np"] = ref
         anomaly_scores = np.round(1.0 - (np.searchsorted(ref, raw_anom, side="right") / len(ref)), 4)
         
     if len(encoded) <= 30:
@@ -831,6 +927,9 @@ def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
         top_indices = np.argmax(deviations, axis=1)
         vals = deviations
     
+    claim_types_list = claim_types.tolist()
+    amount_list = amount.tolist()
+    states_list = states.tolist()
     results = []
     for i, r in enumerate(records):
         rec_id = str(r.get("claim_id", f"CLM-IN-{i+1:04d}"))
@@ -849,7 +948,7 @@ def _batch_assess_insurance(records: list[dict[str, Any]]) -> dict[str, Any]:
                 "impact_log_odds": round(top_imp, 3),
                 "direction": "increases_risk" if top_imp > 0 else "decreases_risk"
             },
-            "summary": f"{claim_types.iloc[i].upper()} Claim ${amount.iloc[i]:,.2f} ({states.iloc[i]})",
+            "summary": f"{claim_types_list[i].upper()} Claim ${amount_list[i]:,.2f} ({states_list[i]})",
             "raw_record": r
         })
         
@@ -1176,6 +1275,18 @@ def health_ready(response: Response):
     }
 
 
+@app.get("/healthz")
+def healthz():
+    """Standard Kubernetes liveness probe."""
+    return health_live()
+
+
+@app.get("/readyz")
+def readyz(response: Response):
+    """Standard Kubernetes readiness probe."""
+    return health_ready(response)
+
+
 @app.get("/")
 def root():
     return {
@@ -1246,7 +1357,7 @@ def assess(request: AssessRequest, req: Request, caller: AuthIdentity = Depends(
 
         # Required ordering: ML inference first; the explanation API receives
         # only the structured ML result, never the raw form payload.
-        ml_json = run_ml(request.domain, validated_input)
+        ml_json = run_ml(request.domain, validated_input, explain=request.include_ai_reasoning)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except NotImplementedError as exc:
@@ -2117,6 +2228,153 @@ async def get_federated_audit_packet(
             "secagg_protocol": "Diffie-Hellman Zero-Sum Additive Masking (Shamir Secret Sharing ready)",
         },
     }
+
+
+# ============================================================================
+# PRODUCTION READINESS: STATUS, FLAGS, BACKUPS, MIGRATIONS & ALERTS
+# ============================================================================
+
+@app.get("/api/status")
+def get_platform_status():
+    """Public telemetry status endpoint for status page and external uptime monitors."""
+    return get_system_status()
+
+
+@app.get("/api/flags")
+def list_feature_flags():
+    """Returns public active feature flags."""
+    return {"flags": feature_flags.get_all_flags()}
+
+
+class FlagOverrideRequest(BaseModel):
+    flag_key: str
+    enabled: bool
+
+
+@app.post("/api/flags/override")
+def override_feature_flag(
+    payload: FlagOverrideRequest,
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint to dynamically toggle feature flags without service redeployment."""
+    updated = feature_flags.set_flag(payload.flag_key, payload.enabled, actor=caller.identity)
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="FLAG_OVERRIDE",
+        details={"flag_key": payload.flag_key, "enabled": payload.enabled},
+        client_ip=caller.client_ip,
+    )
+    return {"status": "SUCCESS", "flag": payload.flag_key, "entry": updated}
+
+
+@app.post("/api/admin/backup/create")
+def create_state_backup(
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint to create an atomic snapshot backup of all persistent state ledgers."""
+    manifest = backup_manager.create_snapshot()
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="BACKUP_CREATE",
+        details={"backup_id": manifest["backup_id"], "files": manifest["total_files"]},
+        client_ip=caller.client_ip,
+    )
+    return {"status": "SUCCESS", "manifest": manifest}
+
+
+class RestoreDrillRequest(BaseModel):
+    backup_id: str
+
+
+@app.post("/api/admin/backup/restore-drill")
+def execute_backup_restore_drill(
+    payload: RestoreDrillRequest,
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint to execute a timed, non-destructive restore drill verifying snapshot integrity."""
+    result = backup_manager.run_restore_drill(payload.backup_id)
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="BACKUP_RESTORE_DRILL",
+        details=result,
+        client_ip=caller.client_ip,
+    )
+    return result
+
+
+@app.get("/api/admin/backups")
+def list_backups(
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint listing all available state snapshots."""
+    return {"backups": backup_manager.list_backups()}
+
+
+@app.get("/api/admin/migrations/status")
+def get_migrations_status(
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint retrieving current database / state schema version."""
+    return {
+        "current_version": migration_runner.get_current_version(),
+        "expand_contract_mode": feature_flags.is_enabled("EXPAND_CONTRACT_SCHEMA_V2", True),
+    }
+
+
+class RunMigrationRequest(BaseModel):
+    target_version: Optional[int] = None
+    dry_run: bool = False
+
+
+@app.post("/api/admin/migrations/run")
+def run_migrations(
+    payload: RunMigrationRequest,
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint executing forward schema migrations with dry-run support."""
+    result = migration_runner.run_migrations(target_version=payload.target_version, dry_run=payload.dry_run)
+    log_admin_action(
+        actor=caller.identity,
+        role=caller.role,
+        action="MIGRATION_EXECUTE",
+        details={"dry_run": payload.dry_run, "applied": result["applied_count"]},
+        client_ip=caller.client_ip,
+    )
+    return result
+
+
+@app.get("/api/admin/alerts")
+def get_incidents(
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint retrieving recent synthetic alerting incident history."""
+    return {"incidents": alert_manager.get_incidents()}
+
+
+@app.post("/api/admin/alerts/test")
+def trigger_test_alert(
+    caller: AuthIdentity = Depends(require_admin),
+):
+    """Admin endpoint dispatching a synthetic test alert."""
+    alert = alert_manager.trigger_test_alert()
+    return {"status": "TRIGGERED", "alert": alert}
+
+
+class WebhookVerifyRequest(BaseModel):
+    payload: Dict[str, Any]
+    signature_header: str
+
+
+@app.post("/api/webhooks/verify")
+def verify_webhook_signature(payload: WebhookVerifyRequest):
+    """Verifies HMAC-SHA256 signature and replay freshness of an incoming webhook."""
+    raw_body = json.dumps(payload.payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    is_valid, msg = webhook_signer.verify_signature(raw_body, payload.signature_header)
+    return {"valid": is_valid, "message": msg}
+
 
 
 

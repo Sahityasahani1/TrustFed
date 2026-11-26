@@ -7,7 +7,7 @@
   "historical_ledger": [
     {
       "round_id": 1,
-      "timestamp": 1795117162.6506517,
+      "timestamp": 1795713273.1912327,
       "consensus_quorum": "3/3 silos",
       "active_silos": [
         "bank",
@@ -15,7 +15,7 @@
         "insurer"
       ],
       "dropped_silo": null,
-      "mask_cancellation_sum_error": "8.6853776702e-16",
+      "mask_cancellation_sum_error": "9.1023681734e-17",
       "dp_epsilon_spent_round": 0.01,
       "dp_epsilon_cumulative": 0.01,
       "dp_budget_remaining": 2.44,
@@ -23,13 +23,13 @@
       "global_roc_auc": 0.8348,
       "global_pr_auc": 0.7237,
       "global_loss": 0.3299,
-      "latency_ms": 3.18,
-      "proof_hash": "sha256:b32f15eaf3af180f89dfac99f49a7db56cbedf6d9488e037aad71e55c4a0eb7f",
+      "latency_ms": 4.05,
+      "proof_hash": "sha256:85a8bf41e8e9bc5f0b31504cf93682a011283a1d852f04e9a1770e9f3b4bb0b6",
       "dropout_recovery": null
     },
     {
       "round_id": 2,
-      "timestamp": 1795117162.65815,
+      "timestamp": 1795713273.1980162,
       "consensus_quorum": "3/3 silos",
       "active_silos": [
         "bank",
@@ -37,7 +37,7 @@
         "insurer"
       ],
       "dropped_silo": null,
-      "mask_cancellation_sum_error": "2.0918350152e-15",
+      "mask_cancellation_sum_error": "1.5703190959e-15",
       "dp_epsilon_spent_round": 0.01,
       "dp_epsilon_cumulative": 0.02,
       "dp_budget_remaining": 2.43,
@@ -45,13 +45,13 @@
       "global_roc_auc": 0.8939,
       "global_pr_auc": 0.7787,
       "global_loss": 0.2611,
-      "latency_ms": 4.96,
-      "proof_hash": "sha256:f29549c3cfb62a8100ce6792e4dd6241157dd305476090fea00f904f24b37403",
+      "latency_ms": 2.6,
+      "proof_hash": "sha256:11253b594f8a2d1c3302916c4d2178e7664ffa77458e9ec2dd84d287c6a0c4f2",
       "dropout_recovery": null
     },
     {
       "round_id": 3,
-      "timestamp": 1795117162.663131,
+      "timestamp": 1795713273.2060502,
       "consensus_quorum": "3/3 silos",
       "active_silos": [
         "bank",
@@ -59,7 +59,7 @@
         "insurer"
       ],
       "dropped_silo": null,
-      "mask_cancellation_sum_error": "7.0292729955e-16",
+      "mask_cancellation_sum_error": "1.9455420367e-15",
       "dp_epsilon_spent_round": 0.01,
       "dp_epsilon_cumulative": 0.03,
       "dp_budget_remaining": 2.42,
@@ -67,13 +67,13 @@
       "global_roc_auc": 0.9316,
       "global_pr_auc": 0.8148,
       "global_loss": 0.209,
-      "latency_ms": 2.87,
-      "proof_hash": "sha256:d839fa70aa7881f0ff68565ee1257639764fde3b131d72d10474fa72cc5106a5",
+      "latency_ms": 3.0,
+      "proof_hash": "sha256:8784a97af8382c9db7b5ba3a93e727ad7b1777df9468ea85ced34ba35d23ed42",
       "dropout_recovery": null
     },
     {
       "round_id": 4,
-      "timestamp": 1795117162.6682944,
+      "timestamp": 1795713273.2119162,
       "consensus_quorum": "3/3 silos",
       "active_silos": [
         "bank",
@@ -81,7 +81,7 @@
         "insurer"
       ],
       "dropped_silo": null,
-      "mask_cancellation_sum_error": "2.2213036179e-16",
+      "mask_cancellation_sum_error": "1.4595519996e-16",
       "dp_epsilon_spent_round": 0.01,
       "dp_epsilon_cumulative": 0.04,
       "dp_budget_remaining": 2.41,
@@ -89,13 +89,13 @@
       "global_roc_auc": 0.9557,
       "global_pr_auc": 0.8385,
       "global_loss": 0.1697,
-      "latency_ms": 2.87,
-      "proof_hash": "sha256:01044836bea79c9350cd9ac2120bb7802d6d4c818140fa3a1ea9c54c7f7e2d5b",
+      "latency_ms": 2.42,
+      "proof_hash": "sha256:097096830962157d9d935b40e6839e62d8717a1e607c6c70b36278beb2beb624",
       "dropout_recovery": null
     },
     {
       "round_id": 5,
-      "timestamp": 1795117162.6771207,
+      "timestamp": 1795713273.2171378,
       "consensus_quorum": "3/3 silos",
       "active_silos": [
         "bank",
@@ -103,7 +103,7 @@
         "insurer"
       ],
       "dropped_silo": null,
-      "mask_cancellation_sum_error": "1.8132073204e-15",
+      "mask_cancellation_sum_error": "1.3633959675e-16",
       "dp_epsilon_spent_round": 0.01,
       "dp_epsilon_cumulative": 0.05,
       "dp_budget_remaining": 2.4,
@@ -111,13 +111,13 @@
       "global_roc_auc": 0.971,
       "global_pr_auc": 0.8541,
       "global_loss": 0.14,
-      "latency_ms": 5.9,
-      "proof_hash": "sha256:8bbfc063abdfb90c0d52d00f2ffca22328c9dc393d6df8b510450a1af337627d",
+      "latency_ms": 2.26,
+      "proof_hash": "sha256:a13f567a09d950738a0c06a2584c6cbc6222f14e214d3d1c98113bad8bddeece",
       "dropout_recovery": null
     },
     {
       "round_id": 6,
-      "timestamp": 1795117162.6844425,
+      "timestamp": 1795713273.2226386,
       "consensus_quorum": "3/3 silos",
       "active_silos": [
         "bank",
@@ -125,7 +125,7 @@
         "insurer"
       ],
       "dropped_silo": null,
-      "mask_cancellation_sum_error": "2.5387163948e-15",
+      "mask_cancellation_sum_error": "7.5681538744e-17",
       "dp_epsilon_spent_round": 0.01,
       "dp_epsilon_cumulative": 0.06,
       "dp_budget_remaining": 2.39,
@@ -133,8 +133,8 @@
       "global_roc_auc": 0.9808,
       "global_pr_auc": 0.8644,
       "global_loss": 0.1175,
-      "latency_ms": 3.94,
-      "proof_hash": "sha256:fd0ad8356cbfd98bede3d0c03b34241c32d97a0b1c33fae638346341316cc771",
+      "latency_ms": 3.07,
+      "proof_hash": "sha256:1008517d89ee2c5279386797527bc9f37115e2f3f7cf742ad0f6297b67f7cfda",
       "dropout_recovery": null
     }
   ]
